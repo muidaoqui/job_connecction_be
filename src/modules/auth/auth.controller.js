@@ -145,12 +145,19 @@ export const forgotPassword = async (req, res) => {
     if (!user) return res.status(404).json({ message: "Không tìm thấy email" });
 
     const resetToken = crypto.randomBytes(32).toString("hex");
+
     user.resetToken = resetToken;
-    user.resetTokenExpire = Date.now() + 15 * 60 * 1000;
+    user.resetTokenExpire = Date.now() + 15 * 60 * 1000; // 15 phút
     await user.save();
 
-    const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
-    await sendEmail(email, "Đặt lại mật khẩu", `Link reset: ${resetUrl}`);
+    // 👉 GỬI LINK RESET THEO DẠNG QUERY PARAM
+    const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
+
+    await sendEmail(
+      email,
+      "Đặt lại mật khẩu",
+      `Bấm vào link để đặt lại mật khẩu: ${resetUrl}`
+    );
 
     res.json({ message: "Email reset mật khẩu đã được gửi!" });
   } catch (err) {
@@ -158,14 +165,19 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
+
 // Reset mật khẩu
 export const resetPassword = async (req, res) => {
   try {
+    const token = req.query.token; // 👉 LẤY TOKEN TỪ QUERY
+
     const user = await User.findOne({
-      resetToken: req.params.token,
+      resetToken: token,
       resetTokenExpire: { $gt: Date.now() },
     });
-    if (!user) return res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+
+    if (!user)
+      return res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
 
     user.password = req.body.password;
     user.resetToken = undefined;
