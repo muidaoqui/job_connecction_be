@@ -1,41 +1,69 @@
 import Job from "./job.model.js";
+import Application from "./application.model.js";
 
-export const searchJobs = async (req, res) => {
+// Tạo job
+export const createJob = async (req, res) => {
   try {
-    const { keyword, location, jobType } = req.query;
-
-    let query = {};
-
-    if (keyword) {
-      query.title = { $regex: keyword, $options: "i" };
-    }
-
-    if (location) {
-      query.location = { $regex: location, $options: "i" };
-    }
-
-    if (jobType) {
-      query.jobType = jobType;
-    }
-
-    const jobs = await Job.find(query);
-
-    res.json(jobs);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const job = await Job.create(req.body);
+    res.status(201).json({ success: true, job });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const getJobById = async (req, res) => {
+// Lấy toàn bộ job
+export const getAllJobs = async (req, res) => {
   try {
-    const job = await Job.findById(req.params.id);
+    const jobs = await Job.find();
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-    if (!job) {
-      return res.status(404).json({ message: "Không tìm thấy công việc" });
-    }
-
+// Update job
+export const updateJob = async (req, res) => {
+  try {
+    const job = await Job.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(job);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete job
+export const deleteJob = async (req, res) => {
+  try {
+    await Job.findByIdAndDelete(req.params.id);
+    res.json({ message: "Job deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Danh sách ứng viên
+export const getApplicants = async (req, res) => {
+  try {
+    const applications = await Application.find({ jobId: req.params.id })
+      .populate("userId", "name email");
+
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Duyệt / từ chối
+export const updateApplicationStatus = async (req, res) => {
+  try {
+    const updated = await Application.findByIdAndUpdate(
+      req.params.id,
+      { status: req.body.status },
+      { new: true }
+    );
+
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
