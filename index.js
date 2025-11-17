@@ -4,20 +4,35 @@ import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import fs from "fs";
+import path from "path";
 import authRoutes from "./src/modules/auth/auth.route.js";
 import jobRoutes from "./src/modules/job/job.route.js";
+import candidateRoutes from "./src/modules/candidate/candidate.route.js";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Ensure uploads directory exists
+const uploadsDir = path.join(process.cwd(), "uploads", "resumes");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log("✅ Created uploads/resumes directory");
+}
+
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
+
+// Serve uploaded files statically
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
+app.use("/api/candidate", candidateRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))

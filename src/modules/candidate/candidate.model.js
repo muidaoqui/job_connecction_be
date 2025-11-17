@@ -6,6 +6,7 @@ const candidateSchema = new mongoose.Schema({
   gender: { type: String, enum: ["male", "female"] },
   address: String,
   resumePath: String,
+  mainResumePath: String,
   profileSummary: String,
 });
 

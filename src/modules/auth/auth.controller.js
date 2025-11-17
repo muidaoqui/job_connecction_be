@@ -61,30 +61,37 @@ export const verifyOtpController = async (req, res) => {
 
 // Đăng ký
 export const register = async (req, res) => {
-  const { email, password, role } = req.body;
+  const { name, email, password, role } = req.body; 
 
   try {
     let user = await User.findOne({ email });
-
+    
     if (user && user.emailVerified) {
       return res.status(400).json({ message: "Email đã được sử dụng" });
     }
 
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpire = Date.now() + 10 * 60 * 1000;
+
     if (!user) {
-      user = new User({ email, password, role: role || "candidate" });
+      user = new User({
+        name, 
+        email,
+        password,
+        role: role || "candidate",
+        otpCode: otp,
+        otpExpire: otpExpire,
+      });
     } else {
+      user.name = name;
       user.password = password;
       user.role = role || "candidate";
+      user.otpCode = otp;
+      user.otpExpire = otpExpire;
     }
 
-    await user.save();
-
-    // Tạo OTP ngay sau khi register
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.otpCode = otp;
-    user.otpExpire = Date.now() + 10 * 60 * 1000;
-    await user.save();
-
+    await user.save(); 
+    
     await sendEmail(email, "Mã xác thực tài khoản", `Mã OTP của bạn là: ${otp}`);
 
     res.status(201).json({
@@ -92,7 +99,11 @@ export const register = async (req, res) => {
       user: { email: user.email, role: user.role, emailVerified: user.emailVerified },
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Lỗi đăng ký:", err); 
+    if (err.name === 'ValidationError') {
+         return res.status(400).json({ message: 'Lỗi xác thực dữ liệu: ' + err.message });
+    }
+    res.status(500).json({ message: err.message || "Đăng ký thất bại" });
   }
 };
 

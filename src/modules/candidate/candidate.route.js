@@ -5,8 +5,47 @@ import {
   createProfile,
   updateProfile,
   uploadResume,
+  setMainResume,
 } from "./candidate.controller.js";
-import { protect } from "../auth/auth.middleware.js"; // middleware xác thực JWT
+import {
+  getExperiences,
+  createExperience,
+  updateExperience,
+  deleteExperience,
+} from "./experience/experience.controller.js";
+import {
+  getSkills,
+  createSkill,
+  updateSkill,
+  deleteSkill,
+  endorseSkill,
+} from "./skill/skill.controller.js";
+import {
+  getEducations,
+  createEducation,
+  updateEducation,
+  deleteEducation,
+} from "./education/education.controller.js";
+import {
+  getProjects,
+  createProject,
+  updateProject,
+  deleteProject,
+} from "./project/project.controller.js";
+import { verifyToken } from "../auth/auth.middleware.js"; 
+
+import {
+  getApplications,
+  applyJob,
+  withdrawApplication,
+  getSavedJobs,
+  saveJob,
+  unsaveJob,
+  checkJobSaved,
+  getViewedJobs,
+  recordJobView,
+  getInvitations,
+} from "./applications/job-application.controller.js";
 
 const router = express.Router();
 
@@ -23,10 +62,72 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Các route
-router.get("/", protect, getProfile);
-router.post("/", protect, createProfile);
-router.put("/", protect, updateProfile);
-router.post("/upload", protect, upload.single("resume"), uploadResume);
+// Profile routes
+router.get("/", verifyToken, getProfile);
+router.post("/", verifyToken, createProfile);
+router.put("/", verifyToken, updateProfile);
+// List all uploaded resumes (files in uploads/resumes)
+router.get("/resumes", verifyToken, async (req, res) => {
+  try {
+    const dir = "uploads/resumes";
+    const fs = await import("fs");
+    const path = await import("path");
+    const files = fs.readdirSync(dir || "");
+    const list = files.map((f) => ({
+      name: f,
+      path: path.join("/uploads/resumes", f).replace(/\\\\/g, "/"),
+    }));
+    res.status(200).json(list);
+  } catch (error) {
+    console.error("Error listing resumes:", error);
+    res.status(500).json({ message: "Cannot list resumes", error: error.message });
+  }
+});
+router.post("/upload", verifyToken, upload.single("resume"), uploadResume);
+router.put("/main-resume", verifyToken, setMainResume);
+
+// Experience routes
+router.get("/experience", verifyToken, getExperiences);
+router.post("/experience", verifyToken, createExperience);
+router.put("/experience/:id", verifyToken, updateExperience);
+router.delete("/experience/:id", verifyToken, deleteExperience);
+
+// Skill routes
+router.get("/skill", verifyToken, getSkills);
+router.post("/skill", verifyToken, createSkill);
+router.put("/skill/:id", verifyToken, updateSkill);
+router.delete("/skill/:id", verifyToken, deleteSkill);
+router.post("/skill/:id/endorse", verifyToken, endorseSkill);
+
+// Education routes
+router.get("/education", verifyToken, getEducations);
+router.post("/education", verifyToken, createEducation);
+router.put("/education/:id", verifyToken, updateEducation);
+router.delete("/education/:id", verifyToken, deleteEducation);
+
+// Project routes
+router.get("/project", verifyToken, getProjects);
+router.post("/project", verifyToken, createProject);
+router.put("/project/:id", verifyToken, updateProject);
+router.delete("/project/:id", verifyToken, deleteProject);
+
+// Application routes
+router.get("/applications", verifyToken, getApplications);
+router.post("/applications/apply", verifyToken, applyJob);
+router.delete("/applications/:applicationId", verifyToken, withdrawApplication);
+
+// Saved job routes
+router.get("/saved-jobs", verifyToken, getSavedJobs);
+router.post("/saved-jobs", verifyToken, saveJob);
+router.delete("/saved-jobs/:jobId", verifyToken, unsaveJob);
+router.get("/saved-jobs/check/:jobId", verifyToken, checkJobSaved);
+
+// Job view routes
+router.get("/viewed-jobs", verifyToken, getViewedJobs);
+router.post("/viewed-jobs", verifyToken, recordJobView);
+
+// Invitations routes
+router.get("/invitations", verifyToken, getInvitations);
 
 export default router;
+

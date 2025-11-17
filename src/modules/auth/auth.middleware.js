@@ -16,7 +16,7 @@ export const verifyToken = async (req, res, next) => {
       return res.status(404).json({ message: "Không tìm thấy người dùng" });
     }
 
-    req.user = user; 
+    req.user = { id: decoded.id, ...user.toObject() }; 
     next();
   } catch (err) {
     res.status(401).json({ message: "Token không hợp lệ hoặc hết hạn" });
