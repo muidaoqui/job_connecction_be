@@ -44,3 +44,23 @@ export const updateApplicationStatusByRecruiter = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+// Lấy tất cả đơn ứng tuyển thuộc các job của recruiter
+export const getAllApplicationsByRecruiter = async (req, res) => {
+  try {
+    const { recruiterId } = req.params;
+
+    // Tìm tất cả job của recruiter
+    const jobs = await Job.find({ recruiterId }).select("_id");
+
+    // Tìm tất cả application thuộc các job này
+    const apps = await Application.find({
+      jobId: { $in: jobs.map((j) => j._id) }
+    })
+      .populate("userId", "name email")
+      .populate("jobId", "title");
+
+    res.status(200).json({ success: true, apps });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

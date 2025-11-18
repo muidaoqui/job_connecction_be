@@ -8,7 +8,7 @@ const jobSchema = new mongoose.Schema(
     salary: { type: String },
     location: { type: String },
     jobType: { type: String }, 
-    recruiterId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    recruiterId: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true },
   },
   { timestamps: true }
 );
