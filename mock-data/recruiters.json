@@ -1,0 +1,22 @@
+[
+  {
+    "user_id": "user_007",
+    "company_id": "comp_001",
+    "position": "HR Manager"
+  },
+  {
+    "user_id": "user_008",
+    "company_id": "comp_002",
+    "position": "Talent Acquisition Specialist"
+  },
+  {
+    "user_id": "user_009",
+    "company_id": "comp_003",
+    "position": "Senior Recruiter"
+  },
+  {
+    "user_id": "user_010",
+    "company_id": "comp_004",
+    "position": "Headhunter"
+  }
+]

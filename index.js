@@ -5,6 +5,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import authRoutes from "./src/modules/auth/auth.route.js";
+import adminRoutes from "./src/modules/admin/admin.route.js";
 
 dotenv.config();
 
@@ -17,7 +18,10 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use("/api/auth", authRoutes);
 
-mongoose.connect(process.env.MONGO_URI)
+app.use("/api/admin", adminRoutes);
+
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
