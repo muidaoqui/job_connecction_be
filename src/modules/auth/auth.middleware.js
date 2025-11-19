@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "./auth.model.js";
-
+import mongoose from "mongoose";
 export const verifyToken = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -49,11 +49,12 @@ export const verifyAdmin = async (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-    console.log(token);
+    console.log("Received token:", token);
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded token:", decoded);
-    const user = await User.findOne({ _id: decoded.id });
-    console.log(user);
+    console.log("Decoded token _id:", decoded._id);
+
+    const user = await User.findById(decoded._id);
+    console.log("Found user:", user);
     if (!user || user.role !== "admin") {
       return res.status(403).json({ message: "Bạn không có quyền truy cập" });
     }

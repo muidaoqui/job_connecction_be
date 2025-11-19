@@ -1,21 +1,29 @@
 [
   {
-    "user_id": "user_007",
+    "_id": {
+      "$oid": "691d9eef033278b708728c93"
+    },
     "company_id": "comp_001",
     "position": "HR Manager"
   },
   {
-    "user_id": "user_008",
+    "_id": {
+      "$oid": "691d9eef033278b708728c94"
+    },
     "company_id": "comp_002",
     "position": "Talent Acquisition Specialist"
   },
   {
-    "user_id": "user_009",
+    "_id": {
+      "$oid": "691d9eef033278b708728c95"
+    },
     "company_id": "comp_003",
     "position": "Senior Recruiter"
   },
   {
-    "user_id": "user_010",
+    "_id": {
+      "$oid": "691d9eef033278b708728c96"
+    },
     "company_id": "comp_004",
     "position": "Headhunter"
   }

@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import { Role } from "../../common/enum/role.js";
 // Tạo token JWT
 const generateToken = (user) => {
-  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+  return jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
 };
@@ -126,21 +126,6 @@ export const login = async (req, res) => {
   try {
     const user = await User.findOne({ email });
 
-    if (user.role === Role.ADMIN) {
-      console.log(user.toJSON());
-      const token = generateToken(user);
-      res.json({
-        message: "Đăng nhập thành công",
-        token,
-        user: {
-          _id: user._id,
-          email: user.email,
-          role: user.role,
-          emailVerified: user.emailVerified,
-        },
-      });
-      return;
-    }
     if (!user)
       return res.status(404).json({ message: "Người dùng không tồn tại" });
 

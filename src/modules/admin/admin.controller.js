@@ -19,3 +19,13 @@ export const getUsers = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+export const getUserDetail = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const userData = await adminService.getUserById(id);
+    res.status(200).json(userData);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
