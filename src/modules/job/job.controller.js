@@ -1,5 +1,5 @@
 import Job from "./job.model.js";
-import Application from "./application.model.js";
+import Application from "../candidate/applications/application.model.js";
 
 // Tạo job
 export const createJob = async (req, res) => {

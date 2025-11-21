@@ -3,7 +3,6 @@ import SavedJob from "../saved-job/saved-job.model.js";
 import JobView from "../job-view/job-view.model.js";
 import Job from "../../job/job.model.js";
 
-// ===== APPLICATIONS =====
 export const getApplications = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -21,7 +20,6 @@ export const applyJob = async (req, res) => {
     const userId = req.user.id;
     const { jobId, resumePath, coverLetter } = req.body;
 
-    // Check if already applied
     const existingApplication = await Application.findOne({ userId, jobId });
     if (existingApplication) {
       return res.status(400).json({ message: "Bạn đã ứng tuyển công việc này rồi" });
@@ -64,7 +62,6 @@ export const withdrawApplication = async (req, res) => {
   }
 };
 
-// ===== SAVED JOBS =====
 export const getSavedJobs = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -82,7 +79,6 @@ export const saveJob = async (req, res) => {
     const userId = req.user.id;
     const { jobId } = req.body;
 
-    // Check if already saved
     const existingSavedJob = await SavedJob.findOne({ userId, jobId });
     if (existingSavedJob) {
       return res.status(400).json({ message: "Công việc này đã được lưu" });
@@ -134,7 +130,6 @@ export const checkJobSaved = async (req, res) => {
   }
 };
 
-// ===== JOB VIEWS =====
 export const getViewedJobs = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -152,10 +147,8 @@ export const recordJobView = async (req, res) => {
     const userId = req.user.id;
     const { jobId } = req.body;
 
-    // Check if already viewed
     const existingView = await JobView.findOne({ userId, jobId });
     if (existingView) {
-      // Update viewed date
       existingView.viewedDate = Date.now();
       await existingView.save();
       return res.json(existingView);
@@ -174,12 +167,10 @@ export const recordJobView = async (req, res) => {
   }
 };
 
-// ===== INVITATIONS (MOCKED - from recruiters) =====
 export const getInvitations = async (req, res) => {
   try {
     const userId = req.user.id;
-    // This would come from Recruiter invitations in real system
-    // For now, return empty array
+    // nhà tuyển dụng gửi lời mời trong hệ thống thực tế
     res.json([]);
   } catch (err) {
     res.status(500).json({ message: err.message });

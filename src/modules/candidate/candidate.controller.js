@@ -1,5 +1,6 @@
 import User from "../auth/auth.model.js";
 import Candidate from "./candidate.model.js";
+import Resume from "./resume.model.js";
 
 // Lấy thông tin profile
 export const getProfile = async (req, res) => {
@@ -64,8 +65,16 @@ export const uploadResume = async (req, res) => {
     console.log("📁 File info:", req.file.filename, "UserID:", userId);
     
     const resumePath = req.file.path;
+    
+    const resume = new Resume({
+      userId,
+      filename: req.file.filename,
+      path: resumePath,
+    });
+    await resume.save();
+    console.log(`✅ Saved resume record to DB for user ${userId}`);
+    
     let candidate = await Candidate.findOne({ userId });
-
     if (!candidate) {
         candidate = new Candidate({ userId, resumePath });  
         await candidate.save();
@@ -75,6 +84,7 @@ export const uploadResume = async (req, res) => {
         await candidate.save();
         console.log("✅ Cập nhật CV cho candidate");
     }
+    
     res.status(200).json({ message: "Resume uploaded successfully", resumePath });
   } catch (error) {
     console.error("❌ Lỗi upload CV:", error);
@@ -82,21 +92,22 @@ export const uploadResume = async (req, res) => {
   }
 };
 
-// List resume files saved on server
 export const listResumes = async (req, res) => {
   try {
-    const fs = await import("fs");
-    const path = await import("path");
-    const dir = path.join(process.cwd(), "uploads", "resumes");
-    if (!fs.existsSync(dir)) {
-      return res.status(200).json([]);
-    }
-    const files = fs.readdirSync(dir);
-    const list = files.map((f) => ({
-      name: f,
-      path: `/uploads/resumes/${f}`,
-      filename: f,
+    const userId = req.user.id;
+    console.log(`📋 Fetching resumes for user: ${userId}`);
+    
+    const resumes = await Resume.find({ userId }).sort({ uploadedAt: -1 });
+    console.log(`✅ Found ${resumes.length} resumes for user ${userId}`);
+    
+    const list = resumes.map((r) => ({
+      id: r._id,
+      name: r.filename,
+      path: `/uploads/resumes/${r.filename}`, 
+      filename: r.filename,
+      uploadedAt: r.uploadedAt,
     }));
+    
     res.status(200).json(list);
   } catch (error) {
     console.error("Error listing resumes:", error);
@@ -104,7 +115,6 @@ export const listResumes = async (req, res) => {
   }
 };
 
-// Set main resume
 export const setMainResume = async (req, res) => {
   try {
     const userId = req.user.id;

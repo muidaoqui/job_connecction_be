@@ -6,6 +6,7 @@ import {
   updateProfile,
   uploadResume,
   setMainResume,
+  listResumes,
 } from "./candidate.controller.js";
 import {
   getExperiences,
@@ -63,26 +64,14 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Profile routes
+// GET /api/candidate - Get user's profile
 router.get("/", verifyToken, getProfile);
 router.post("/", verifyToken, createProfile);
 router.put("/", verifyToken, updateProfile);
-// List all uploaded resumes (files in uploads/resumes)
-router.get("/resumes", verifyToken, async (req, res) => {
-  try {
-    const dir = "uploads/resumes";
-    const fs = await import("fs");
-    const path = await import("path");
-    const files = fs.readdirSync(dir || "");
-    const list = files.map((f) => ({
-      name: f,
-      path: path.join("/uploads/resumes", f).replace(/\\\\/g, "/"),
-    }));
-    res.status(200).json(list);
-  } catch (error) {
-    console.error("Error listing resumes:", error);
-    res.status(500).json({ message: "Cannot list resumes", error: error.message });
-  }
-});
+
+// GET /api/candidate/resumes - List user's uploaded CVs (user-specific, filtered by userId)
+router.get("/resumes", verifyToken, listResumes);
+
 router.post("/upload", verifyToken, upload.single("resume"), uploadResume);
 router.put("/main-resume", verifyToken, setMainResume);
 
