@@ -9,8 +9,12 @@ import path from "path";
 import authRoutes from "./src/modules/auth/auth.route.js";
 import jobRoutes from "./src/modules/job/job.route.js";
 import candidateRoutes from "./src/modules/candidate/candidate.route.js";
+<<<<<<< HEAD
 import { verifyToken } from "./src/modules/auth/auth.middleware.js";
 import Resume from "./src/modules/candidate/resume.model.js";
+=======
+import recruiterAppRoutes from "./src/modules/candidate/applications/recruiter-application.route.js";
+>>>>>>> 1ac76f50cb17ff5f0ec461439084f44125bb5307
 
 dotenv.config();
 
@@ -65,6 +69,8 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/candidate", candidateRoutes);
+app.use("/api/recruiter/applications", recruiterAppRoutes);
+app.use("/uploads", express.static("uploads"));
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
