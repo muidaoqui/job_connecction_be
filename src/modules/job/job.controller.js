@@ -1,5 +1,6 @@
 import Job from "./job.model.js";
 import Application from "./application.model.js";
+import mongoose from "mongoose";
 
 // Tạo job
 export const createJob = async (req, res) => {
@@ -20,10 +21,16 @@ export const createJob = async (req, res) => {
 export const getJobById = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
+
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
-    res.json({ job });
+
+    res.json({
+      success: true,
+      job   // FE cần đúng key này
+    });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -42,6 +49,11 @@ export const getAllJobs = async (req, res) => {
 export const updateJob = async (req, res) => {
   try {
     const job = await Job.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    
+    if (!job) {
+      return res.status(404).json({ message: "Job không tồn tại" });
+    }
+
     res.json(job);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -51,8 +63,13 @@ export const updateJob = async (req, res) => {
 // Delete job
 export const deleteJob = async (req, res) => {
   try {
-    await Job.findByIdAndDelete(req.params.id);
-    res.json({ message: "Job deleted successfully" });
+    const job = await Job.findByIdAndDelete(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({ message: "Job không tồn tại" });
+    }
+
+    res.json({ message: "Xoá job thành công" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -115,5 +132,31 @@ export const getRecruiterStats = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+export const applyJob = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+    const { name, email, message } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Vui lòng tải lên CV dạng PDF." });
+    }
+
+    const application = new Application({
+      jobId: new mongoose.Types.ObjectId(jobId),
+      name,
+      email,
+      message,
+      cvFile: req.file.path,
+      status: "pending",
+    });
+
+    await application.save();
+
+    return res.json({ success: true, message: "Ứng tuyển thành công!" });
+  } catch (err) {
+    console.error("Lỗi applyJob:", err);
+    return res.status(500).json({ message: err.message });
   }
 };

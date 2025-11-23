@@ -1,4 +1,4 @@
-import Application from "./application.model.js";
+import Application from "../../job/application.model.js";
 import Job from "../../job/job.model.js";
 
 // Nhà tuyển dụng xem các ứng viên đã nộp vào job của họ
