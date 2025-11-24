@@ -9,12 +9,9 @@ import path from "path";
 import authRoutes from "./src/modules/auth/auth.route.js";
 import jobRoutes from "./src/modules/job/job.route.js";
 import candidateRoutes from "./src/modules/candidate/candidate.route.js";
-<<<<<<< HEAD
 import { verifyToken } from "./src/modules/auth/auth.middleware.js";
 import Resume from "./src/modules/candidate/resume.model.js";
-=======
-import recruiterAppRoutes from "./src/modules/candidate/applications/recruiter-application.route.js";
->>>>>>> 1ac76f50cb17ff5f0ec461439084f44125bb5307
+import recruiterAppRoutes from "./src/modules/recruiter/job-application.route.js";
 
 dotenv.config();
 

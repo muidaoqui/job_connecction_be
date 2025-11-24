@@ -1,10 +1,5 @@
 import Job from "./job.model.js";
-<<<<<<< HEAD
 import Application from "../candidate/applications/application.model.js";
-=======
-import Application from "./application.model.js";
-import mongoose from "mongoose";
->>>>>>> 1ac76f50cb17ff5f0ec461439084f44125bb5307
 
 // Tạo job
 export const createJob = async (req, res) => {
