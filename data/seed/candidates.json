@@ -1,0 +1,92 @@
+[
+  {
+    "_id": {"$oid": "64e1f2a3b4c5600000000001"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000005"},
+    "fullName": "Hoàng Văn E",
+    "phone": "+84 912 000 001",
+    "location": "Ho Chi Minh City",
+    "mainResumePath": "/uploads/resumes/resume_user5.pdf",
+    "createdAt": {"$date": "2025-05-04T08:00:00Z"}
+  },
+  {
+    "_id": {"$oid": "64e1f2a3b4c5600000000002"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000006"},
+    "fullName": "Võ Thị F",
+    "phone": "+84 912 000 002",
+    "location": "Hanoi",
+    "mainResumePath": "/uploads/resumes/resume_user6.pdf",
+    "createdAt": {"$date": "2025-06-08T09:30:00Z"}
+  },
+  {
+    "_id": {"$oid": "64e1f2a3b4c5600000000003"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000007"},
+    "fullName": "Đinh Văn G",
+    "phone": "+84 912 000 003",
+    "location": "Da Nang",
+    "mainResumePath": "/uploads/resumes/resume_user7.pdf",
+    "createdAt": {"$date": "2025-07-12T10:20:00Z"}
+  },
+  {
+    "_id": {"$oid": "64e1f2a3b4c5600000000004"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000008"},
+    "fullName": "Ngô Thị H",
+    "phone": "+84 912 000 004",
+    "location": "Hue",
+    "mainResumePath": "/uploads/resumes/resume_user8.pdf",
+    "createdAt": {"$date": "2025-08-19T11:15:00Z"}
+  },
+  {
+    "_id": {"$oid": "64e1f2a3b4c5600000000005"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000009"},
+    "fullName": "Bùi Văn I",
+    "phone": "+84 912 000 005",
+    "location": "Hanoi",
+    "mainResumePath": "/uploads/resumes/resume_user9.pdf",
+    "createdAt": {"$date": "2025-09-21T12:40:00Z"}
+  },
+  {
+    "_id": {"$oid": "64e1f2a3b4c5600000000006"},
+    "userId": {"$oid": "64a1b2c3d4e5f6000000000a"},
+    "fullName": "Trương Thị K",
+    "phone": "+84 912 000 006",
+    "location": "Ho Chi Minh City",
+    "mainResumePath": "/uploads/resumes/resume_user10.pdf",
+    "createdAt": {"$date": "2025-10-23T13:50:00Z"}
+  },
+  {
+    "_id": {"$oid": "64e1f2a3b4c5600000000007"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000001"},
+    "fullName": "Alternate Candidate 1",
+    "phone": "+84 912 000 007",
+    "location": "Ho Chi Minh City",
+    "mainResumePath": null,
+    "createdAt": {"$date": "2025-11-02T08:30:00Z"}
+  },
+  {
+    "_id": {"$oid": "64e1f2a3b4c5600000000008"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000002"},
+    "fullName": "Alternate Candidate 2",
+    "phone": "+84 912 000 008",
+    "location": "Da Nang",
+    "mainResumePath": null,
+    "createdAt": {"$date": "2025-11-10T09:45:00Z"}
+  },
+  {
+    "_id": {"$oid": "64e1f2a3b4c5600000000009"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000003"},
+    "fullName": "Alternate Candidate 3",
+    "phone": "+84 912 000 009",
+    "location": "Hanoi",
+    "mainResumePath": null,
+    "createdAt": {"$date": "2025-11-15T10:15:00Z"}
+  },
+  {
+    "_id": {"$oid": "64e1f2a3b4c560000000000a"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000004"},
+    "fullName": "Alternate Candidate 4",
+    "phone": "+84 912 000 010",
+    "location": "Hue",
+    "mainResumePath": null,
+    "createdAt": {"$date": "2025-11-20T11:20:00Z"}
+  }
+]

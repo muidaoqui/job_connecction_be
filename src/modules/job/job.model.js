@@ -7,8 +7,10 @@ const jobSchema = new mongoose.Schema(
     requirements: { type: String },
     salary: { type: String },
     location: { type: String },
-    jobType: { type: String }, 
-    recruiterId: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true },
+    jobType: { type: String },
+    recruiterId: { type: mongoose.Schema.Types.ObjectId, ref: "Recruiter", required: true },
+    companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
+    saveCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
