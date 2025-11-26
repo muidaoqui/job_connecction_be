@@ -11,6 +11,11 @@ const userSchema = new mongoose.Schema({
     enum: ["admin", "recruiter", "candidate"],
     default: "candidate",
   },
+  status: {
+    type: String,
+    enum: ["active", "inactive", "banned"],
+    default: "active",
+  },
   resetToken: String,
   resetTokenExpire: Date,
   emailVerified: { type: Boolean, default: false },
