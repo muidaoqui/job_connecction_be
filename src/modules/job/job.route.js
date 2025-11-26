@@ -12,6 +12,7 @@ import { getRecruiterStats } from "./job.controller.js";
 import { applyJob } from "./job.controller.js";
 import { uploadCV } from "./uploadCV.js";
 import Application from "./application.model.js";
+import { searchJobs } from "./job.controller.js";
 
 const router = express.Router();
 // Applicants
@@ -38,6 +39,7 @@ router.get("/stats/:id", getRecruiterStats);
 router.get("/:id", getJobById);
 router.put("/:id", updateJob);
 router.delete("/:id", deleteJob);
+router.get("/search", searchJobs);
 
 
 
