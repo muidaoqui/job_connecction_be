@@ -37,9 +37,12 @@ export const getJobById = async (req, res) => {
       .populate({ 
         path: 'recruiterId', 
         select: 'userId position followers companyId',
-        populate: { path: 'userId', select: 'name email' }
+        populate: [
+          { path: 'userId', select: 'name email' },
+          { path: 'companyId', select: 'name industry size country logo address backgroundImage images' }
+        ]
       })
-      .populate({ path: 'companyId', select: 'name industry size country logo address website' });
+      .populate({ path: 'companyId', select: 'name industry size country logo address backgroundImage images' });
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
@@ -62,9 +65,12 @@ export const getAllJobs = async (req, res) => {
       .populate({ 
         path: 'recruiterId', 
         select: 'userId position followers companyId',
-        populate: { path: 'userId', select: 'name' }
+        populate: [
+          { path: 'userId', select: 'name' },
+          { path: 'companyId', select: 'name industry size country logo backgroundImage images' }
+        ]
       })
-      .populate({ path: 'companyId', select: 'name industry size country logo' })
+      .populate({ path: 'companyId', select: 'name industry size country logo backgroundImage images' })
       .sort({ saveCount: -1 });
     res.json(jobs);
   } catch (error) {

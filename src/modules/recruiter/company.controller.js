@@ -3,7 +3,7 @@ import Company from "./company.model.js";
 // Create a new company
 export const createCompany = async (req, res) => {
   try {
-    const { name, industry, size, country, website, logo, description, address } = req.body;
+    const { name, industry, size, country, logo, description, address, backgroundImage, images } = req.body;
 
     if (!name) {
       return res.status(400).json({ message: "Company name is required" });
@@ -14,10 +14,11 @@ export const createCompany = async (req, res) => {
       industry,
       size,
       country,
-      website,
       logo,
       description,
       address,
+      backgroundImage,
+      images,
     });
 
     await company.save();
@@ -44,11 +45,11 @@ export const getAllCompanies = async (req, res) => {
 
     res.json({
       success: true,
-      companies,
+      data: companies,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -58,12 +59,12 @@ export const getCompanyById = async (req, res) => {
     const company = await Company.findById(req.params.id);
 
     if (!company) {
-      return res.status(404).json({ message: "Company not found" });
+      return res.status(404).json({ success: false, message: "Company not found" });
     }
 
     res.json({ success: true, company });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -71,11 +72,11 @@ export const getCompanyById = async (req, res) => {
 export const updateCompany = async (req, res) => {
   try {
     const companyId = req.params.id;
-    const { name, industry, size, country, website, logo, description, address } = req.body;
+    const { name, industry, size, country, logo, description, address, backgroundImage, images } = req.body;
 
     const company = await Company.findByIdAndUpdate(
       companyId,
-      { name, industry, size, country, website, logo, description, address },
+      { name, industry, size, country, logo, description, address, backgroundImage, images },
       { new: true, runValidators: true }
     );
 
@@ -118,8 +119,8 @@ export const searchCompanies = async (req, res) => {
     })
       .limit(limit);
 
-    res.json({ success: true, companies });
+    res.json({ success: true, data: companies });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
