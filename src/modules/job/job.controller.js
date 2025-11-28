@@ -54,6 +54,32 @@ export const getJobById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+export const getAllJobs = async (req, res) => {
+  try {
+    const { keyword, location, jobType } = req.query;
+
+    let filter = {};
+
+    // 🔍 lọc theo keyword (title, description)
+    if (keyword && keyword.trim() !== "") {
+      filter.$or = [
+        { title: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+      ];
+    }
+
+    // 📍 lọc theo location
+    if (location && location.trim() !== "") {
+      filter.location = { $regex: location, $options: "i" };
+    }
+
+    // 💼 lọc theo loại hình job fulltime / parttime
+    if (jobType && jobType.trim() !== "") {
+      filter.jobType = { $regex: jobType, $options: "i" };
+    }
+
+    const jobs = await Job.find(filter).sort({ createdAt: -1 });
+
 // Lấy toàn bộ job (sắp xếp theo saveCount cho "hot jobs")
 export const getAllJobs = async (req, res) => {
   try {
@@ -67,7 +93,9 @@ export const getAllJobs = async (req, res) => {
       .populate({ path: 'companyId', select: 'name industry size country logo' })
       .sort({ saveCount: -1 });
     res.json(jobs);
+
   } catch (error) {
+    console.error("Get jobs error:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -225,5 +253,38 @@ export const applyJob = async (req, res) => {
   } catch (err) {
     console.error("Lỗi applyJob:", err);
     return res.status(500).json({ message: err.message });
+  }
+};
+export const searchJobs = async (req, res) => {
+  try {
+    const keyword = req.query.q;
+
+    // Nếu không có keyword, trả về rỗng (để FE không lỗi)
+    if (!keyword || keyword.trim() === "") {
+      return res.json({ success: true, data: [] });
+    }
+
+    // Tìm theo title hoặc description
+    const jobs = await Job.find(
+      {
+        $or: [
+          { title: { $regex: keyword, $options: "i" } },
+          { description: { $regex: keyword, $options: "i" } },
+          { location: { $regex: keyword, $options: "i" } },
+        ],
+      }
+    ).limit(8); // giới hạn 8 job suggest
+
+    return res.json({
+      success: true,
+      data: jobs,
+    });
+
+  } catch (err) {
+    console.error("Search job error: ", err);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server khi tìm kiếm",
+    });
   }
 };
