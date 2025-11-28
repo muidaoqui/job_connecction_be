@@ -6,8 +6,11 @@ const companySchema = new mongoose.Schema(
     industry: { type: String },
     size: { type: String }, // e.g., "1000-5000"
     country: { type: String },
-    website: { type: String },
     logo: { type: String }, // URL to logo image
+    // Background hero image for company detail/header
+    backgroundImage: { type: String },
+    // Additional related images (gallery)
+    images: [{ type: String }],
     description: { type: String },
     address: { type: String },
   },

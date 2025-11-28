@@ -1,0 +1,194 @@
+[{
+  "_id": {
+    "$oid": "64b1c2d3e4f5600000000001"
+  },
+  "name": "Tech Solutions JSC",
+  "industry": "Information Technology",
+  "size": "200-500",
+  "country": "Vietnam",
+  "website": "https://techsolutions.example.com",
+  "logo": "https://placehold.co/100x100?text=TS",
+  "description": "A leading provider of software solutions for enterprise clients.",
+  "address": "123 Lê Lợi, Quận 1, TP. HCM",
+  "createdAt": {
+    "$date": "2025-01-15T08:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "64b1c2d3e4f5600000000002"
+  },
+  "name": "FinBank Corp",
+  "industry": "Finance",
+  "size": "1000-5000",
+  "country": "Vietnam",
+  "website": "https://finbank.example.com",
+  "logo": "https://placehold.co/100x100?text=FB",
+  "description": "Regional bank providing retail and corporate banking services.",
+  "address": "45 Nguyễn Huệ, Quận 1, TP. HCM",
+  "createdAt": {
+    "$date": "2025-02-01T09:30:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "64b1c2d3e4f5600000000003"
+  },
+  "name": "GreenHealth",
+  "industry": "Healthcare",
+  "size": "50-200",
+  "country": "Vietnam",
+  "website": "https://greenhealth.example.com",
+  "logo": "https://placehold.co/100x100?text=GH",
+  "description": "Healthcare startup focusing on telemedicine services.",
+  "address": "88 Phạm Ngọc Thạch, TP. HCM",
+  "createdAt": {
+    "$date": "2025-03-05T10:15:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "64b1c2d3e4f5600000000004"
+  },
+  "name": "EduNext",
+  "industry": "Education",
+  "size": "20-50",
+  "country": "Vietnam",
+  "website": "https://edunext.example.com",
+  "logo": "https://placehold.co/100x100?text=EN",
+  "description": "EdTech company building learning platforms for schools.",
+  "address": "12 Trần Hưng Đạo, Hà Nội",
+  "createdAt": {
+    "$date": "2025-04-10T11:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "64b1c2d3e4f5600000000005"
+  },
+  "name": "RetailMart",
+  "industry": "Retail",
+  "size": "500-1000",
+  "country": "Vietnam",
+  "website": "https://retailmart.example.com",
+  "logo": "https://placehold.co/100x100?text=RM",
+  "description": "National retail chain with a large network of stores.",
+  "address": "500 Hoàng Văn Thụ, Hà Nội",
+  "createdAt": {
+    "$date": "2025-05-20T12:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "64b1c2d3e4f5600000000006"
+  },
+  "name": "AgriFoods",
+  "industry": "Agriculture",
+  "size": "200-500",
+  "country": "Vietnam",
+  "website": "https://agrifoods.example.com",
+  "logo": "https://placehold.co/100x100?text=AF",
+  "description": "Producer and exporter of quality agricultural products.",
+  "address": "88 Cách Mạng Tháng 8, Đà Nẵng",
+  "createdAt": {
+    "$date": "2025-06-18T13:20:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "64b1c2d3e4f5600000000007"
+  },
+  "name": "LogiTrans",
+  "industry": "Logistics",
+  "size": "100-200",
+  "country": "Vietnam",
+  "website": "https://logitrans.example.com",
+  "logo": "https://placehold.co/100x100?text=LT",
+  "description": "Logistics and freight forwarding company.",
+  "address": "33 Lý Thường Kiệt, Hải Phòng",
+  "createdAt": {
+    "$date": "2025-07-12T14:40:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "64b1c2d3e4f5600000000008"
+  },
+  "name": "DesignStudio",
+  "industry": "Creative",
+  "size": "10-20",
+  "country": "Vietnam",
+  "website": "https://designstudio.example.com",
+  "logo": "https://placehold.co/100x100?text=DS",
+  "description": "Small creative studio specializing in branding.",
+  "address": "7 Đinh Tiên Hoàng, Huế",
+  "createdAt": {
+    "$date": "2025-08-02T15:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "64b1c2d3e4f5600000000009"
+  },
+  "name": "AutoWorks",
+  "industry": "Automotive",
+  "size": "50-100",
+  "country": "Vietnam",
+  "website": "https://autoworks.example.com",
+  "logo": "https://placehold.co/100x100?text=AW",
+  "description": "Automotive parts manufacturer.",
+  "address": "120 Trường Chinh, Hà Nội",
+  "createdAt": {
+    "$date": "2025-09-09T16:10:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "64b1c2d3e4f560000000000a"
+  },
+  "name": "MediaHouse",
+  "industry": "Media",
+  "size": "100-300",
+  "country": "Vietnam",
+  "website": "https://mediahouse.example.com",
+  "logo": "https://placehold.co/100x100?text=MH",
+  "description": "Media agency producing digital content.",
+  "address": "66 Bà Triệu, Hà Nội",
+  "createdAt": {
+    "$date": "2025-10-05T17:20:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6926b382611914963ef02dce"
+  },
+  "userId": {
+    "$oid": "69255baae8b5a3a800940d50"
+  },
+  "logo": null,
+  "coverImage": "/uploads/company/cover/coverImage-1764144002229-52470.jpg",
+  "galleryImages": [
+    "/uploads/company/gallery/galleryImages-1764144002241-35979.jpg"
+  ],
+  "businessLicense": "/uploads/company/license/businessLicense-1764144002234-68482.pdf",
+  "name": "Công Ty A",
+  "tagline": "aa",
+  "country": "Việt Nam",
+  "industry": "Công nghệ thông tin",
+  "techs": [
+    "React"
+  ],
+  "size": "10-50",
+  "website": "http://localhost:5173",
+  "socialLinks": [
+    "http://localhost:5173"
+  ],
+  "description": "<p>aaaaa</p>",
+  "createdAt": {
+    "$date": "2025-11-26T08:00:02.338Z"
+  },
+  "updatedAt": {
+    "$date": "2025-11-26T08:00:02.338Z"
+  },
+  "__v": 0
+}]
