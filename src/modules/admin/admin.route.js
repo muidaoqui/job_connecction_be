@@ -3,10 +3,22 @@ import { getUsers } from "./admin.controller.js";
 import { verifyAdmin } from "../auth/auth.middleware.js";
 import { getUserDetail } from "./admin.controller.js";
 import { toggleUserStatus } from "./admin.controller.js";
+import { getJobs } from "./admin.controller.js";
+import { approveJob } from "./admin.controller.js";
+import { rejectJob } from "./admin.controller.js";
 const adminRouter = express.Router();
 
 adminRouter.get("/users", verifyAdmin, getUsers);
-adminRouter.get("/users/:id", verifyAdmin, getUserDetail);
-adminRouter.patch("/users/:id/toggle-status", verifyAdmin, toggleUserStatus);
 
+adminRouter.get("/users/:id", verifyAdmin, getUserDetail);
+
+adminRouter.patch("/users/:id/toggle-status", verifyAdmin, toggleUserStatus);
+// Lấy danh sách job chờ duyệt
+adminRouter.get("/jobs", verifyAdmin, getJobs);
+
+// Duyệt job
+adminRouter.put("/jobs/:jobId/approve", verifyAdmin, approveJob);
+
+// Từ chối job
+adminRouter.put("/jobs/:jobId/reject", verifyAdmin, rejectJob);
 export default adminRouter;

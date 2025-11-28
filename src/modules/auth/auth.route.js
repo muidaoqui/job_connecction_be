@@ -22,10 +22,7 @@ router.post("/register", register);
 // Đăng nhập
 router.post("/login", login);
 
-// Quên mật khẩu
 router.post("/forgot-password", forgotPassword);
-
-// Reset mật khẩu
-router.post("/reset-password/:token", resetPassword);
+router.post("/reset-password", resetPassword);
 
 export default router;

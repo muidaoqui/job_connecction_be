@@ -1,6 +1,7 @@
 import User from "../auth/auth.model.js";
 import CandidateSchema from "../candidate/candidate.model.js";
 import RecruiterSchema from "../recruiter/recruiter.model.js";
+import Job from "../job/job.model.js";
 
 export const getAllUsers = async (filters) => {
   const query = {};
@@ -31,20 +32,53 @@ export const getUserById = async (userId) => {
 export const toggleUserStatus = async (userId) => {
   try {
     const user = await User.findById(userId);
+    if (!user) throw new Error("User not found");
 
-    if (!user) {
-      throw new Error("User not found");
-    }
-    console.log(user);
-    console.log("Current status:", user.status);
+    // Toggle status 1 lần
+    const newStatus = user.status === "active" ? "banned" : "active";
 
-    // Toggle status active <-> banned
-    user.status = user.status === "active" ? "banned" : "active";
-    user.updated_at = new Date();
+    // Cập nhật và trả về document mới
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { status: newStatus, updated_at: new Date() },
+      { new: true }
+    );
 
-    await user.save();
-    return user;
+    return updatedUser; // trả về toàn bộ document mới
   } catch (error) {
+    console.error("Toggle status backend error:", error);
     throw new Error(error.message);
   }
+};
+
+export const getJobsService = async () => {
+  return await Job.find().populate("recruiterId").populate("companyId");
+};
+
+export const approveJobService = async (jobId) => {
+  const job = await Job.findById(jobId);
+
+  if (!job) throw new Error("Job not found");
+
+  // if (job.status !== "pending")
+  //   throw new Error("Only pending jobs can be approved");
+
+  job.status = "approved";
+  await job.save();
+
+  return job;
+};
+
+export const rejectJobService = async (jobId) => {
+  const job = await Job.findById(jobId);
+
+  if (!job) throw new Error("Job not found");
+
+  // if (job.status !== "pending")
+  //   throw new Error("Only pending jobs can be rejected");
+
+  job.status = "rejected";
+  await job.save();
+
+  return job;
 };

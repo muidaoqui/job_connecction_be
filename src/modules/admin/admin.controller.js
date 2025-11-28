@@ -44,3 +44,42 @@ export const toggleUserStatus = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const getJobs = async (req, res) => {
+  try {
+    const jobs = await adminService.getJobsService();
+    res.status(200).json({ success: true, data: jobs });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const approveJob = async (req, res) => {
+  const { jobId } = req.params;
+
+  try {
+    const job = await adminService.approveJobService(jobId);
+    res.status(200).json({
+      success: true,
+      message: "Job approved successfully",
+      data: job,
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const rejectJob = async (req, res) => {
+  const { jobId } = req.params;
+
+  try {
+    const job = await adminService.rejectJobService(jobId);
+    res.status(200).json({
+      success: true,
+      message: "Job rejected successfully",
+      data: job,
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};

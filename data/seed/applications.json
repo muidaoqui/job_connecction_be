@@ -1,0 +1,92 @@
+[
+  {
+    "_id": {"$oid": "6501b2c3d4e5600000000001"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000005"},
+    "jobId": {"$oid": "64d1e2f3a4b5600000000001"},
+    "status": "applied",
+    "appliedDate": {"$date": "2025-02-25T10:00:00Z"},
+    "resumePath": "/uploads/resumes/resume_user5.pdf",
+    "coverLetter": "I am excited to apply for the Frontend Developer role."
+  },
+  {
+    "_id": {"$oid": "6501b2c3d4e5600000000002"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000006"},
+    "jobId": {"$oid": "64d1e2f3a4b5600000000002"},
+    "status": "pending",
+    "appliedDate": {"$date": "2025-03-15T11:00:00Z"},
+    "resumePath": "/uploads/resumes/resume_user6.pdf",
+    "coverLetter": "Experienced Node.js developer ready to contribute."
+  },
+  {
+    "_id": {"$oid": "6501b2c3d4e5600000000003"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000007"},
+    "jobId": {"$oid": "64d1e2f3a4b5600000000003"},
+    "status": "accepted",
+    "appliedDate": {"$date": "2025-04-12T12:00:00Z"},
+    "resumePath": "/uploads/resumes/resume_user7.pdf",
+    "coverLetter": "Strong product thinking and cross-team collaboration skills."
+  },
+  {
+    "_id": {"$oid": "6501b2c3d4e5600000000004"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000008"},
+    "jobId": {"$oid": "64d1e2f3a4b5600000000004"},
+    "status": "rejected",
+    "appliedDate": {"$date": "2025-05-20T13:30:00Z"},
+    "resumePath": "/uploads/resumes/resume_user8.pdf",
+    "coverLetter": "Background in data engineering and ETL processes."
+  },
+  {
+    "_id": {"$oid": "6501b2c3d4e5600000000005"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000009"},
+    "jobId": {"$oid": "64d1e2f3a4b5600000000005"},
+    "status": "applied",
+    "appliedDate": {"$date": "2025-06-20T14:00:00Z"},
+    "resumePath": "/uploads/resumes/resume_user9.pdf",
+    "coverLetter": "Portfolio of creative design work included."
+  },
+  {
+    "_id": {"$oid": "6501b2c3d4e5600000000006"},
+    "userId": {"$oid": "64a1b2c3d4e5f6000000000a"},
+    "jobId": {"$oid": "64d1e2f3a4b5600000000006"},
+    "status": "pending",
+    "appliedDate": {"$date": "2025-07-25T15:10:00Z"},
+    "resumePath": "/uploads/resumes/resume_user10.pdf",
+    "coverLetter": "Experience in operations and logistics management."
+  },
+  {
+    "_id": {"$oid": "6501b2c3d4e5600000000007"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000001"},
+    "jobId": {"$oid": "64d1e2f3a4b5600000000007"},
+    "status": "applied",
+    "appliedDate": {"$date": "2025-08-05T16:30:00Z"},
+    "resumePath": "/uploads/resumes/resume_user1_alt.pdf",
+    "coverLetter": "Proven sales track record and client relationship experience."
+  },
+  {
+    "_id": {"$oid": "6501b2c3d4e5600000000008"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000002"},
+    "jobId": {"$oid": "64d1e2f3a4b5600000000008"},
+    "status": "pending",
+    "appliedDate": {"$date": "2025-09-15T17:00:00Z"},
+    "resumePath": "/uploads/resumes/resume_user2_alt.pdf",
+    "coverLetter": "QA automation experience with Cypress and Selenium."
+  },
+  {
+    "_id": {"$oid": "6501b2c3d4e5600000000009"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000003"},
+    "jobId": {"$oid": "64d1e2f3a4b5600000000009"},
+    "status": "applied",
+    "appliedDate": {"$date": "2025-10-20T18:20:00Z"},
+    "resumePath": "/uploads/resumes/resume_user3_alt.pdf",
+    "coverLetter": "Content writing and SEO experience."
+  },
+  {
+    "_id": {"$oid": "6501b2c3d4e560000000000a"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000004"},
+    "jobId": {"$oid": "64d1e2f3a4b560000000000a"},
+    "status": "pending",
+    "appliedDate": {"$date": "2025-11-01T19:30:00Z"},
+    "resumePath": "/uploads/resumes/resume_user4_alt.pdf",
+    "coverLetter": "Customer service and client-facing experience."
+  }
+]
