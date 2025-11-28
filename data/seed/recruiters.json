@@ -1,0 +1,82 @@
+[
+  {
+    "_id": {"$oid": "64c1d2e3f4a5600000000001"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000001"},
+    "companyId": {"$oid": "64b1c2d3e4f5600000000001"},
+    "position": "Senior Talent Partner",
+    "followers": 120,
+    "createdAt": {"$date": "2025-02-01T09:00:00Z"}
+  },
+  {
+    "_id": {"$oid": "64c1d2e3f4a5600000000002"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000002"},
+    "companyId": {"$oid": "64b1c2d3e4f5600000000002"},
+    "position": "Head of Recruitment",
+    "followers": 250,
+    "createdAt": {"$date": "2025-03-01T10:15:00Z"}
+  },
+  {
+    "_id": {"$oid": "64c1d2e3f4a5600000000003"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000003"},
+    "companyId": {"$oid": "64b1c2d3e4f5600000000003"},
+    "position": "Recruitment Lead",
+    "followers": 80,
+    "createdAt": {"$date": "2025-04-05T11:20:00Z"}
+  },
+  {
+    "_id": {"$oid": "64c1d2e3f4a5600000000004"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000004"},
+    "companyId": {"$oid": "64b1c2d3e4f5600000000004"},
+    "position": "Talent Acquisition Specialist",
+    "followers": 45,
+    "createdAt": {"$date": "2025-05-15T12:30:00Z"}
+  },
+  {
+    "_id": {"$oid": "64c1d2e3f4a5600000000005"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000005"},
+    "companyId": {"$oid": "64b1c2d3e4f5600000000005"},
+    "position": "HR Business Partner",
+    "followers": 10,
+    "createdAt": {"$date": "2025-06-18T13:00:00Z"}
+  },
+  {
+    "_id": {"$oid": "64c1d2e3f4a5600000000006"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000006"},
+    "companyId": {"$oid": "64b1c2d3e4f5600000000006"},
+    "position": "Senior Recruiter",
+    "followers": 65,
+    "createdAt": {"$date": "2025-07-22T14:30:00Z"}
+  },
+  {
+    "_id": {"$oid": "64c1d2e3f4a5600000000007"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000007"},
+    "companyId": {"$oid": "64b1c2d3e4f5600000000007"},
+    "position": "Recruitment Consultant",
+    "followers": 5,
+    "createdAt": {"$date": "2025-08-02T15:40:00Z"}
+  },
+  {
+    "_id": {"$oid": "64c1d2e3f4a5600000000008"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000008"},
+    "companyId": {"$oid": "64b1c2d3e4f5600000000008"},
+    "position": "Talent Sourcer",
+    "followers": 18,
+    "createdAt": {"$date": "2025-09-10T16:00:00Z"}
+  },
+  {
+    "_id": {"$oid": "64c1d2e3f4a5600000000009"},
+    "userId": {"$oid": "64a1b2c3d4e5f60000000009"},
+    "companyId": {"$oid": "64b1c2d3e4f5600000000009"},
+    "position": "Recruitment Coordinator",
+    "followers": 30,
+    "createdAt": {"$date": "2025-10-12T17:10:00Z"}
+  },
+  {
+    "_id": {"$oid": "64c1d2e3f4a560000000000a"},
+    "userId": {"$oid": "64a1b2c3d4e5f6000000000a"},
+    "companyId": {"$oid": "64b1c2d3e4f560000000000a"},
+    "position": "Campus Recruiter",
+    "followers": 9,
+    "createdAt": {"$date": "2025-11-05T18:00:00Z"}
+  }
+]

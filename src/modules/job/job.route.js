@@ -7,7 +7,10 @@ import {
   deleteJob,
   getApplicants,
   updateApplicationStatus,
+  incrementSaveCount,
+  decrementSaveCount,
 } from "./job.controller.js";
+import { verifyToken } from "../auth/auth.middleware.js";
 import { getRecruiterStats } from "./job.controller.js";
 import { applyJob } from "./job.controller.js";
 import { uploadCV } from "./uploadCV.js";
@@ -33,7 +36,7 @@ router.put("/applications/:id/status", updateApplicationStatus);
 router.post("/:id/apply", uploadCV, applyJob);
 
 // CRUD Job
-router.post("/", createJob);
+router.post("/", verifyToken, createJob);
 router.get("/", getAllJobs);
 router.get("/stats/:id", getRecruiterStats);
 router.get("/:id", getJobById);
@@ -41,7 +44,8 @@ router.put("/:id", updateJob);
 router.delete("/:id", deleteJob);
 router.get("/search", searchJobs);
 
-
-
+// Save/Unsave job to track popularity (saveCount)
+router.post("/:id/save", incrementSaveCount);
+router.post("/:id/unsave", decrementSaveCount);
 
 export default router;
