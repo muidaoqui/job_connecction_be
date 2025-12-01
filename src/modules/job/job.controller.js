@@ -1,5 +1,6 @@
 import Job from "./job.model.js";
 import Application from "../candidate/applications/application.model.js";
+import SavedJob from "../candidate/saved-job/saved-job.model.js";
 import Recruiter from "../recruiter/recruiter.model.js";
 
 // Tạo job
@@ -116,6 +117,63 @@ export const decrementSaveCount = async (req, res) => {
 
     res.json({ success: true, saveCount: job.saveCount });
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Save job for logged-in user
+export const saveJob = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const jobId = req.params.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Vui lòng đăng nhập" });
+    }
+
+    // Check if already saved
+    const existingSave = await SavedJob.findOne({ userId, jobId });
+    if (existingSave) {
+      return res.status(200).json({ message: "Công việc đã được lưu" });
+    }
+
+    // Create new saved job record
+    const savedJob = new SavedJob({ userId, jobId });
+    await savedJob.save();
+
+    // Increment job saveCount
+    await Job.findByIdAndUpdate(jobId, { $inc: { saveCount: 1 } });
+
+    res.status(200).json({ success: true, message: "Đã lưu công việc" });
+  } catch (error) {
+    console.error("Error saving job:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Unsave job for logged-in user
+export const unsaveJob = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const jobId = req.params.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Vui lòng đăng nhập" });
+    }
+
+    // Remove saved job record
+    const result = await SavedJob.findOneAndDelete({ userId, jobId });
+    
+    if (!result) {
+      return res.status(404).json({ message: "Saved job not found" });
+    }
+
+    // Decrement job saveCount
+    await Job.findByIdAndUpdate(jobId, { $inc: { saveCount: -1 } });
+
+    res.status(200).json({ success: true, message: "Đã bỏ lưu công việc" });
+  } catch (error) {
+    console.error("Error unsaving job:", error);
     res.status(500).json({ message: error.message });
   }
 };

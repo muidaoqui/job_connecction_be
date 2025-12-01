@@ -9,6 +9,8 @@ import {
   updateApplicationStatus,
   incrementSaveCount,
   decrementSaveCount,
+  saveJob,
+  unsaveJob,
 } from "./job.controller.js";
 import { verifyToken } from "../auth/auth.middleware.js";
 import { getRecruiterStats } from "./job.controller.js";
@@ -44,8 +46,8 @@ router.put("/:id", updateJob);
 router.delete("/:id", deleteJob);
 router.get("/search", searchJobs);
 
-// Save/Unsave job to track popularity (saveCount)
-router.post("/:id/save", incrementSaveCount);
-router.post("/:id/unsave", decrementSaveCount);
+// Save/Unsave job for authenticated users (create SavedJob records and update saveCount)
+router.post("/:id/save", verifyToken, saveJob);
+router.post("/:id/unsave", verifyToken, unsaveJob);
 
 export default router;

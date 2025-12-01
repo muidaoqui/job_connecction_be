@@ -7,6 +7,13 @@ import {
   uploadResume,
   setMainResume,
   listResumes,
+  getApplications,
+  withdrawApplication,
+  getSavedJobs,
+  checkSavedJob,
+  unsaveJob,
+  getViewedJobs,
+  removeViewedJob,
 } from "./candidate.controller.js";
 import {
   getExperiences,
@@ -33,20 +40,7 @@ import {
   updateProject,
   deleteProject,
 } from "./project/project.controller.js";
-import { verifyToken } from "../auth/auth.middleware.js"; 
-
-import {
-  getApplications,
-  applyJob,
-  withdrawApplication,
-  getSavedJobs,
-  saveJob,
-  unsaveJob,
-  checkJobSaved,
-  getViewedJobs,
-  recordJobView,
-  getInvitations,
-} from "./applications/job-application.controller.js";
+import { verifyToken } from "../auth/auth.middleware.js";
 
 const router = express.Router();
 
@@ -102,21 +96,16 @@ router.delete("/project/:id", verifyToken, deleteProject);
 
 // Application routes
 router.get("/applications", verifyToken, getApplications);
-router.post("/applications/apply", verifyToken, applyJob);
 router.delete("/applications/:applicationId", verifyToken, withdrawApplication);
 
 // Saved job routes
 router.get("/saved-jobs", verifyToken, getSavedJobs);
-router.post("/saved-jobs", verifyToken, saveJob);
-router.delete("/saved-jobs/:jobId", verifyToken, unsaveJob);
-router.get("/saved-jobs/check/:jobId", verifyToken, checkJobSaved);
+router.get("/saved-jobs/check/:jobId", verifyToken, checkSavedJob);
+router.delete("/saved-jobs/:savedJobId", verifyToken, unsaveJob);
 
 // Job view routes
 router.get("/viewed-jobs", verifyToken, getViewedJobs);
-router.post("/viewed-jobs", verifyToken, recordJobView);
-
-// Invitations routes
-router.get("/invitations", verifyToken, getInvitations);
+router.delete("/viewed-jobs/:jobViewId", verifyToken, removeViewedJob);
 
 export default router;
 
