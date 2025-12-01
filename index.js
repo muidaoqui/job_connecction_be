@@ -14,7 +14,6 @@ import companyRoutes from "./src/modules/recruiter/company.route.js";
 import { verifyToken } from "./src/modules/auth/auth.middleware.js";
 import Resume from "./src/modules/candidate/resume.model.js";
 import recruiterAppRoutes from "./src/modules/candidate/applications/recruiter-application.route.js";
-import companyRoutes from "./src/modules/recruiter/company/company.route.js";
 
 dotenv.config();
 
@@ -80,7 +79,6 @@ app.use("/api/recruiter", recruiterRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/recruiter/applications", recruiterAppRoutes);
 app.use("/uploads", express.static("uploads"));
-app.use("/api/company", companyRoutes);
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
