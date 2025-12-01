@@ -14,6 +14,7 @@ import {
   unsaveJob,
   getViewedJobs,
   removeViewedJob,
+  uploadAvatar,
 } from "./candidate.controller.js";
 import {
   getExperiences,
@@ -55,7 +56,19 @@ const storage = multer.diskStorage({
   },
 });
 
+// Cấu hình nơi lưu file avatar
+const avatarStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/avatars/");
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, `${uniqueSuffix}-${file.originalname}`);
+  },
+});
+
 const upload = multer({ storage });
+const avatarUpload = multer({ storage: avatarStorage });
 
 // Profile routes
 // GET /api/candidate - Get user's profile
@@ -68,6 +81,9 @@ router.get("/resumes", verifyToken, listResumes);
 
 router.post("/upload", verifyToken, upload.single("resume"), uploadResume);
 router.put("/main-resume", verifyToken, setMainResume);
+
+// Avatar upload route
+router.post("/upload-avatar", verifyToken, avatarUpload.single("avatar"), uploadAvatar);
 
 // Experience routes
 router.get("/experience", verifyToken, getExperiences);
