@@ -278,13 +278,14 @@ export const applyJob = async (req, res) => {
     }
 
     const application = new Application({
-      jobId: new mongoose.Types.ObjectId(jobId),
-      name,
-      email,
-      message,
-      cvFile: req.file.path,
-      status: "pending",
-    });
+  jobId: new mongoose.Types.ObjectId(jobId),
+  userId: new mongoose.Types.ObjectId(req.user.id),                // ⭐ THÊM DÒNG NÀY
+  name,
+  email,
+  message,
+  cvFile: req.file.path,
+  status: "pending",
+});
 
     await application.save();
 

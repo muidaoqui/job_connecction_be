@@ -5,12 +5,19 @@ import {
   followRecruiter,
   unfollowRecruiter,
   saveMyRecruiterProfile,
-  getMyRecruiterProfile
+  getMyRecruiterProfile,
+  getApplicantsForRecruiter
 } from "./recruiter.controller.js";
 import { verifyToken } from "../auth/auth.middleware.js";
+import { updateApplicantStatus } from "./recruiter.controller.js";
 
 const router = express.Router();
-
+router.get("/applicants/me", verifyToken, getApplicantsForRecruiter);
+router.put(
+  "/applicants/:appId/status",
+  verifyToken,
+  updateApplicantStatus
+);
 // PUBLIC
 router.get("/top", getTopRecruiters);
 
