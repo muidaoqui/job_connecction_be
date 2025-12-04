@@ -35,7 +35,7 @@ router.get("/applications/all", async (req, res) => {
 });
 
 router.put("/applications/:id/status", updateApplicationStatus);
-router.post("/:id/apply", uploadCV, applyJob);
+router.post("/:id/apply", verifyToken, uploadCV.single("resume"), applyJob);
 
 // CRUD Job
 router.post("/", verifyToken, createJob);

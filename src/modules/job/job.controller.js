@@ -2,6 +2,7 @@ import Job from "./job.model.js";
 import Application from "../candidate/applications/application.model.js";
 import SavedJob from "../candidate/saved-job/saved-job.model.js";
 import Recruiter from "../recruiter/recruiter.model.js";
+import mongoose from "mongoose";
 
 // Tạo job
 export const createJob = async (req, res) => {
