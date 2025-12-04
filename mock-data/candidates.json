@@ -1,0 +1,62 @@
+[
+  {
+    "_id": {
+      "$oid": "691d9eef033278b708728c8d"
+    },
+    "date_of_birth": "2000-01-15T00:00:00Z",
+    "gender": "male",
+    "address": "123 Đường ABC, Quận 1, TP.HCM",
+    "resume_path": "/uploads/resumes/an_nguyen_cv.pdf",
+    "profile_summary": "Sinh viên mới tốt nghiệp chuyên ngành Kỹ thuật phần mềm với tư duy logic tốt."
+  },
+  {
+    "_id": {
+      "$oid": "691d9eef033278b708728c8e"
+    },
+    "date_of_birth": "1999-05-20T00:00:00Z",
+    "gender": "female",
+    "address": "456 Đường XYZ, Quận 3, TP.HCM",
+    "resume_path": "/uploads/resumes/binh_le_cv.pdf",
+    "profile_summary": "Lập trình viên Frontend có 1 năm kinh nghiệm với ReactJS."
+  },
+  {
+    "_id": {
+      "$oid": "691d9eef033278b708728c8f"
+    },
+    "date_of_birth": "1998-11-10T00:00:00Z",
+    "gender": "male",
+    "address": "789 Đường DEF, Quận 5, TP.HCM",
+    "resume_path": "/uploads/resumes/cuong_tran_cv.pdf",
+    "profile_summary": "Backend Developer chuyên về NodeJS và MongoDB."
+  },
+  {
+    "_id": {
+      "$oid": "691d9eef033278b708728c90"
+    },
+    "date_of_birth": "2001-03-08T00:00:00Z",
+    "gender": "female",
+    "address": "101 Đường GHI, Quận 7, TP.HCM",
+    "resume_path": "/uploads/resumes/dung_pham_cv.pdf",
+    "profile_summary": "Thực tập sinh Marketing năng động, sáng tạo."
+  },
+  {
+    "_id": {
+      "$oid": "691d9eef033278b708728c91"
+    },
+    "date_of_birth": "1997-07-22T00:00:00Z",
+    "gender": "male",
+    "address": "202 Đường JKL, Quận Tân Bình, TP.HCM",
+    "resume_path": "/uploads/resumes/em_hoang_cv.pdf",
+    "profile_summary": "Fullstack Developer có kinh nghiệm làm việc với MERN Stack."
+  },
+  {
+    "_id": {
+      "$oid": "691d9eef033278b708728c92"
+    },
+    "date_of_birth": "1996-12-30T00:00:00Z",
+    "gender": "male",
+    "address": "303 Đường MNO, Quận Phú Nhuận, TP.HCM",
+    "resume_path": "/uploads/resumes/phuc_vuong_cv.pdf",
+    "profile_summary": "Chuyên viên phân tích dữ liệu với 2 năm kinh nghiệm."
+  }
+]

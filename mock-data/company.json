@@ -1,0 +1,67 @@
+[
+  {
+    "_id": { "$oid": "65b706c6a46660f06535c5c1" },
+    "name": "TechSolutions Global",
+    "industry": "Công nghệ thông tin",
+    "size": "5001-10000",
+    "country": "Hoa Kỳ",
+    "website": "https://techsolutions.com",
+    "logo": "https://example.com/logos/techsolutions.png",
+    "description": "Công ty hàng đầu về giải pháp phần mềm đám mây và AI.",
+    "address": "123 Silicon Valley Blvd, CA 94000",
+    "createdAt": { "$date": "2024-01-20T10:00:00.000Z" },
+    "updatedAt": { "$date": "2024-01-20T10:00:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "65b706c6a46660f06535c5c2" },
+    "name": "GreenEnergy Vietnam",
+    "industry": "Năng lượng tái tạo",
+    "size": "501-1000",
+    "country": "Việt Nam",
+    "website": "https://greenenergyvn.vn",
+    "logo": "https://example.com/logos/greenenergy.png",
+    "description": "Phát triển các dự án điện mặt trời và điện gió tại Đông Nam Á.",
+    "address": "45 Nguyễn Huệ, Quận 1, TP.HCM",
+    "createdAt": { "$date": "2024-01-21T11:30:00.000Z" },
+    "updatedAt": { "$date": "2024-01-21T11:30:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "65b706c6a46660f06535c5c3" },
+    "name": "Apex Finance Corp",
+    "industry": "Tài chính & Ngân hàng",
+    "size": "10001+",
+    "country": "Vương quốc Anh",
+    "website": "https://apexfinance.co.uk",
+    "logo": "https://example.com/logos/apex.png",
+    "description": "Tổ chức dịch vụ tài chính toàn cầu, chuyên về quản lý tài sản.",
+    "address": "789 Piccadilly Circus, London WC1N 2ES",
+    "createdAt": { "$date": "2024-01-22T12:45:00.000Z" },
+    "updatedAt": { "$date": "2024-01-22T12:45:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "65b706c6a46660f06535c5c4" },
+    "name": "MediCare Pharma",
+    "industry": "Y tế & Dược phẩm",
+    "size": "1001-5000",
+    "country": "Nhật Bản",
+    "website": "https://medicarepharma.jp",
+    "logo": "https://example.com/logos/medicare.png",
+    "description": "Nghiên cứu và sản xuất thuốc điều trị bệnh hiếm gặp.",
+    "address": "1-1-1 Otemachi, Chiyoda City, Tokyo 100-8111",
+    "createdAt": { "$date": "2024-01-23T14:15:00.000Z" },
+    "updatedAt": { "$date": "2024-01-23T14:15:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "65b706c6a46660f06535c5c5" },
+    "name": "CreativeAds Studio",
+    "industry": "Quảng cáo & Truyền thông",
+    "size": "100-500",
+    "country": "Canada",
+    "website": "https://creativeads.ca",
+    "logo": "https://example.com/logos/creativeads.png",
+    "description": "Công ty agency sáng tạo chuyên về chiến dịch kỹ thuật số.",
+    "address": "321 King St West, Toronto, ON M5V 1J2",
+    "createdAt": { "$date": "2024-01-24T15:05:00.000Z" },
+    "updatedAt": { "$date": "2024-01-24T15:05:00.000Z" }
+  }
+]
