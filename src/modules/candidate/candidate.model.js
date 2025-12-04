@@ -8,6 +8,7 @@ const candidateSchema = new mongoose.Schema({
   resumePath: String,
   mainResumePath: String,
   profileSummary: String,
+  avatarUrl: String,
 });
 
 export default mongoose.model("Candidate", candidateSchema);

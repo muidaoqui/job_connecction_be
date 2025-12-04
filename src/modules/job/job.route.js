@@ -9,12 +9,15 @@ import {
   updateApplicationStatus,
   incrementSaveCount,
   decrementSaveCount,
+  saveJob,
+  unsaveJob,
 } from "./job.controller.js";
 import { verifyToken } from "../auth/auth.middleware.js";
 import { getRecruiterStats } from "./job.controller.js";
 import { applyJob } from "./job.controller.js";
 import { uploadCV } from "./uploadCV.js";
 import Application from "./application.model.js";
+import { searchJobs } from "./job.controller.js";
 
 const router = express.Router();
 // Applicants
@@ -41,9 +44,10 @@ router.get("/stats/:id", getRecruiterStats);
 router.get("/:id", getJobById);
 router.put("/:id", updateJob);
 router.delete("/:id", deleteJob);
+router.get("/search", searchJobs);
 
-// Save/Unsave job to track popularity (saveCount)
-router.post("/:id/save", incrementSaveCount);
-router.post("/:id/unsave", decrementSaveCount);
+// Save/Unsave job for authenticated users (create SavedJob records and update saveCount)
+router.post("/:id/save", verifyToken, saveJob);
+router.post("/:id/unsave", verifyToken, unsaveJob);
 
 export default router;

@@ -1,5 +1,6 @@
 import Job from "./job.model.js";
 import Application from "../candidate/applications/application.model.js";
+import SavedJob from "../candidate/saved-job/saved-job.model.js";
 import Recruiter from "../recruiter/recruiter.model.js";
 
 // Tạo job
@@ -37,9 +38,12 @@ export const getJobById = async (req, res) => {
       .populate({ 
         path: 'recruiterId', 
         select: 'userId position followers companyId',
-        populate: { path: 'userId', select: 'name email' }
+        populate: [
+          { path: 'userId', select: 'name email' },
+          { path: 'companyId', select: 'name industry size country logo address backgroundImage images' }
+        ]
       })
-      .populate({ path: 'companyId', select: 'name industry size country logo address website' });
+      .populate({ path: 'companyId', select: 'name industry size country logo address backgroundImage images' });
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
@@ -62,12 +66,17 @@ export const getAllJobs = async (req, res) => {
       .populate({ 
         path: 'recruiterId', 
         select: 'userId position followers companyId',
-        populate: { path: 'userId', select: 'name' }
+        populate: [
+          { path: 'userId', select: 'name' },
+          { path: 'companyId', select: 'name industry size country logo backgroundImage images' }
+        ]
       })
-      .populate({ path: 'companyId', select: 'name industry size country logo' })
+      .populate({ path: 'companyId', select: 'name industry size country logo backgroundImage images' })
       .sort({ saveCount: -1 });
     res.json(jobs);
+
   } catch (error) {
+    console.error("Get jobs error:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -108,6 +117,63 @@ export const decrementSaveCount = async (req, res) => {
 
     res.json({ success: true, saveCount: job.saveCount });
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Save job for logged-in user
+export const saveJob = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const jobId = req.params.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Vui lòng đăng nhập" });
+    }
+
+    // Check if already saved
+    const existingSave = await SavedJob.findOne({ userId, jobId });
+    if (existingSave) {
+      return res.status(200).json({ message: "Công việc đã được lưu" });
+    }
+
+    // Create new saved job record
+    const savedJob = new SavedJob({ userId, jobId });
+    await savedJob.save();
+
+    // Increment job saveCount
+    await Job.findByIdAndUpdate(jobId, { $inc: { saveCount: 1 } });
+
+    res.status(200).json({ success: true, message: "Đã lưu công việc" });
+  } catch (error) {
+    console.error("Error saving job:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Unsave job for logged-in user
+export const unsaveJob = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const jobId = req.params.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Vui lòng đăng nhập" });
+    }
+
+    // Remove saved job record
+    const result = await SavedJob.findOneAndDelete({ userId, jobId });
+    
+    if (!result) {
+      return res.status(404).json({ message: "Saved job not found" });
+    }
+
+    // Decrement job saveCount
+    await Job.findByIdAndUpdate(jobId, { $inc: { saveCount: -1 } });
+
+    res.status(200).json({ success: true, message: "Đã bỏ lưu công việc" });
+  } catch (error) {
+    console.error("Error unsaving job:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -226,4 +292,38 @@ export const applyJob = async (req, res) => {
     console.error("Lỗi applyJob:", err);
     return res.status(500).json({ message: err.message });
   }
+};
+export const searchJobs = async (req, res) => {
+  try {
+    const keyword = req.query.q;
+
+    // Nếu không có keyword, trả về rỗng (để FE không lỗi)
+    if (!keyword || keyword.trim() === "") {
+      return res.json({ success: true, data: [] });
+    }
+
+    // Tìm theo title hoặc description
+    const jobs = await Job.find(
+      {
+        $or: [
+          { title: { $regex: keyword, $options: "i" } },
+          { description: { $regex: keyword, $options: "i" } },
+          { location: { $regex: keyword, $options: "i" } },
+        ],
+      }
+    ).limit(8); // giới hạn 8 job suggest
+
+    return res.json({
+      success: true,
+      data: jobs,
+    });
+
+  } catch (err) {
+    console.error("Search job error: ", err);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server khi tìm kiếm",
+    });
+  }
+  
 };

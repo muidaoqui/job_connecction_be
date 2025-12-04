@@ -7,6 +7,14 @@ import {
   uploadResume,
   setMainResume,
   listResumes,
+  getApplications,
+  withdrawApplication,
+  getSavedJobs,
+  checkSavedJob,
+  unsaveJob,
+  getViewedJobs,
+  removeViewedJob,
+  uploadAvatar,
 } from "./candidate.controller.js";
 import {
   getExperiences,
@@ -33,20 +41,7 @@ import {
   updateProject,
   deleteProject,
 } from "./project/project.controller.js";
-import { verifyToken } from "../auth/auth.middleware.js"; 
-
-import {
-  getApplications,
-  applyJob,
-  withdrawApplication,
-  getSavedJobs,
-  saveJob,
-  unsaveJob,
-  checkJobSaved,
-  getViewedJobs,
-  recordJobView,
-  getInvitations,
-} from "./applications/job-application.controller.js";
+import { verifyToken } from "../auth/auth.middleware.js";
 
 const router = express.Router();
 
@@ -61,7 +56,19 @@ const storage = multer.diskStorage({
   },
 });
 
+// Cấu hình nơi lưu file avatar
+const avatarStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/avatars/");
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, `${uniqueSuffix}-${file.originalname}`);
+  },
+});
+
 const upload = multer({ storage });
+const avatarUpload = multer({ storage: avatarStorage });
 
 // Profile routes
 // GET /api/candidate - Get user's profile
@@ -74,6 +81,9 @@ router.get("/resumes", verifyToken, listResumes);
 
 router.post("/upload", verifyToken, upload.single("resume"), uploadResume);
 router.put("/main-resume", verifyToken, setMainResume);
+
+// Avatar upload route
+router.post("/upload-avatar", verifyToken, avatarUpload.single("avatar"), uploadAvatar);
 
 // Experience routes
 router.get("/experience", verifyToken, getExperiences);
@@ -102,21 +112,16 @@ router.delete("/project/:id", verifyToken, deleteProject);
 
 // Application routes
 router.get("/applications", verifyToken, getApplications);
-router.post("/applications/apply", verifyToken, applyJob);
 router.delete("/applications/:applicationId", verifyToken, withdrawApplication);
 
 // Saved job routes
 router.get("/saved-jobs", verifyToken, getSavedJobs);
-router.post("/saved-jobs", verifyToken, saveJob);
-router.delete("/saved-jobs/:jobId", verifyToken, unsaveJob);
-router.get("/saved-jobs/check/:jobId", verifyToken, checkJobSaved);
+router.get("/saved-jobs/check/:jobId", verifyToken, checkSavedJob);
+router.delete("/saved-jobs/:savedJobId", verifyToken, unsaveJob);
 
 // Job view routes
 router.get("/viewed-jobs", verifyToken, getViewedJobs);
-router.post("/viewed-jobs", verifyToken, recordJobView);
-
-// Invitations routes
-router.get("/invitations", verifyToken, getInvitations);
+router.delete("/viewed-jobs/:jobViewId", verifyToken, removeViewedJob);
 
 export default router;
 

@@ -209,3 +209,73 @@ export const getTopRecruiters = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// Lấy hồ sơ recruiter của user đang đăng nhập
+export const getMyRecruiterProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const recruiter = await Recruiter.findOne({ userId });
+
+    return res.status(200).json({
+      success: true,
+      data: recruiter || null
+    });
+  } catch (error) {
+    console.error("getMyRecruiterProfile error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+};
+
+// Tạo hoặc cập nhật hồ sơ recruiter
+export const saveMyRecruiterProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const { fullName, position, phone, workEmail, bio } = req.body;
+
+    let recruiter = await Recruiter.findOne({ userId });
+
+    if (!recruiter) {
+      recruiter = await Recruiter.create({
+        userId,
+        fullName,
+        position,
+        phone,
+        workEmail,
+        bio,
+        companyId: null,
+        followers: 0
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: "Tạo hồ sơ nhà tuyển dụng thành công!",
+        data: recruiter
+      });
+    }
+
+    recruiter.fullName = fullName;
+    recruiter.position = position;
+    recruiter.phone = phone;
+    recruiter.workEmail = workEmail;
+    recruiter.bio = bio;
+
+    await recruiter.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Cập nhật hồ sơ nhà tuyển dụng thành công!",
+      data: recruiter
+    });
+
+  } catch (error) {
+    console.error("saveMyRecruiterProfile error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+};
