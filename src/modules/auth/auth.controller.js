@@ -3,10 +3,10 @@ import User from "./auth.model.js";
 import sendEmail from "../../utils/sendEmail.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-
+import { Role } from "../../common/enum/role.js";
 // Tạo token JWT
 const generateToken = (user) => {
-  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+  return jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
 };
@@ -28,7 +28,11 @@ export const sendOtpController = async (req, res) => {
     user.otpExpire = Date.now() + 10 * 60 * 1000; // 10 phút
     await user.save();
 
-    await sendEmail(email, "Mã xác thực tài khoản", `Mã OTP của bạn là: ${otp}`);
+    await sendEmail(
+      email,
+      "Mã xác thực tài khoản",
+      `Mã OTP của bạn là: ${otp}`
+    );
 
     res.status(200).json({ message: "Đã gửi mã OTP đến email" });
   } catch (err) {
@@ -43,10 +47,13 @@ export const verifyOtpController = async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "Người dùng không tồn tại" });
+    if (!user)
+      return res.status(404).json({ message: "Người dùng không tồn tại" });
 
-    if (user.otpCode !== otp) return res.status(400).json({ message: "Mã OTP sai" });
-    if (user.otpExpire < Date.now()) return res.status(400).json({ message: "Mã OTP đã hết hạn" });
+    if (user.otpCode !== otp)
+      return res.status(400).json({ message: "Mã OTP sai" });
+    if (user.otpExpire < Date.now())
+      return res.status(400).json({ message: "Mã OTP đã hết hạn" });
 
     user.emailVerified = true;
     user.otpCode = undefined;
@@ -61,21 +68,30 @@ export const verifyOtpController = async (req, res) => {
 
 // Đăng ký
 export const register = async (req, res) => {
-  const { name, email, password, role } = req.body; 
+  const { name, email, password, role } = req.body;
 
   try {
     let user = await User.findOne({ email });
-    
+
     if (user && user.emailVerified) {
       return res.status(400).json({ message: "Email đã được sử dụng" });
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    let otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpire = Date.now() + 10 * 60 * 1000;
 
     if (!user) {
+      if (role && !["candidate", "recruiter"].includes(role)) {
+        return res.status(400).json({ message: "Vai trò không hợp lệ" });
+      }
+      if (role === Role.CANDIDATE) {
+        user = new User({ email, password, role: role || "candidate" });
+      }
+      if (role === Role.RECRUITER) {
+        user = new User({ email, password, role: "recruiter" });
+      }
       user = new User({
-        name, 
+        name,
         email,
         password,
         role: role || "candidate",
@@ -90,18 +106,41 @@ export const register = async (req, res) => {
       user.otpExpire = otpExpire;
     }
 
-    await user.save(); 
-    
-    await sendEmail(email, "Mã xác thực tài khoản", `Mã OTP của bạn là: ${otp}`);
+    await user.save();
+
+    // Tạo OTP ngay sau khi register
+    otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otpCode = otp;
+    user.otpExpire = Date.now() + 10 * 60 * 1000;
+    await user.save();
+
+    await sendEmail(
+      email,
+      "Mã xác thực tài khoản",
+      `Mã OTP của bạn là: ${otp}`
+    );
+    await user.save();
+
+    await sendEmail(
+      email,
+      "Mã xác thực tài khoản",
+      `Mã OTP của bạn là: ${otp}`
+    );
 
     res.status(201).json({
       message: "Đăng ký thành công, vui lòng xác thực email",
-      user: { email: user.email, role: user.role, emailVerified: user.emailVerified },
+      user: {
+        email: user.email,
+        role: user.role,
+        emailVerified: user.emailVerified,
+      },
     });
   } catch (err) {
-    console.error("Lỗi đăng ký:", err); 
-    if (err.name === 'ValidationError') {
-         return res.status(400).json({ message: 'Lỗi xác thực dữ liệu: ' + err.message });
+    console.error("Lỗi đăng ký:", err);
+    if (err.name === "ValidationError") {
+      return res
+        .status(400)
+        .json({ message: "Lỗi xác thực dữ liệu: " + err.message });
     }
     res.status(500).json({ message: err.message || "Đăng ký thất bại" });
   }
@@ -113,19 +152,26 @@ export const login = async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "Người dùng không tồn tại" });
+
+    if (!user)
+      return res.status(404).json({ message: "Người dùng không tồn tại" });
 
     // Nếu user chưa đặt password (tạo tạm "temp") → yêu cầu đổi mật khẩu hoặc OTP
     if (!user.password || user.password === "temp") {
-      return res.status(400).json({ message: "Người dùng chưa đặt mật khẩu. Vui lòng xác thực OTP." });
+      return res.status(400).json({
+        message: "Người dùng chưa đặt mật khẩu. Vui lòng xác thực OTP.",
+      });
     }
 
     const isMatch = await user.comparePassword(password);
-    if (!isMatch) return res.status(400).json({ message: "Mật khẩu không đúng" });
+    if (!isMatch)
+      return res.status(400).json({ message: "Mật khẩu không đúng" });
 
     // Nếu email chưa xác thực
     if (!user.emailVerified) {
-      return res.status(400).json({ message: "Chưa xác thực email", needVerification: true });
+      return res
+        .status(400)
+        .json({ message: "Chưa xác thực email", needVerification: true });
     }
 
     // Tạo token
@@ -176,7 +222,6 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-
 // Reset mật khẩu
 export const resetPassword = async (req, res) => {
   try {
@@ -186,9 +231,15 @@ export const resetPassword = async (req, res) => {
       resetToken: token,
       resetTokenExpire: { $gt: Date.now() },
     });
+    if (!user)
+      return res
+        .status(400)
+        .json({ message: "Token không hợp lệ hoặc đã hết hạn" });
 
     if (!user)
-      return res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+      return res
+        .status(400)
+        .json({ message: "Token không hợp lệ hoặc đã hết hạn" });
 
     user.password = req.body.password;
     user.resetToken = undefined;

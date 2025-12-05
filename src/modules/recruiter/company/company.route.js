@@ -6,6 +6,7 @@ import {
 
 import { verifyToken } from "../../auth/auth.middleware.js";
 import upload from "./uploadCompany.js";
+import { getCompanyList } from "./company.controller.js";
 
 const router = express.Router();
 
@@ -22,5 +23,6 @@ router.post("/profile", verifyToken, uploadFields, createOrUpdateCompany);
 
 // Lấy profile
 router.get("/profile", verifyToken, getCompanyByUser);
+router.get("/", getCompanyList);
 
 export default router;
