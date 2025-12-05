@@ -27,4 +27,16 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-export const uploadCV = multer({ storage, fileFilter }).single("cvFile");
+const uploadCV = multer({ storage, fileFilter }).single("cvFile");
+
+// Middleware bắt lỗi từ multer
+export const uploadCvMiddleware = (req, res, next) => {
+  uploadCV(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message });
+    }
+    next();
+  });
+};
+
+export default uploadCV;
