@@ -279,5 +279,35 @@ export const removeViewedJob = async (req, res) => {
   }
 };
 
+// Upload avatar
+export const uploadAvatar = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const avatarUrl = `${req.protocol}://${req.get("host")}/uploads/avatars/${req.file.filename}`;
+    let candidate = await Candidate.findOne({ userId });
+
+    if (!candidate) {
+      candidate = new Candidate({ userId, avatarUrl });
+      await candidate.save();
+    } else {
+      candidate = await Candidate.findOneAndUpdate(
+        { userId },
+        { avatarUrl },
+        { new: true }
+      );
+    }
+
+    res.status(200).json({ avatarUrl, message: "Avatar uploaded successfully" });
+  } catch (error) {
+    console.error("❌ Error uploading avatar:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 
 

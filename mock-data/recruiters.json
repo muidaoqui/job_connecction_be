@@ -1,0 +1,30 @@
+[
+  {
+    "_id": {
+      "$oid": "691d9eef033278b708728c93"
+    },
+    "company_id": "65b706c6a46660f06535c5c1",
+    "position": "HR Manager"
+  },
+  {
+    "_id": {
+      "$oid": "691d9eef033278b708728c94"
+    },
+    "company_id": "65b706c6a46660f06535c5c2",
+    "position": "Talent Acquisition Specialist"
+  },
+  {
+    "_id": {
+      "$oid": "691d9eef033278b708728c95"
+    },
+    "company_id": "65b706c6a46660f06535c5c3",
+    "position": "Senior Recruiter"
+  },
+  {
+    "_id": {
+      "$oid": "691d9eef033278b708728c96"
+    },
+    "company_id": "65b706c6a46660f06535c5c4",
+    "position": "Headhunter"
+  }
+]
