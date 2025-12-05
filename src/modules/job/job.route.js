@@ -47,6 +47,9 @@ router.put("/applications/:id/status", updateApplicationStatus);
 /* ---------------- CRUD JOB ---------------- */
 router.post("/", verifyToken, createJob);
 router.get("/", getAllJobs);
+
+router.get("/search", searchJobs);
+
 router.get("/stats/:id", getRecruiterStats);
 router.get("/search", searchJobs);
 
