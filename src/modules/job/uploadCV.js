@@ -1,30 +1,26 @@
 import multer from "multer";
-import fs from "fs";
 import path from "path";
 
-const cvPath = path.join("uploads", "cv");
-
-// Tự tạo thư mục nếu chưa tồn tại
-if (!fs.existsSync(cvPath)) {
-  fs.mkdirSync(cvPath, { recursive: true });
-}
-
+// Lưu vào thư mục uploads/resumes/
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, cvPath);
+  destination: function (req, file, cb) {
+    cb(null, "uploads/resumes/");
   },
-  filename: (req, file, cb) => {
+  filename: function (req, file, cb) {
     const uniqueName = Date.now() + "-" + file.originalname;
     cb(null, uniqueName);
   }
 });
 
+// Chỉ nhận file PDF hoặc DOC
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype === "application/pdf") {
+  const allowed = [".pdf", ".doc", ".docx"];
+  if (allowed.includes(path.extname(file.originalname).toLowerCase())) {
     cb(null, true);
   } else {
-    cb(new Error("Chỉ được upload file PDF."), false);
+    cb(new Error("Invalid file type"), false);
   }
 };
 
-export const uploadCV = multer({ storage, fileFilter }).single("cvFile");
+// export đúng dạng Multer
+export const uploadCV = multer({ storage, fileFilter });
