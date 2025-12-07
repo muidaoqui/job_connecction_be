@@ -270,7 +270,7 @@ export const getRecruiterStats = async (req, res) => {
 };
 export const applyJob = async (req, res) => {
   try {
-    const jobId = req.params.id;
+    const jobId = req.params.jobId;
     const { name, email, message } = req.body;
 
     if (!req.file) {
