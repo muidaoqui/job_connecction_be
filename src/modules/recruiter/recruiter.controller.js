@@ -1,6 +1,39 @@
 import Recruiter from "./recruiter.model.js";
 import User from "../auth/auth.model.js";
 import mongoose from "mongoose";
+import Application from "../candidate/applications/application.model.js";
+import Job from "../job/job.model.js";
+
+
+export const getApplicantsForRecruiter = async (req, res) => {
+  try {
+    const recruiterUserId = req.user._id;
+
+    // Lấy recruiterId theo userId
+    const recruiter = await Recruiter.findOne({ userId: recruiterUserId });
+    if (!recruiter) {
+      return res.status(404).json({ message: "Recruiter not found" });
+    }
+
+    // Lấy tất cả job mà recruiter đã đăng
+    const jobs = await Job.find({ recruiterId: recruiter._id }).select("_id");
+    const jobIds = jobs.map(j => j._id);
+
+    // Lấy tất cả ứng viên apply vào các job đó
+    const applications = await Application.find({ jobId: { $in: jobIds } })
+      .populate("userId", "name email")
+      .populate("jobId", "title");
+
+    return res.json({
+      success: true,
+      applications
+    });
+
+  } catch (err) {
+    console.error("getApplicantsForRecruiter error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
 
 // Get recruiter profile by userId
 export const getRecruiterByUserId = async (req, res) => {
@@ -207,5 +240,94 @@ export const getTopRecruiters = async (req, res) => {
     res.json({ success: true, recruiters: topRecruiters });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+// Lấy hồ sơ recruiter của user đang đăng nhập
+export const getMyRecruiterProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const recruiter = await Recruiter.findOne({ userId });
+
+    return res.status(200).json({
+      success: true,
+      data: recruiter || null
+    });
+  } catch (error) {
+    console.error("getMyRecruiterProfile error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+};
+
+// Tạo hoặc cập nhật hồ sơ recruiter
+export const saveMyRecruiterProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const { fullName, position, phone, workEmail, bio } = req.body;
+
+    let recruiter = await Recruiter.findOne({ userId });
+
+    if (!recruiter) {
+      recruiter = await Recruiter.create({
+        userId,
+        fullName,
+        position,
+        phone,
+        workEmail,
+        bio,
+        companyId: null,
+        followers: 0
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: "Tạo hồ sơ nhà tuyển dụng thành công!",
+        data: recruiter
+      });
+    }
+
+    recruiter.fullName = fullName;
+    recruiter.position = position;
+    recruiter.phone = phone;
+    recruiter.workEmail = workEmail;
+    recruiter.bio = bio;
+
+    await recruiter.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Cập nhật hồ sơ nhà tuyển dụng thành công!",
+      data: recruiter
+    });
+
+  } catch (error) {
+    console.error("saveMyRecruiterProfile error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+};
+export const updateApplicantStatus = async (req, res) => {
+  try {
+    const { appId } = req.params;
+    const { status } = req.body;
+
+    const application = await Application.findById(appId);
+    if (!application) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    application.status = status;
+    await application.save();
+
+    res.json({ success: true, application });
+  } catch (error) {
+    console.error("updateApplicantStatus error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
