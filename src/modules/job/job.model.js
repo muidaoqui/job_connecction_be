@@ -11,6 +11,19 @@ const jobSchema = new mongoose.Schema(
     recruiterId: { type: mongoose.Schema.Types.ObjectId, ref: "Recruiter", required: true },
     companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
     saveCount: { type: Number, default: 0 },
+    embedding: {
+      type: [Number],
+      default: undefined, // Hoặc bỏ default
+    },
+    embeddingText: {
+      type: String,
+    },
+    embeddingUpdatedAt: {
+      type: Date,
+    },
+    embeddingDimensions: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );
