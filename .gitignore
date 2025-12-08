@@ -1,4 +1,7 @@
 node_modules/
 .env
+job_connecction_be/package-lock.json
+job_connecction_be/package.json
+
+
 package-lock.json
-package.json
