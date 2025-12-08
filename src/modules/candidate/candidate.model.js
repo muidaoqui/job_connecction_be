@@ -9,6 +9,20 @@ const candidateSchema = new mongoose.Schema({
   mainResumePath: String,
   profileSummary: String,
   avatarUrl: String,
+  embedding: {
+    type: [Number],
+    default: undefined,
+  },
+  embeddingText: {
+    type: String,
+  },
+  embeddingUpdatedAt: {
+    type: Date,
+  },
+  embeddingDimensions: {
+    type: Number,
+  },
+    
 });
 
 export default mongoose.model("Candidate", candidateSchema);
