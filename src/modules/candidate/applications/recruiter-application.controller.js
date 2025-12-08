@@ -1,4 +1,4 @@
-import Application from "../../candidate/applications/application.model.js";
+import Application from "../../job/application.model.js";
 import Job from "../../job/job.model.js";
 
 // Lấy toàn bộ đơn của recruiter

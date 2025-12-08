@@ -1,4 +1,4 @@
-import Application from "../../candidate/applications/application.model.js";
+import Application from "../job/application.model.js";
 import SavedJob from "../saved-job/saved-job.model.js";
 import JobView from "../job-view/job-view.model.js";
 import Job from "../../job/job.model.js";

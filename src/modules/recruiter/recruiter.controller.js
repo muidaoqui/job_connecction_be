@@ -1,7 +1,7 @@
 import Recruiter from "./recruiter.model.js";
 import User from "../auth/auth.model.js";
 import mongoose from "mongoose";
-import Application from "../candidate/applications/application.model.js";
+import Application from "../job/application.model.js";
 import Job from "../job/job.model.js";
 
 
@@ -191,7 +191,7 @@ export const getRecruiterStats = async (req, res) => {
 
     // Import Job to count posted jobs
     const Job = require("../job/job.model.js").default;
-    const Application = require("../candidate/applications/application.model.js").default;
+    const Application = require("../job/application.model.js").default;
 
     const postedJobs = await Job.countDocuments({ recruiterId: userId });
     const jobs = await Job.find({ recruiterId: userId }).select("_id");
