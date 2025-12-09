@@ -11,15 +11,18 @@ import {
   decrementSaveCount,
   saveJob,
   unsaveJob,
+  getRecruiterStats,
+  applyJob,
+  searchJobs
 } from "./job.controller.js";
+
 import { verifyToken } from "../auth/auth.middleware.js";
-import { getRecruiterStats } from "./job.controller.js";
-import { applyJob } from "./job.controller.js";
-import { uploadCV } from "./uploadCV.js";
 import Application from "./application.model.js";
-import { searchJobs } from "./job.controller.js";
+
+import { uploadCvMiddleware } from "./uploadCV.js";
 
 const router = express.Router();
+
 // Applicants
 router.get("/applications/all", async (req, res) => {
   try {
@@ -35,18 +38,21 @@ router.get("/applications/all", async (req, res) => {
 });
 
 router.put("/applications/:id/status", updateApplicationStatus);
-router.post("/:id/apply", uploadCV, applyJob);
+
+router.post("/:id/apply", uploadCvMiddleware, applyJob);
 
 // CRUD Job
 router.post("/", verifyToken, createJob);
 router.get("/", getAllJobs);
+
+router.get("/search", searchJobs);
+
 router.get("/stats/:id", getRecruiterStats);
 router.get("/:id", getJobById);
 router.put("/:id", updateJob);
 router.delete("/:id", deleteJob);
-router.get("/search", searchJobs);
 
-// Save/Unsave job for authenticated users (create SavedJob records and update saveCount)
+// Save / Unsave Job
 router.post("/:id/save", verifyToken, saveJob);
 router.post("/:id/unsave", verifyToken, unsaveJob);
 
