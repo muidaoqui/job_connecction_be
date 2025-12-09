@@ -7,8 +7,19 @@ const recruiterSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
-    position: String,
+    companyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
+      default: null,
+    },
+
+    // Hồ sơ nhà tuyển dụng
+    fullName: { type: String, required: true },
+    position: { type: String, required: true },
+    phone: { type: String, required: true },
+    workEmail: { type: String, required: true },
+    bio: { type: String, default: "" },
+
     followers: { type: Number, default: 0 },
   },
   { timestamps: true }
