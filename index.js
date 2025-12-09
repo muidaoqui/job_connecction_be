@@ -77,6 +77,8 @@ app.get("/uploads/resumes/:filename", verifyToken, async (req, res) => {
 
     // const resume = await Resume.findOne({ filename, userId });
 
+    // const resume = await Resume.findOne({ filename, userId });
+
     if (!resume) {
       console.log(
         `❌ Unauthorized access attempt: user ${userId} tried to access ${filename}`

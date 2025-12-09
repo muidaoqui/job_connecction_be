@@ -13,6 +13,17 @@ const recruiterSchema = new mongoose.Schema(
       default: null,
     },
 
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    companyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
+      default: null,
+    },
+
     // Hồ sơ nhà tuyển dụng
     fullName: { type: String, required: true },
     position: { type: String, required: true },
