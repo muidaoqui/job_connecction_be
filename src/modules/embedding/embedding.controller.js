@@ -109,7 +109,54 @@ export const findSimilarJobs = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+// Get recommended jobs for logged-in candidate
+export const getRecommendedJobsForCandidate = async (req, res) => {
+    try {
+        const userId = req.user.id; // From auth middleware
+        const { limit = 6 } = req.query;
 
+        // 1. Tìm candidate profile
+        const candidate = await Candidate.findOne({ userId });
+        if (!candidate) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Candidate profile not found' 
+            });
+        }
+
+        // 2. Kiểm tra xem candidate đã có embedding chưa
+        if (!candidate.embeddingText || !candidate.embedding || candidate.embedding.length === 0) {
+            return res.status(200).json({
+                success: false,
+                needsProfile: true,
+                message: 'Vui lòng cập nhật đầy đủ hồ sơ của bạn (học vấn, kinh nghiệm, kỹ năng) để nhận gợi ý công việc phù hợp'
+            });
+        }
+
+        // 3. Search jobs bằng candidate embedding
+        const results = await searchJobsByEmbedding(
+            candidate.embedding,
+            parseInt(limit),
+            100 // numCandidates
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Recommended jobs retrieved successfully',
+            data: {
+                total: results.length,
+                jobs: results,
+                candidateProfile: {
+                    embeddingText: candidate.embeddingText,
+                    lastUpdated: candidate.embeddingUpdatedAt
+                }
+            }
+        });
+    } catch (error) {
+        console.error("Error getting recommended jobs:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 // ============== CANDIDATE CONTROLLERS ==============
 
 // Generate embeddings cho candidate - chỉ cần candidateId
@@ -213,3 +260,94 @@ export const findSimilarCandidates = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+// Force update job embedding
+export const forceUpdateJobEmbedding = async (req, res) => {
+    try {
+        const { jobId } = req.params;
+        
+        const result = await generateAndSaveJobEmbedding(jobId);
+
+        res.status(200).json({
+            success: true,
+            message: 'Job embedding force updated successfully',
+            data: result
+        });
+    } catch (error) {
+        console.error("Error force updating job embedding:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Force update candidate embedding
+export const forceUpdateCandidateEmbedding = async (req, res) => {
+    try {
+        const { candidateId } = req.params;
+        
+        const result = await generateAndSaveCandidateEmbedding(candidateId);
+
+        res.status(200).json({
+            success: true,
+            message: 'Candidate embedding force updated successfully',
+            data: result
+        });
+    } catch (error) {
+        console.error("Error force updating candidate embedding:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Batch update all job embeddings
+export const batchUpdateJobEmbeddings = async (req, res) => {
+    try {
+        const jobs = await Job.find({ embedding: { $exists: false } }).select('_id');
+        
+        const results = await Promise.allSettled(
+            jobs.map(job => generateAndSaveJobEmbedding(job._id.toString()))
+        );
+
+        const successful = results.filter(r => r.status === 'fulfilled').length;
+        const failed = results.filter(r => r.status === 'rejected').length;
+
+        res.status(200).json({
+            success: true,
+            message: `Batch update completed`,
+            data: {
+                total: jobs.length,
+                successful,
+                failed
+            }
+        });
+    } catch (error) {
+        console.error("Error batch updating job embeddings:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Batch update all candidate embeddings
+export const batchUpdateCandidateEmbeddings = async (req, res) => {
+    try {
+        const candidates = await Candidate.find({ embedding: { $exists: false } }).select('_id');
+        
+        const results = await Promise.allSettled(
+            candidates.map(candidate => generateAndSaveCandidateEmbedding(candidate._id.toString()))
+        );
+
+        const successful = results.filter(r => r.status === 'fulfilled').length;
+        const failed = results.filter(r => r.status === 'rejected').length;
+
+        res.status(200).json({
+            success: true,
+            message: `Batch update completed`,
+            data: {
+                total: candidates.length,
+                successful,
+                failed
+            }
+        });
+    } catch (error) {
+        console.error("Error batch updating candidate embeddings:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+

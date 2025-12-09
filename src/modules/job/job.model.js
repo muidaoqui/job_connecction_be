@@ -13,19 +13,39 @@ const jobSchema = new mongoose.Schema(
     saveCount: { type: Number, default: 0 },
     embedding: {
       type: [Number],
-      default: undefined, // Hoặc bỏ default
+      default: undefined
     },
-    embeddingText: {
-      type: String,
-    },
-    embeddingUpdatedAt: {
-      type: Date,
-    },
-    embeddingDimensions: {
-      type: Number,
-    },
+    embeddingText: String,
+    embeddingUpdatedAt: Date,
+    embeddingDimensions: Number
   },
   { timestamps: true }
 );
+
+// Hook: Tự động update embedding khi job được update
+jobSchema.pre('save', async function(next) {
+    // Chỉ update embedding nếu các trường liên quan thay đổi
+    const embeddingFields = ['title', 'description', 'requirements', 'location', 'salary', 'jobType'];
+    const hasRelevantChanges = embeddingFields.some(field => this.isModified(field));
+
+    if (hasRelevantChanges && !this.isNew) {
+        // Đánh dấu cần regenerate embedding
+        this._needsEmbeddingUpdate = true;
+    }
+    next();
+});
+
+// Hook: Sau khi save, regenerate embedding nếu cần
+jobSchema.post('save', async function(doc) {
+    if (doc._needsEmbeddingUpdate) {
+        try {
+            const { generateAndSaveJobEmbedding } = await import('../embedding/embedding.serivice.js');
+            await generateAndSaveJobEmbedding(doc._id.toString());
+            console.log(`✅ Auto-updated embedding for job ${doc._id}`);
+        } catch (error) {
+            console.error(`⚠️ Failed to auto-update embedding for job ${doc._id}:`, error.message);
+        }
+    }
+});
 
 export default mongoose.model("Job", jobSchema);

@@ -11,7 +11,7 @@ import jobRoutes from "./src/modules/job/job.route.js";
 import candidateRoutes from "./src/modules/candidate/candidate.route.js";
 import recruiterRoutes from "./src/modules/recruiter/recruiter.route.js";
 import companyRoutes from "./src/modules/recruiter/company.route.js";
-import Embedded from "./src/modules/embedding/embedding.routers.js";
+import embeddingRoutes from "./src/modules/embedding/embedding.routers.js";
 import { verifyToken } from "./src/modules/auth/auth.middleware.js";
 import Resume from "./src/modules/candidate/resume.model.js";
 import recruiterAppRoutes from "./src/modules/candidate/applications/recruiter-application.route.js";
@@ -87,7 +87,7 @@ app.use("/api/candidate", candidateRoutes);
 app.use("/api/recruiter", recruiterRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/recruiter/applications", recruiterAppRoutes);
-app.use("/api/embeddings", Embedded);
+app.use("/api/embeddings", embeddingRoutes);
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -104,6 +104,20 @@ app.get("/", (req, res) => {
   res.json({ message: "Backend is running!" });
 });
 
+app.get("/health", (req, res) => {
+  res.json({ status: "OK", message: "Server is running" });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route ${req.originalUrl} not found`,
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`✅ Server listening on port ${PORT}`);
 });
+
+export default app;

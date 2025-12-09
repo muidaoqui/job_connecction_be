@@ -3,8 +3,9 @@ import Job from "./job.model.js";
 import Application from "./application.model.js";
 import SavedJob from "../candidate/saved-job/saved-job.model.js";
 import Recruiter from "../recruiter/recruiter.model.js";
+import { generateAndSaveJobEmbedding } from "../embedding/embedding.serivice.js";
 
-// Tạo job
+// Tạo job (với embedding info trong response)
 export const createJob = async (req, res) => {
   try {
     // Ensure authenticated
@@ -27,7 +28,23 @@ export const createJob = async (req, res) => {
     const job = new Job(jobData);
     await job.save();
 
-    res.status(201).json({ success: true, job });
+    // Auto-generate embedding ngay sau khi tạo job
+    let embeddingInfo = null;
+    try {
+      embeddingInfo = await generateAndSaveJobEmbedding(job._id.toString());
+      console.log(`✅ Embedding generated for job ${job._id}`);
+    } catch (embeddingError) {
+      console.error(`⚠️ Failed to generate embedding for job ${job._id}:`, embeddingError.message);
+    }
+
+    res.status(201).json({ 
+      success: true, 
+      job,
+      embedding: embeddingInfo ? {
+        dimensions: embeddingInfo.embeddingDimensions,
+        generatedAt: embeddingInfo.embeddingUpdatedAt
+      } : null
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
