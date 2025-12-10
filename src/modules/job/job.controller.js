@@ -2,34 +2,52 @@ import mongoose from "mongoose";
 import Job from "./job.model.js";
 import Application from "../job/application.model.js";
 import SavedJob from "../candidate/saved-job/saved-job.model.js";
-import Recruiter from "../recruiter/recruiter.model.js";
+import { Recruiter } from "../recruiter/recruiter.model.js";
 
 // Tạo job
 export const createJob = async (req, res) => {
   try {
-    // Ensure authenticated
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: "Vui lòng đăng nhập" });
+    // 1) CHECK LOGIN
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: "Bạn cần đăng nhập để đăng tin" });
     }
 
-    // Ensure the authenticated user has a recruiter profile
-    const recruiterProfile = await Recruiter.findOne({ userId: req.user.id });
-    if (!recruiterProfile) {
-      return res.status(403).json({ message: "Bạn cần có hồ sơ nhà tuyển dụng để đăng tin" });
+    // 2) FIND RECRUITER PROFILE
+    const recruiter = await Recruiter.findOne({ userId: req.user._id });
+    if (!recruiter) {
+      return res.status(403).json({
+        message: "Bạn cần tạo hồ sơ Nhà tuyển dụng trước khi đăng tin"
+      });
     }
 
-    // Build job data and force recruiterId from server-side profile (prevent spoofing)
+    // 3) BUILD JOB DATA (BE sẽ tự set recruiterId)
     const jobData = {
-      ...req.body,
-      recruiterId: recruiterProfile._id,
+      title: req.body.title,
+      description: req.body.description,
+      requirement: req.body.requirement,
+      salary: req.body.salary,
+      location: req.body.location,
+      type: req.body.type,
+      companyId: recruiter.companyId || null, // auto link company
+      recruiterId: recruiter._id,             // ⭐ QUAN TRỌNG
     };
 
-    const job = new Job(jobData);
-    await job.save();
+    // 4) CREATE NEW JOB
+    const newJob = new Job(jobData);
+    await newJob.save();
 
-    res.status(201).json({ success: true, job });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(201).json({
+      success: true,
+      message: "Đăng tin thành công",
+      job: newJob,
+    });
+  } catch (err) {
+    console.error("❌ Lỗi tạo job:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server khi đăng tin",
+      error: err.message,
+    });
   }
 };
 // Lấy job theo ID
@@ -60,27 +78,38 @@ export const getJobById = async (req, res) => {
   }
 };
 // Lấy toàn bộ job (sắp xếp theo saveCount cho "hot jobs")
+// Lấy toàn bộ job (sắp xếp theo mức độ HOT)
 export const getAllJobs = async (req, res) => {
   try {
-    // Populate recruiter basic info and company details, sort by saveCount descending (most saved = hottest)
     const jobs = await Job.find()
-      .populate({ 
-        path: 'recruiterId', 
-        select: 'userId position followers companyId',
-        populate: [
-          { path: 'userId', select: 'name' },
-          { path: 'companyId', select: 'name industry size country logo backgroundImage images' }
-        ]
+      .populate({
+        path: "recruiterId",
+        select: "userId position companyId",
+        populate: {
+          path: "userId",
+          select: "name email"
+        }
       })
-      .populate({ path: 'companyId', select: 'name industry size country logo backgroundImage images' })
-      .sort({ saveCount: -1 });
-    res.json(jobs);
+      .populate({
+        path: "companyId",
+        select: "name industry size country logo address backgroundImage images"
+      })
+      .sort({ createdAt: -1 });   // ưu tiên tin mới đăng
+
+    return res.json({
+      success: true,
+      data: jobs
+    });
 
   } catch (error) {
-    console.error("Get jobs error:", error);
-    res.status(500).json({ message: error.message });
+    console.error("🔥 Lỗi getAllJobs:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server khi lấy danh sách công việc"
+    });
   }
 };
+
 
 // Increment saveCount when job is saved by user
 export const incrementSaveCount = async (req, res) => {
