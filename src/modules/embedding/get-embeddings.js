@@ -1,5 +1,5 @@
-import { pipeline } from '@xenova/transformers';
-
+import { pipeline } from '@huggingface/transformers';
+// please run `npm install @huggingface/transformers` to install the package
 // Function to generate embeddings for a given data source
 export async function getEmbedding(data) {
     const embedder = await pipeline(

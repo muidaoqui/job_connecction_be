@@ -157,6 +157,171 @@ export const getRecommendedJobsForCandidate = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+// ============== BATCH OPERATIONS ==============
+
+// Batch generate embeddings for all jobs
+export const batchGenerateAllJobEmbeddings = async (req, res) => {
+    try {
+        // Lấy tất cả jobs
+        const jobs = await Job.find({}).select('_id title');
+        
+        if (jobs.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: 'No jobs found to generate embeddings',
+                data: { total: 0, successful: 0, failed: 0 }
+            });
+        }
+
+        console.log(`🚀 Starting batch embedding generation for ${jobs.length} jobs...`);
+
+        const results = {
+            total: jobs.length,
+            successful: 0,
+            failed: 0,
+            errors: []
+        };
+
+        // Process jobs one by one (để tránh overload)
+        for (const job of jobs) {
+            try {
+                console.log(`Processing job ${results.successful + results.failed + 1}/${jobs.length}: ${job.title}`);
+                
+                await generateAndSaveJobEmbedding(job._id.toString());
+                results.successful++;
+                
+                console.log(`✅ Success: ${job.title}`);
+            } catch (error) {
+                results.failed++;
+                results.errors.push({
+                    jobId: job._id,
+                    title: job.title,
+                    error: error.message
+                });
+                
+                console.error(`❌ Failed: ${job.title} - ${error.message}`);
+            }
+        }
+
+        console.log(`✅ Batch generation completed: ${results.successful} successful, ${results.failed} failed`);
+
+        res.status(200).json({
+            success: true,
+            message: `Batch generation completed`,
+            data: results
+        });
+    } catch (error) {
+        console.error("Error in batch job embedding generation:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Batch generate embeddings for jobs without embeddings
+export const batchGenerateMissingJobEmbeddings = async (req, res) => {
+    try {
+        // Chỉ lấy jobs chưa có embedding
+        const jobs = await Job.find({ 
+            $or: [
+                { embedding: { $exists: false } },
+                { embedding: [] },
+                { embeddingText: { $exists: false } }
+            ]
+        }).select('_id title');
+        
+        if (jobs.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: 'All jobs already have embeddings',
+                data: { total: 0, successful: 0, failed: 0 }
+            });
+        }
+
+        console.log(`🚀 Starting batch embedding generation for ${jobs.length} jobs without embeddings...`);
+
+        const results = {
+            total: jobs.length,
+            successful: 0,
+            failed: 0,
+            errors: []
+        };
+
+        for (const job of jobs) {
+            try {
+                console.log(`Processing job ${results.successful + results.failed + 1}/${jobs.length}: ${job.title}`);
+                
+                await generateAndSaveJobEmbedding(job._id.toString());
+                results.successful++;
+                
+                console.log(`✅ Success: ${job.title}`);
+                
+                // Optional: Add delay to avoid rate limiting
+                await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
+            } catch (error) {
+                results.failed++;
+                results.errors.push({
+                    jobId: job._id,
+                    title: job.title,
+                    error: error.message
+                });
+                
+                console.error(`❌ Failed: ${job.title} - ${error.message}`);
+            }
+        }
+
+        console.log(`✅ Batch generation completed: ${results.successful} successful, ${results.failed} failed`);
+
+        res.status(200).json({
+            success: true,
+            message: `Batch generation completed`,
+            data: results
+        });
+    } catch (error) {
+        console.error("Error in batch job embedding generation:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Get embedding statistics
+export const getEmbeddingStats = async (req, res) => {
+    try {
+        const totalJobs = await Job.countDocuments();
+        const jobsWithEmbedding = await Job.countDocuments({ 
+            embedding: { $exists: true, $ne: [] },
+            embeddingText: { $exists: true }
+        });
+        const jobsWithoutEmbedding = totalJobs - jobsWithEmbedding;
+
+        const totalCandidates = await Candidate.countDocuments();
+        const candidatesWithEmbedding = await Candidate.countDocuments({ 
+            embedding: { $exists: true, $ne: [] },
+            embeddingText: { $exists: true }
+        });
+        const candidatesWithoutEmbedding = totalCandidates - candidatesWithEmbedding;
+
+        res.status(200).json({
+            success: true,
+            data: {
+                jobs: {
+                    total: totalJobs,
+                    withEmbedding: jobsWithEmbedding,
+                    withoutEmbedding: jobsWithoutEmbedding,
+                    percentage: totalJobs > 0 ? Math.round((jobsWithEmbedding / totalJobs) * 100) : 0
+                },
+                candidates: {
+                    total: totalCandidates,
+                    withEmbedding: candidatesWithEmbedding,
+                    withoutEmbedding: candidatesWithoutEmbedding,
+                    percentage: totalCandidates > 0 ? Math.round((candidatesWithEmbedding / totalCandidates) * 100) : 0
+                }
+            }
+        });
+    } catch (error) {
+        console.error("Error getting embedding stats:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 // ============== CANDIDATE CONTROLLERS ==============
 
 // Generate embeddings cho candidate - chỉ cần candidateId
