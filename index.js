@@ -11,7 +11,7 @@ import adminRoutes from "./src/modules/admin/admin.route.js";
 import jobRoutes from "./src/modules/job/job.route.js";
 import candidateRoutes from "./src/modules/candidate/candidate.route.js";
 import recruiterRoutes from "./src/modules/recruiter/recruiter.route.js";
-import companyRoutes from "./src/modules/recruiter/company.route.js";
+import companyRoutes from "./src/modules/recruiter/company/company.route.js";
 import embeddingRoutes from "./src/modules/embedding/embedding.routers.js";
 import { verifyToken } from "./src/modules/auth/auth.middleware.js";
 import Resume from "./src/modules/candidate/resume.model.js";
