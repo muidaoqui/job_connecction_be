@@ -7,6 +7,7 @@ import morgan from "morgan";
 import fs from "fs";
 import path from "path";
 import authRoutes from "./src/modules/auth/auth.route.js";
+import adminRoutes from "./src/modules/admin/admin.route.js";
 import jobRoutes from "./src/modules/job/job.route.js";
 import candidateRoutes from "./src/modules/candidate/candidate.route.js";
 import recruiterRoutes from "./src/modules/recruiter/recruiter.route.js";
@@ -64,7 +65,9 @@ app.get("/uploads/resumes/:filename", verifyToken, async (req, res) => {
     const resume = await Resume.findOne({ filename, userId });
 
     if (!resume) {
-      console.log(`❌ Unauthorized access attempt: user ${userId} tried to access ${filename}`);
+      console.log(
+        `❌ Unauthorized access attempt: user ${userId} tried to access ${filename}`
+      );
       return res.status(403).json({ message: "Access denied" });
     }
 

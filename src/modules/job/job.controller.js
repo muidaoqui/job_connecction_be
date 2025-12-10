@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import Job from "./job.model.js";
-import Application from "./application.model.js";
+import Application from "../job/application.model.js";
 import SavedJob from "../candidate/saved-job/saved-job.model.js";
 import Recruiter from "../recruiter/recruiter.model.js";
 import { generateAndSaveJobEmbedding } from "../embedding/embedding.serivice.js";
@@ -295,13 +295,14 @@ export const applyJob = async (req, res) => {
     }
 
     const application = new Application({
-      jobId: new mongoose.Types.ObjectId(jobId),
-      name,
-      email,
-      message,
-      cvFile: req.file.path,
-      status: "pending",
-    });
+  jobId: new mongoose.Types.ObjectId(jobId),
+  userId: new mongoose.Types.ObjectId(req.user.id),                // ⭐ THÊM DÒNG NÀY
+  name,
+  email,
+  message,
+  cvFile: req.file.path,
+  status: "pending",
+});
 
     await application.save();
 

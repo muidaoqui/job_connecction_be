@@ -8,7 +8,11 @@ const jobSchema = new mongoose.Schema(
     salary: { type: String },
     location: { type: String },
     jobType: { type: String },
-    recruiterId: { type: mongoose.Schema.Types.ObjectId, ref: "Recruiter", required: true },
+    recruiterId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Recruiter",
+      required: true,
+    },
     companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
     saveCount: { type: Number, default: 0 },
     embedding: {
@@ -19,6 +23,7 @@ const jobSchema = new mongoose.Schema(
     embeddingUpdatedAt: Date,
     embeddingDimensions: Number
   },
+
   { timestamps: true }
 );
 
