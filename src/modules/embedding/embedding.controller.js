@@ -112,7 +112,7 @@ export const findSimilarJobs = async (req, res) => {
 // Get recommended jobs for logged-in candidate
 export const getRecommendedJobsForCandidate = async (req, res) => {
     try {
-        const userId = req.user.id; // From auth middleware
+        const userId = req.user._id; // From auth middleware
         const { limit = 6 } = req.query;
 
         // 1. Tìm candidate profile

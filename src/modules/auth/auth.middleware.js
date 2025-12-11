@@ -26,6 +26,7 @@ export const verifyToken = async (req, res, next) => {
     // Đảm bảo req.user.id tồn tại (dùng _id từ MongoDB hoặc decoded.id)
     req.user = { 
       id: user._id.toString(), // hoặc decoded.id
+      // id: user.id,
       email: user.email,
       role: user.role,
       ...user.toObject() 
