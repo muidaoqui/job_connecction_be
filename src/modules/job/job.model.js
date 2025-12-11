@@ -15,6 +15,11 @@ const jobSchema = new mongoose.Schema(
     },
     companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
     saveCount: { type: Number, default: 0 },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
     embedding: {
       type: [Number],
       default: undefined

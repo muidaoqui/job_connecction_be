@@ -1,11 +1,11 @@
 import Company from "./company.model.js";
-import Recruiter from "../recruiter.model.js";
+import  Recruiter  from "../recruiter.model.js";   
 export const createOrUpdateCompany = async (req, res) => {
   try {
     const userId = req.user._id;
 
     // 🔥 1. Kiểm tra profile recruiter
-    const recruiter = await Recruiter.findOne({ userId });
+    const recruiter = await Recruiter.findOne({ userId: req.user._id });
 
     if (!recruiter) {
       return res.status(403).json({
