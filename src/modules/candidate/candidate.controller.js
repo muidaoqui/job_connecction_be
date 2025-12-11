@@ -111,39 +111,22 @@ export const updateProfile = async (req, res) => {
 // Tải lên CV
 export const uploadResume = async (req, res) => {
   try {
-    if (!req.file) {
-      console.error("❌ Không có file được tải lên");
-      return res.status(400).json({ message: "Vui lòng chọn file để tải lên" });
+    const userId = req.user.id;
+    const filePath = req.file.path;
+
+    let candidate = await Candidate.findById(userId);
+    if (!candidate) {
+      candidate = new Candidate({ _id: userId, resumePath: filePath });
+      await candidate.save();
+    } else {
+      candidate.resumePath = filePath;
+      await candidate.save();
     }
 
-    const userId = req.user.id;
-    console.log("📁 File info:", req.file.filename, "UserID:", userId);
-    
-    const resumePath = req.file.path;
-    
-    const resume = new Resume({
-      userId,
-      filename: req.file.filename,
-      path: resumePath,
-    });
-    await resume.save();
-    console.log(`✅ Saved resume record to DB for user ${userId}`);
-    
-    let candidate = await Candidate.findOne({ userId });
-    if (!candidate) {
-        candidate = new Candidate({ userId, resumePath });  
-        await candidate.save();
-        console.log("✅ Tạo candidate mới với CV");
-    } else {
-        candidate.resumePath = resumePath;
-        await candidate.save();
-        console.log("✅ Cập nhật CV cho candidate");
-    }
-    
-    res.status(200).json({ message: "Resume uploaded successfully", resumePath });
+    res.status(200).json({ message: "Resume uploaded", resumePath: filePath });
   } catch (error) {
-    console.error("❌ Lỗi upload CV:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error("Upload resume error:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
