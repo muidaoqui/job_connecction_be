@@ -8,9 +8,18 @@ const jobSchema = new mongoose.Schema(
     salary: { type: String },
     location: { type: String },
     jobType: { type: String },
-    recruiterId: { type: mongoose.Schema.Types.ObjectId, ref: "Recruiter", required: true },
+    recruiterId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Recruiter",
+      required: true,
+    },
     companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
     saveCount: { type: Number, default: 0 },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
     embedding: {
       type: [Number],
       default: undefined
@@ -19,9 +28,11 @@ const jobSchema = new mongoose.Schema(
     embeddingUpdatedAt: Date,
     embeddingDimensions: Number
   },
+
   { timestamps: true }
 );
 
+export default mongoose.model("Job", jobSchema);
 // Hook: Tự động update embedding khi job được update
 jobSchema.pre('save', async function(next) {
     // Chỉ update embedding nếu các trường liên quan thay đổi

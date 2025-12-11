@@ -7,14 +7,17 @@ import morgan from "morgan";
 import fs from "fs";
 import path from "path";
 import authRoutes from "./src/modules/auth/auth.route.js";
+import adminRoutes from "./src/modules/admin/admin.route.js";
 import jobRoutes from "./src/modules/job/job.route.js";
 import candidateRoutes from "./src/modules/candidate/candidate.route.js";
-import recruiterRoutes from "./src/modules/recruiter/recruiter.route.js";
-import companyRoutes from "./src/modules/recruiter/company.route.js";
-import embeddingRoutes from "./src/modules/embedding/embedding.routers.js";
 import { verifyToken } from "./src/modules/auth/auth.middleware.js";
 import Resume from "./src/modules/candidate/resume.model.js";
 import recruiterAppRoutes from "./src/modules/candidate/applications/recruiter-application.route.js";
+import recruiterRoutes from "./src/modules/recruiter/recruiter.route.js";
+import { fileURLToPath } from "url";
+import companyRoutes from "./src/modules/recruiter/company/company.route.js";
+
+console.log("🔥 Loaded recruiterRoutes from:", recruiterRoutes);
 
 dotenv.config();
 
@@ -64,7 +67,9 @@ app.get("/uploads/resumes/:filename", verifyToken, async (req, res) => {
     const resume = await Resume.findOne({ filename, userId });
 
     if (!resume) {
-      console.log(`❌ Unauthorized access attempt: user ${userId} tried to access ${filename}`);
+      console.log(
+        `❌ Unauthorized access attempt: user ${userId} tried to access ${filename}`
+      );
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -80,13 +85,21 @@ app.get("/uploads/resumes/:filename", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Error serving file" });
   }
 });
-
+// ROUTES CHÍNH
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/candidate", candidateRoutes);
-app.use("/api/recruiter", recruiterRoutes);
 app.use("/api/company", companyRoutes);
+
+// ROUTE HỒ SƠ RECRUITER (QUAN TRỌNG)
+app.use("/api/recruiter", recruiterRoutes);
+
+// ROUTE ỨNG TUYỂN RECRUITER
 app.use("/api/recruiter/applications", recruiterAppRoutes);
+
+// STATIC
+app.use("/uploads", express.static("uploads"));
+
 app.use("/api/embeddings", embeddingRoutes);
 mongoose
   .connect(process.env.MONGO_URI, {

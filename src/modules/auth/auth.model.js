@@ -2,10 +2,21 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
+  _id: { type: mongoose.Schema.Types.ObjectId, required: true, auto: true },
+  name: String,
   name: { type: String, required: true },
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ["admin", "recruiter", "candidate"], default: "candidate" },
+  role: {
+    type: String,
+    enum: ["admin", "recruiter", "candidate"],
+    default: "candidate",
+  },
+  status: {
+    type: String,
+    enum: ["active", "inactive", "banned"],
+    default: "active",
+  },
   resetToken: String,
   resetTokenExpire: Date,
   emailVerified: { type: Boolean, default: false },

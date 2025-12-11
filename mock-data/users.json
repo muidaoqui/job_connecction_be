@@ -1,0 +1,112 @@
+[
+  {
+    "_id": "user_001",
+    "email": "nguyenvana@gmail.com",
+    "password": "$2b$10$hashedpassword123",
+    "firstName": "An",
+    "lastName": "Nguyễn Văn",
+    "phoneNumber": "0901234567",
+    "role": "candidate",
+    "created_at": "2023-10-01T08:00:00Z",
+    "updated_at": "2023-10-01T08:00:00Z"
+  },
+  {
+    "_id": "user_002",
+    "email": "lethib@gmail.com",
+    "password": "$2b$10$hashedpassword123",
+    "firstName": "Bình",
+    "lastName": "Lê Thị",
+    "phoneNumber": "0901234568",
+    "role": "candidate",
+    "created_at": "2023-10-02T09:00:00Z",
+    "updated_at": "2023-10-02T09:00:00Z"
+  },
+  {
+    "_id": "user_003",
+    "email": "tranc@gmail.com",
+    "password": "$2b$10$hashedpassword123",
+    "firstName": "Cường",
+    "lastName": "Trần Văn",
+    "phoneNumber": "0901234569",
+    "role": "candidate",
+    "created_at": "2023-10-03T10:00:00Z",
+    "updated_at": "2023-10-03T10:00:00Z"
+  },
+  {
+    "_id": "user_004",
+    "email": "phamthid@gmail.com",
+    "password": "$2b$10$hashedpassword123",
+    "firstName": "Dung",
+    "lastName": "Phạm Thị",
+    "phoneNumber": "0901234570",
+    "role": "candidate",
+    "created_at": "2023-10-04T11:00:00Z",
+    "updated_at": "2023-10-04T11:00:00Z"
+  },
+  {
+    "_id": "user_005",
+    "email": "hoange@gmail.com",
+    "password": "$2b$10$hashedpassword123",
+    "firstName": "Em",
+    "lastName": "Hoàng Văn",
+    "phoneNumber": "0901234571",
+    "role": "candidate",
+    "created_at": "2023-10-05T12:00:00Z",
+    "updated_at": "2023-10-05T12:00:00Z"
+  },
+  {
+    "_id": "user_006",
+    "email": "vuongf@gmail.com",
+    "password": "$2b$10$hashedpassword123",
+    "firstName": "Phúc",
+    "lastName": "Vương",
+    "phoneNumber": "0901234572",
+    "role": "candidate",
+    "created_at": "2023-10-06T13:00:00Z",
+    "updated_at": "2023-10-06T13:00:00Z"
+  },
+  {
+    "_id": "user_007",
+    "email": "hr.manager@companyA.com",
+    "password": "$2b$10$hashedpassword123",
+    "firstName": "Giang",
+    "lastName": "Ngô Hương",
+    "phoneNumber": "0911222333",
+    "role": "recruiter",
+    "created_at": "2023-09-15T08:30:00Z",
+    "updated_at": "2023-09-15T08:30:00Z"
+  },
+  {
+    "_id": "user_008",
+    "email": "talent.acquisition@companyB.com",
+    "password": "$2b$10$hashedpassword123",
+    "firstName": "Hùng",
+    "lastName": "Đặng Quang",
+    "phoneNumber": "0911222444",
+    "role": "recruiter",
+    "created_at": "2023-09-16T09:30:00Z",
+    "updated_at": "2023-09-16T09:30:00Z"
+  },
+  {
+    "_id": "user_009",
+    "email": "recruiter@companyC.com",
+    "password": "$2b$10$hashedpassword123",
+    "firstName": "Khánh",
+    "lastName": "Bùi Duy",
+    "phoneNumber": "0911222555",
+    "role": "recruiter",
+    "created_at": "2023-09-17T10:30:00Z",
+    "updated_at": "2023-09-17T10:30:00Z"
+  },
+  {
+    "_id": "user_010",
+    "email": "headhunter@agency.com",
+    "password": "$2b$10$hashedpassword123",
+    "firstName": "Lan",
+    "lastName": "Võ Thị",
+    "phoneNumber": "0911222666",
+    "role": "recruiter",
+    "created_at": "2023-09-18T11:30:00Z",
+    "updated_at": "2023-09-18T11:30:00Z"
+  }
+]

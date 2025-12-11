@@ -1,42 +1,33 @@
 import express from "express";
-import {
-  getRecruiterByUserId,
-  getAllRecruiters,
-  createRecruiterProfile,
-  updateRecruiterProfile,
-  followRecruiter,
-  unfollowRecruiter,
-  getRecruiterStats,
-  getTopRecruiters,
-} from "./recruiter.controller.js";
+import { getMyRecruiterProfile, saveMyRecruiterProfile } from "./recruiter.controller.js";
 import { verifyToken } from "../auth/auth.middleware.js";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+// Tạo folder upload nếu chưa có
+const avatarFolder = "uploads/avatars";
+if (!fs.existsSync(avatarFolder)) {
+  fs.mkdirSync(avatarFolder, { recursive: true });
+}
+
+// Setup multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, avatarFolder),
+  filename: (req, file, cb) => {
+    const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, unique + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage });
 
 const router = express.Router();
 
-// Public routes
-// Get all recruiters with pagination
-router.get("/", getAllRecruiters);
+// GET hồ sơ recruiter
+router.get("/profile/me", verifyToken, getMyRecruiterProfile);
 
-// Get top recruiters by followers
-router.get("/top", getTopRecruiters);
-
-// Get recruiter by ID
-router.get("/:id", getRecruiterByUserId);
-
-// Get recruiter stats
-router.get("/:id/stats", getRecruiterStats);
-
-// Protected routes (require authentication)
-// Create recruiter profile
-router.post("/", verifyToken, createRecruiterProfile);
-
-// Update recruiter profile
-router.put("/:id", verifyToken, updateRecruiterProfile);
-
-// Follow a recruiter
-router.post("/:id/follow", verifyToken, followRecruiter);
-
-// Unfollow a recruiter
-router.post("/:id/unfollow", verifyToken, unfollowRecruiter);
+// POST lưu hồ sơ recruiter
+router.post("/profile/me", verifyToken, upload.single("avatar"), saveMyRecruiterProfile);
 
 export default router;

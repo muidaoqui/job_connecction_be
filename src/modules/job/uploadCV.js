@@ -1,42 +1,31 @@
 import multer from "multer";
-import fs from "fs";
 import path from "path";
 
-const cvPath = path.join("uploads", "cv");
-
-// Tự tạo thư mục nếu chưa tồn tại
-if (!fs.existsSync(cvPath)) {
-  fs.mkdirSync(cvPath, { recursive: true });
-}
-
+// Cấu hình lưu file vào thư mục uploads/resumes/
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, cvPath);
+  destination: function (req, file, cb) {
+    cb(null, "uploads/resumes/");
   },
-  filename: (req, file, cb) => {
+  filename: function (req, file, cb) {
     const uniqueName = Date.now() + "-" + file.originalname;
     cb(null, uniqueName);
   }
 });
 
+// Chỉ chấp nhận PDF, DOC, DOCX
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype === "application/pdf") {
+  const allowed = [".pdf", ".doc", ".docx"];
+
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (allowed.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error("Chỉ được upload file PDF."), false);
+    cb(new Error("Invalid file type"), false);
   }
 };
 
-const uploadCV = multer({ storage, fileFilter }).single("cvFile");
-
-// Middleware bắt lỗi từ multer
-export const uploadCvMiddleware = (req, res, next) => {
-  uploadCV(req, res, (err) => {
-    if (err) {
-      return res.status(400).json({ message: err.message });
-    }
-    next();
-  });
-};
-
-export default uploadCV;
+// Export Multer INSTANCE để route tự gọi .single("resume")
+export const uploadCV = multer({
+  storage,
+  fileFilter
+});

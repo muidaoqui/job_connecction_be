@@ -1,7 +1,7 @@
 import User from "../auth/auth.model.js";
 import Candidate from "./candidate.model.js";
 import Resume from "./resume.model.js";
-import Application from "./applications/application.model.js";
+import Application from "../job/application.model.js";
 import SavedJob from "./saved-job/saved-job.model.js";
 import JobView from "./job-view/job-view.model.js";
 

@@ -1,4 +1,4 @@
-import Application from "../../job/application.model.js";
+import Application from "../job/application.model.js";
 import SavedJob from "../saved-job/saved-job.model.js";
 import JobView from "../job-view/job-view.model.js";
 import Job from "../../job/job.model.js";
@@ -17,29 +17,31 @@ export const getApplications = async (req, res) => {
 
 export const applyJob = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { jobId, resumePath, coverLetter } = req.body;
+    const { id } = req.params;
+    const { name, email, message } = req.body;
 
-    const existingApplication = await Application.findOne({ userId, jobId });
-    if (existingApplication) {
-      return res.status(400).json({ message: "Bạn đã ứng tuyển công việc này rồi" });
+    if (!req.file) {
+      return res.status(400).json({ message: "Resume file is required" });
     }
 
-    const application = new Application({
-      userId,
-      jobId,
-      resumePath,
-      coverLetter,
-      status: "applied",
+    const newApplication = new JobApplication({
+      jobId: id,
+      userId: req.user.id,
+      name,
+      email,
+      message,
+      resumePath: `/uploads/resumes/${req.file.filename}`,
     });
 
-    const savedApplication = await application.save();
-    await savedApplication.populate("jobId");
-    res.status(201).json(savedApplication);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    await newApplication.save();
+
+    res.status(201).json({ message: "Application submitted successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
+ 
 
 export const withdrawApplication = async (req, res) => {
   try {

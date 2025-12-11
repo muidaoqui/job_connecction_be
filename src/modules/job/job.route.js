@@ -5,7 +5,6 @@ import {
   getJobById,
   updateJob,
   deleteJob,
-  getApplicants,
   updateApplicationStatus,
   incrementSaveCount,
   decrementSaveCount,
@@ -17,13 +16,20 @@ import {
 } from "./job.controller.js";
 
 import { verifyToken } from "../auth/auth.middleware.js";
-import Application from "./application.model.js";
-
-import { uploadCvMiddleware } from "./uploadCV.js";
+import { uploadCV } from "./uploadCV.js";         // Giữ bản đúng
+import Application from "../job/application.model.js";
 
 const router = express.Router();
 
-// Applicants
+/* ---------------- APPLY JOB (LUÔN ĐỂ TRÊN) ---------------- */
+router.post(
+  "/:jobId/apply",
+  verifyToken,
+  uploadCV.single("resume"),
+  applyJob
+);
+
+/* ---------------- APPLICATION LIST ---------------- */
 router.get("/applications/all", async (req, res) => {
   try {
     const apps = await Application.find()
@@ -32,28 +38,29 @@ router.get("/applications/all", async (req, res) => {
 
     res.json({ success: true, apps });
   } catch (err) {
-    console.error("Lỗi lấy ứng viên:", err);
     res.status(500).json({ message: err.message });
   }
 });
 
 router.put("/applications/:id/status", updateApplicationStatus);
 
-router.post("/:id/apply", uploadCvMiddleware, applyJob);
-
-// CRUD Job
+/* ---------------- CRUD JOB ---------------- */
 router.post("/", verifyToken, createJob);
 router.get("/", getAllJobs);
 
+/* ---------------- JOB SEARCH ---------------- */
 router.get("/search", searchJobs);
 
+/* ---------------- RECRUITER STATS ---------------- */
 router.get("/stats/:id", getRecruiterStats);
+
+/* ---------------- SAVE / UNSAVE JOB (phải đặt TRÊN /:id) ---------------- */
+router.post("/:id/save", verifyToken, saveJob);
+router.post("/:id/unsave", verifyToken, unsaveJob);
+
+/* ---------------- GET / UPDATE / DELETE JOB (ĐỂ SAU CÙNG) ---------------- */
 router.get("/:id", getJobById);
 router.put("/:id", updateJob);
 router.delete("/:id", deleteJob);
-
-// Save / Unsave Job
-router.post("/:id/save", verifyToken, saveJob);
-router.post("/:id/unsave", verifyToken, unsaveJob);
 
 export default router;
