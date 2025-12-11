@@ -23,14 +23,8 @@ export const createJob = async (req, res) => {
 
     // 3) BUILD JOB DATA
     const jobData = {
-      title: req.body.title,
-      description: req.body.description,
-      requirement: req.body.requirement,
-      salary: req.body.salary,
-      location: req.body.location,
-      type: req.body.type,
-      companyId: recruiter.companyId || null,
-      recruiterId: recruiter._id,
+      ...req.body,
+      recruiterId: recruiterProfile._id,
     };
 
     // 4) CREATE NEW JOB
