@@ -4,9 +4,9 @@ const projectSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   projectName: { type: String, required: true },
   description: String,
-  startDate: { type: Date, required: true },
-  endDate: { type: Date },
   skills: [String],
+  startDate: Date,
+  endDate: Date,
   projectUrl: String,
   createdAt: { type: Date, default: Date.now },
 });

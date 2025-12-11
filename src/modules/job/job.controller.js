@@ -2,9 +2,10 @@ import mongoose from "mongoose";
 import Job from "./job.model.js";
 import Application from "../job/application.model.js";
 import SavedJob from "../candidate/saved-job/saved-job.model.js";
-import { Recruiter } from "../recruiter/recruiter.model.js";
+import Recruiter from "../recruiter/recruiter.model.js";
+import { generateAndSaveJobEmbedding } from "../embedding/embedding.serivice.js";
 
-// Tạo job
+// Tạo job (với embedding info trong response)
 export const createJob = async (req, res) => {
   try {
     // 1) CHECK LOGIN
@@ -48,6 +49,25 @@ export const createJob = async (req, res) => {
       message: "Lỗi server khi đăng tin",
       error: err.message,
     });
+    // Auto-generate embedding ngay sau khi tạo job
+    let embeddingInfo = null;
+    try {
+      embeddingInfo = await generateAndSaveJobEmbedding(job._id.toString());
+      console.log(`✅ Embedding generated for job ${job._id}`);
+    } catch (embeddingError) {
+      console.error(`⚠️ Failed to generate embedding for job ${job._id}:`, embeddingError.message);
+    }
+
+    res.status(201).json({ 
+      success: true, 
+      job,
+      embedding: embeddingInfo ? {
+        dimensions: embeddingInfo.embeddingDimensions,
+        generatedAt: embeddingInfo.embeddingUpdatedAt
+      } : null
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 // Lấy job theo ID

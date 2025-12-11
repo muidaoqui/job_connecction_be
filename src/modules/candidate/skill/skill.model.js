@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 const skillSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   skillName: { type: String, required: true },
-  proficiency: { type: String, enum: ["beginner", "intermediate", "advanced", "expert"], default: "beginner" },
-  endorsements: { type: Number, default: 0 },
+  proficiency: { type: String, enum: ["Beginner", "Intermediate", "Advanced", "Expert"] },
+  yearsOfExperience: Number,
   createdAt: { type: Date, default: Date.now },
 });
 

@@ -67,5 +67,16 @@ export const verifyAdmin = async (req, res, next) => {
   } catch (error) {
     console.error("Lỗi xác thực admin:", error);
     res.status(401).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+    // Đảm bảo req.user.id tồn tại (dùng _id từ MongoDB hoặc decoded.id)
+    req.user = { 
+      id: user._id.toString(), // hoặc decoded.id
+      email: user.email,
+      role: user.role,
+      ...user.toObject() 
+    }; 
+    next();
+  } catch (err) {
+    console.error("Token verification error:", err);
+    res.status(401).json({ message: "Token không hợp lệ hoặc hết hạn" });
   }
 };

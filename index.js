@@ -100,6 +100,7 @@ app.use("/api/recruiter/applications", recruiterAppRoutes);
 // STATIC
 app.use("/uploads", express.static("uploads"));
 
+app.use("/api/embeddings", embeddingRoutes);
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -116,6 +117,20 @@ app.get("/", (req, res) => {
   res.json({ message: "Backend is running!" });
 });
 
+app.get("/health", (req, res) => {
+  res.json({ status: "OK", message: "Server is running" });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route ${req.originalUrl} not found`,
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`✅ Server listening on port ${PORT}`);
 });
+
+export default app;
