@@ -23,7 +23,6 @@ export const verifyToken = async (req, res, next) => {
       return res.status(404).json({ message: "Không tìm thấy người dùng" });
     }
 
-<<<<<<< HEAD
     // Đảm bảo req.user.id tồn tại (dùng _id từ MongoDB hoặc decoded.id)
     req.user = { 
       id: user._id.toString(), // hoặc decoded.id
@@ -31,9 +30,6 @@ export const verifyToken = async (req, res, next) => {
       role: user.role,
       ...user.toObject() 
     }; 
-=======
-    req.user = { _id: user._id, role: user.role, email: user.email };
->>>>>>> 932def8364816154c9e2ef6f12103420a2935051
     next();
   } catch (err) {
     return res.status(401).json({ message: "Token không hợp lệ hoặc hết hạn" });
@@ -86,10 +82,13 @@ export const verifyAdmin = async (req, res, next) => {
       return res.status(403).json({ message: "Bạn không có quyền truy cập" });
     }
 
-    req.user = {
+    req.user = { 
+      id: user._id.toString(), // hoặc decoded.id
       _id: user._id,
+      name: user.name,
       email: user.email,
       role: user.role,
+      ...user.toObject() 
     };
 
     next();
