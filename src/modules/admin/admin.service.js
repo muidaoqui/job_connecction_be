@@ -1,6 +1,5 @@
 import User from "../auth/auth.model.js";
 import CandidateSchema from "../candidate/candidate.model.js";
-import { Recruiter } from "../recruiter/recruiter.model.js";
 import Job from "../job/job.model.js";
 
 export const getAllUsers = async (filters) => {

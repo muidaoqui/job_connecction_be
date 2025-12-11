@@ -21,7 +21,7 @@ export const createJob = async (req, res) => {
       });
     }
 
-    // 3) BUILD JOB DATA (BE sẽ tự set recruiterId)
+    // 3) BUILD JOB DATA
     const jobData = {
       title: req.body.title,
       description: req.body.description,
@@ -29,47 +29,46 @@ export const createJob = async (req, res) => {
       salary: req.body.salary,
       location: req.body.location,
       type: req.body.type,
-      companyId: recruiter.companyId || null, // auto link company
-      recruiterId: recruiter._id,             // ⭐ QUAN TRỌNG
+      companyId: recruiter.companyId || null,
+      recruiterId: recruiter._id,
     };
 
     // 4) CREATE NEW JOB
     const newJob = new Job(jobData);
     await newJob.save();
 
+    // 5) GENERATE EMBEDDING (KHÔNG nằm trong catch)
+    let embeddingInfo = null;
+    try {
+      embeddingInfo = await generateAndSaveJobEmbedding(newJob._id.toString());
+      console.log(`✅ Embedding generated for job ${newJob._id}`);
+    } catch (embeddingError) {
+      console.error(`⚠️ Failed to generate embedding for job ${newJob._id}:`, embeddingError.message);
+    }
+
+    // 6) RESPONSE
     return res.status(201).json({
       success: true,
       message: "Đăng tin thành công",
       job: newJob,
+      embedding: embeddingInfo
+        ? {
+            dimensions: embeddingInfo.embeddingDimensions,
+            generatedAt: embeddingInfo.embeddingUpdatedAt
+          }
+        : null
     });
-  } catch (err) {
-    console.error("❌ Lỗi tạo job:", err);
+
+  } catch (error) {
+    console.error("❌ Lỗi tạo job:", error);
     return res.status(500).json({
       success: false,
       message: "Lỗi server khi đăng tin",
-      error: err.message,
+      error: error.message,
     });
-    // Auto-generate embedding ngay sau khi tạo job
-    let embeddingInfo = null;
-    try {
-      embeddingInfo = await generateAndSaveJobEmbedding(job._id.toString());
-      console.log(`✅ Embedding generated for job ${job._id}`);
-    } catch (embeddingError) {
-      console.error(`⚠️ Failed to generate embedding for job ${job._id}:`, embeddingError.message);
-    }
-
-    res.status(201).json({ 
-      success: true, 
-      job,
-      embedding: embeddingInfo ? {
-        dimensions: embeddingInfo.embeddingDimensions,
-        generatedAt: embeddingInfo.embeddingUpdatedAt
-      } : null
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
   }
 };
+
 // Lấy job theo ID
 export const getJobById = async (req, res) => {
   try {

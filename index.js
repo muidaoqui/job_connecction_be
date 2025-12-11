@@ -16,6 +16,7 @@ import recruiterAppRoutes from "./src/modules/candidate/applications/recruiter-a
 import recruiterRoutes from "./src/modules/recruiter/recruiter.route.js";
 import { fileURLToPath } from "url";
 import companyRoutes from "./src/modules/recruiter/company/company.route.js";
+import embeddingRoutes from "./src/modules/embedding/embedding.route.js";
 
 console.log("🔥 Loaded recruiterRoutes from:", recruiterRoutes);
 

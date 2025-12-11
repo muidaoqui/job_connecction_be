@@ -32,7 +32,6 @@ const jobSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Job", jobSchema);
 // Hook: Tự động update embedding khi job được update
 jobSchema.pre('save', async function(next) {
     // Chỉ update embedding nếu các trường liên quan thay đổi

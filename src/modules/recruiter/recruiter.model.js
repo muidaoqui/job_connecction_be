@@ -17,4 +17,4 @@ const recruiterSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const Recruiter = mongoose.model("Recruiter", recruiterSchema);
+export default mongoose.model("Recruiter", recruiterSchema);

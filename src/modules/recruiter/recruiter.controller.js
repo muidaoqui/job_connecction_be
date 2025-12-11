@@ -1,4 +1,4 @@
-import { Recruiter } from "../recruiter/recruiter.model.js";
+import  Recruiter  from "../recruiter/recruiter.model.js";
 import User from "../auth/auth.model.js";
 import mongoose from "mongoose";
 import Application from "../job/application.model.js";

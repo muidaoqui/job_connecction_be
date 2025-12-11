@@ -1,5 +1,5 @@
 import Company from "./company.model.js";
-import { Recruiter } from "../recruiter.model.js";   
+import  Recruiter  from "../recruiter.model.js";   
 export const createOrUpdateCompany = async (req, res) => {
   try {
     const userId = req.user._id;
