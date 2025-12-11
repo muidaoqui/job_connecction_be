@@ -10,14 +10,6 @@ import authRoutes from "./src/modules/auth/auth.route.js";
 import adminRoutes from "./src/modules/admin/admin.route.js";
 import jobRoutes from "./src/modules/job/job.route.js";
 import candidateRoutes from "./src/modules/candidate/candidate.route.js";
-<<<<<<< HEAD
-import recruiterRoutes from "./src/modules/recruiter/recruiter.route.js";
-import companyRoutes from "./src/modules/recruiter/company/company.route.js";
-import embeddingRoutes from "./src/modules/embedding/embedding.routers.js";
-import { verifyToken } from "./src/modules/auth/auth.middleware.js";
-import Resume from "./src/modules/candidate/resume.model.js";
-import recruiterAppRoutes from "./src/modules/candidate/applications/recruiter-application.route.js";
-=======
 import { verifyToken } from "./src/modules/auth/auth.middleware.js";
 import Resume from "./src/modules/candidate/resume.model.js";
 import recruiterAppRoutes from "./src/modules/candidate/applications/recruiter-application.route.js";
@@ -27,7 +19,6 @@ import companyRoutes from "./src/modules/recruiter/company/company.route.js";
 import embeddingRoutes from "./src/modules/embedding/embedding.route.js";
 
 console.log("🔥 Loaded recruiterRoutes from:", recruiterRoutes);
->>>>>>> 932def8364816154c9e2ef6f12103420a2935051
 
 dotenv.config();
 
