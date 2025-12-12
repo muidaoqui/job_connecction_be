@@ -5,14 +5,15 @@ export const createOrUpdateCompany = async (req, res) => {
     const userId = req.user._id;
 
     // 🔥 1. Kiểm tra profile recruiter
-    const recruiter = await Recruiter.findOne({ userId: req.user._id });
+    let recruiter = await Recruiter.findOne({ userId: req.user._id });
 
-    if (!recruiter) {
-      return res.status(403).json({
-        success: false,
-        message: "Bạn cần tạo hồ sơ Nhà tuyển dụng trước",
-      });
-    }
+// 👉 Nếu chưa có recruiter → báo tạo hồ sơ recruiter
+if (!recruiter) {
+  return res.status(403).json({
+    success: false,
+    message: "Bạn cần tạo hồ sơ Nhà tuyển dụng trước",
+  });
+}
 
     // Lấy dữ liệu gửi lên
     const {
@@ -119,14 +120,23 @@ export const createOrUpdateCompany = async (req, res) => {
 };
 export const getCompanyByUser = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const company = await Company.findOne({ userId });
+    const recruiter = await Recruiter.findOne({ userId: req.user._id });
+
+    if (!recruiter || !recruiter.companyId) {
+      return res.status(200).json({
+        success: true,
+        data: null,
+      });
+    }
+
+    const company = await Company.findById(recruiter.companyId);
 
     return res.status(200).json({
       success: true,
-      data: company || null,
+      data: company,
     });
   } catch (err) {
+    console.error("getCompanyByUser error:", err);
     return res.status(500).json({
       success: false,
       message: "Lỗi server khi lấy thông tin công ty",
@@ -148,5 +158,29 @@ export const getCompanyList = async (req, res) => {
   } catch (error) {
     console.error("Get companies error:", error);
     res.status(500).json({ success: false, message: "Lỗi server" });
+  }
+};
+export const getCompanyById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const company = await Company.findById(id);
+
+    if (!company) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy công ty",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: company,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server",
+    });
   }
 };

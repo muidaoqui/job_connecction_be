@@ -10,28 +10,42 @@ export const createJob = async (req, res) => {
   try {
     // 1) CHECK LOGIN
     if (!req.user || !req.user._id) {
-      return res.status(401).json({ message: "Bạn cần đăng nhập để đăng tin" });
-    }
+  return res.status(401).json({ message: "Bạn cần đăng nhập" });
+}
 
-    // 2) FIND RECRUITER PROFILE
-    const recruiter = await Recruiter.findOne({ userId: req.user._id });
-    if (!recruiter) {
-      return res.status(403).json({
-        message: "Bạn cần tạo hồ sơ Nhà tuyển dụng trước khi đăng tin"
-      });
-    }
+// 2. lấy recruiter profile
+const recruiter = await Recruiter.findOne({
+  userId: req.user._id,   // 🔥 QUAN TRỌNG
+});
+
+if (!recruiter) {
+  return res.status(403).json({
+    message: "Bạn cần tạo hồ sơ Nhà tuyển dụng trước khi đăng tin",
+  });
+}
+
+// 2. Tìm công ty theo userId (đúng với DB của anh)
+const company = await Company.findOne({
+  userId: req.user._id,   // 🔥 KHÔNG DÙNG recruiterId
+});
+
+if (!company) {
+  return res.status(403).json({
+    message: "Bạn cần tạo công ty trước khi đăng tin tuyển dụng",
+  });
+}
 
     // 3) BUILD JOB DATA
     const jobData = {
-      title: req.body.title,
-      description: req.body.description,
-      requirement: req.body.requirement,
-      salary: req.body.salary,
-      location: req.body.location,
-      type: req.body.type,
-      companyId: recruiter.companyId || null,
-      recruiterId: recruiter._id,
-    };
+  title: req.body.title,
+  description: req.body.description,
+  requirements: req.body.requirements, // ✅ ĐÚNG
+  salary: req.body.salary,
+  location: req.body.location,
+  jobType: req.body.jobType,            // ✅ ĐÚNG
+  companyId: recruiter.companyId,       // ✅ KHÔNG NULL
+  recruiterId: recruiter._id,
+};
 
     // 4) CREATE NEW JOB
     const newJob = new Job(jobData);
@@ -73,29 +87,33 @@ export const createJob = async (req, res) => {
 export const getJobById = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id)
-      .populate({ 
-        path: 'recruiterId', 
-        select: 'userId position followers companyId',
-        populate: [
-          { path: 'userId', select: 'name email' },
-          { path: 'companyId', select: 'name industry size country logo address backgroundImage images' }
-        ]
+      .populate({
+        path: "recruiterId",
+        select: "userId position followers",
+        populate: {
+          path: "userId",
+          select: "name email",
+        },
       })
-      .populate({ path: 'companyId', select: 'name industry size country logo address backgroundImage images' });
+      .populate({
+        path: "companyId",
+        select: "name industry size country logo address backgroundImage images",
+      });
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    res.json({
+    return res.json({
       success: true,
-      job   // FE cần đúng key này
+      job,
     });
-
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("❌ getJobById error:", error);
+    return res.status(500).json({ message: error.message });
   }
 };
+
 // Lấy toàn bộ job (sắp xếp theo saveCount cho "hot jobs")
 // Lấy toàn bộ job (sắp xếp theo mức độ HOT)
 export const getAllJobs = async (req, res) => {
@@ -318,22 +336,22 @@ export const getRecruiterStats = async (req, res) => {
 };
 export const applyJob = async (req, res) => {
   try {
-    const jobId = req.params.id;
+    const jobId = req.params.id;   // ✔ sửa lại
     const { name, email, message } = req.body;
 
     if (!req.file) {
-      return res.status(400).json({ message: "Vui lòng tải lên CV dạng PDF." });
+      return res.status(400).json({ message: "Vui lòng tải lên CV." });
     }
 
     const application = new Application({
-  jobId: new mongoose.Types.ObjectId(jobId),
-  userId: new mongoose.Types.ObjectId(req.user.id),                // ⭐ THÊM DÒNG NÀY
-  name,
-  email,
-  message,
-  cvFile: req.file.path,
-  status: "pending",
-});
+      jobId: new mongoose.Types.ObjectId(jobId),
+      userId: new mongoose.Types.ObjectId(req.user.id),
+      name,
+      email,
+      message,
+      cvFile: req.file.path,
+      status: "pending",
+    });
 
     await application.save();
 
@@ -377,3 +395,22 @@ export const searchJobs = async (req, res) => {
   }
   
 };
+export const getJobsByCompany = async (req, res) => {
+  try {
+    const { companyId } = req.params;
+
+    const jobs = await Job.find({ companyId })
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      data: jobs,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server",
+    });
+  }
+};
+
