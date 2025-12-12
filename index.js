@@ -17,7 +17,11 @@ import recruiterRoutes from "./src/modules/recruiter/recruiter.route.js";
 import { fileURLToPath } from "url";
 import companyRoutes from "./src/modules/recruiter/company/company.route.js";
 import embeddingRoutes from "./src/modules/embedding/embedding.route.js";
+import readCVRouter from "./src/modules/candidate/readCV.route.js";
 
+// Đường dẫn tuyệt đối của thư mục hiện tại
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 console.log("🔥 Loaded recruiterRoutes from:", recruiterRoutes);
 
 dotenv.config();
@@ -102,6 +106,7 @@ app.use("/api/recruiter/applications", recruiterAppRoutes);
 app.use("/uploads", express.static("uploads"));
 
 app.use("/api/embeddings", embeddingRoutes);
+app.use("/api/read-cv", readCVRouter);
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
