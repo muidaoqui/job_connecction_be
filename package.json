@@ -12,13 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-<<<<<<<<< Temporary merge branch 1
-    "axios": "^1.6.0",
-    "bcryptjs": "^2.4.3",
-=========
     "@xenova/transformers": "^2.17.2",
+    "axios": "^1.6.0",
     "bcryptjs": "^3.0.3",
->>>>>>>>> Temporary merge branch 2
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
@@ -27,7 +23,8 @@
     "mongoose": "^7.0.3",
     "morgan": "^1.10.1",
     "multer": "^1.4.5-lts.1",
-    "nodemailer": "^6.9.4"
+    "nodemailer": "^7.0.11",
+    "pdf-parse": "^1.1.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
