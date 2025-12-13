@@ -120,16 +120,35 @@ if (!recruiter) {
 };
 export const getCompanyByUser = async (req, res) => {
   try {
-    const recruiter = await Recruiter.findOne({ userId: req.user._id });
+    const userId = req.user._id;
 
-    if (!recruiter || !recruiter.companyId) {
+    // 1️⃣ Tìm recruiter
+    const recruiter = await Recruiter.findOne({ userId });
+
+    // 2️⃣ Nếu recruiter có companyId → lấy theo companyId
+    if (recruiter?.companyId) {
+      const company = await Company.findById(recruiter.companyId);
+      return res.status(200).json({
+        success: true,
+        data: company,
+      });
+    }
+
+    // 3️⃣ 🔥 FALLBACK: recruiter chưa có companyId → tìm theo userId
+    const company = await Company.findOne({ userId });
+
+    if (!company) {
       return res.status(200).json({
         success: true,
         data: null,
       });
     }
 
-    const company = await Company.findById(recruiter.companyId);
+    // 4️⃣ 🔥 TỰ ĐỘNG SYNC LẠI recruiter.companyId
+    if (recruiter) {
+      recruiter.companyId = company._id;
+      await recruiter.save();
+    }
 
     return res.status(200).json({
       success: true,
