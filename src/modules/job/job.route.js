@@ -18,14 +18,15 @@ import {
 import { verifyToken } from "../auth/auth.middleware.js";
 import { uploadCV } from "./uploadCV.js";         // Giữ bản đúng
 import Application from "../job/application.model.js";
+import { getJobsByCompany } from "./job.controller.js";
 
 const router = express.Router();
 
 /* ---------------- APPLY JOB (LUÔN ĐỂ TRÊN) ---------------- */
 router.post(
-  "/:jobId/apply",
+  "/:id/apply",
   verifyToken,
-  uploadCV.single("resume"),
+  uploadCV.single("cvFile"),
   applyJob
 );
 
@@ -57,6 +58,7 @@ router.get("/stats/:id", getRecruiterStats);
 /* ---------------- SAVE / UNSAVE JOB (phải đặt TRÊN /:id) ---------------- */
 router.post("/:id/save", verifyToken, saveJob);
 router.post("/:id/unsave", verifyToken, unsaveJob);
+router.get("/company/:companyId", getJobsByCompany);
 
 /* ---------------- GET / UPDATE / DELETE JOB (ĐỂ SAU CÙNG) ---------------- */
 router.get("/:id", getJobById);
