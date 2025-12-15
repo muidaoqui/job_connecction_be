@@ -111,7 +111,11 @@ export const getJobById = async (req, res) => {
 // Lấy toàn bộ job (sắp xếp theo mức độ HOT)
 export const getAllJobs = async (req, res) => {
   try {
-    const jobs = await Job.find()
+    const { companyId } = req.query;
+
+    const filter = companyId ? { companyId } : {};
+
+    const jobs = await Job.find(filter)
       .populate({
         path: "recruiterId",
         select: "userId position companyId",
@@ -124,13 +128,12 @@ export const getAllJobs = async (req, res) => {
         path: "companyId",
         select: "name industry size country logo address backgroundImage images"
       })
-      .sort({ createdAt: -1 });   // ưu tiên tin mới đăng
+      .sort({ createdAt: -1 });
 
     return res.json({
       success: true,
       data: jobs
     });
-
   } catch (error) {
     console.error("🔥 Lỗi getAllJobs:", error);
     return res.status(500).json({
@@ -139,6 +142,7 @@ export const getAllJobs = async (req, res) => {
     });
   }
 };
+
 
 
 // Increment saveCount when job is saved by user

@@ -53,24 +53,37 @@ export const getAllRecruiters = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const { companyId } = req.query;
 
-    const recruiters = await Recruiter.find()
+    const filter = companyId ? { companyId } : {};
+
+    const recruiters = await Recruiter.find(filter)
       .populate("userId", "name email")
       .populate("companyId", "name industry logo")
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const total = await Recruiter.countDocuments();
+    const total = await Recruiter.countDocuments(filter);
 
     res.json({
       success: true,
       recruiters,
-      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("🔥 Lỗi getAllRecruiters:", error);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server khi lấy danh sách recruiter"
+    });
   }
 };
+
 
 /* ================================
    📌 TẠO HỒ SƠ RECRUITER
