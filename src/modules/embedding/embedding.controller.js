@@ -116,7 +116,7 @@ export const getRecommendedJobsForCandidate = async (req, res) => {
         const { limit = 6 } = req.query;
 
         // 1. Tìm candidate profile
-        const candidate = await Candidate.findOne({ userId });
+        const candidate = await Candidate.findById({_id: userId});
         if (!candidate) {
             return res.status(404).json({ 
                 success: false, 
