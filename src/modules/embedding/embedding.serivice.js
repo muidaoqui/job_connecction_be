@@ -147,10 +147,10 @@ export const generateAndSaveCandidateEmbedding = async (candidateId) => {
 
         // 2. Lấy tất cả dữ liệu liên quan
         const [educations, experiences, projects, skills] = await Promise.all([
-            Education.find({ userId }),
-            Experience.find({ userId }),
-            Project.find({ userId }),
-            Skill.find({ userId })
+            Education.find({ userId: candidate._id }),
+            Experience.find({ userId: candidate._id }),
+            Project.find({ userId: candidate._id }),
+            Skill.find({ userId: candidate._id })
         ]);
 
         // 3. Tính tuổi từ dateOfBirth

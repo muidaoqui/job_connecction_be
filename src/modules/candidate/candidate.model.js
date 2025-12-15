@@ -9,13 +9,13 @@ const candidateSchema = new mongoose.Schema({
   mainResumePath: String,
   profileSummary: String,
   avatarUrl: String,
+  embeddingText: String,
+  embeddingUpdatedAt: Date,
+  embeddingDimensions: Number,
   embedding: {
     type: [Number],
     default: undefined,
   },
-  embeddingText: String,
-  embeddingUpdatedAt: Date,
-  embeddingDimensions: Number,
 }, { timestamps: true });
 
 // Hook: Tự động update embedding khi candidate được update
