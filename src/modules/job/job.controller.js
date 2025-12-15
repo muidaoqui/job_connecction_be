@@ -19,11 +19,23 @@ export const createJob = async (req, res) => {
       });
     }
 
-    if (!recruiter.companyId) {
-      return res.status(403).json({
-        success: false,
-        message: "Bạn cần tạo công ty trước khi đăng job",
-      });
+    // 3) BUILD JOB DATA
+    const jobData = {
+      ...req.body,
+      recruiterId: recruiterProfile._id,
+    };
+
+    // 4) CREATE NEW JOB
+    const newJob = new Job(jobData);
+    await newJob.save();
+
+    // 5) GENERATE EMBEDDING (KHÔNG nằm trong catch)
+    let embeddingInfo = null;
+    try {
+      embeddingInfo = await generateAndSaveJobEmbedding(newJob._id.toString());
+      console.log(`✅ Embedding generated for job ${newJob._id}`);
+    } catch (embeddingError) {
+      console.error(`⚠️ Failed to generate embedding for job ${newJob._id}:`, embeddingError.message);
     }
 
     // 2️⃣ Lấy dữ liệu từ FE
