@@ -1,20 +1,28 @@
+// recruiter.model.js
 import mongoose from "mongoose";
 
-const recruiterSchema = new mongoose.Schema(
-  {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    name: { type: String, required: true },
-    position: { type: String, required: true },
-    phone: { type: String, required: true },
-    workEmail: { type: String, required: true },
-    bio: { type: String },
-    avatar: { type: String }, // lưu URL ảnh
+const recruiterSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+    unique: true,
   },
-  { timestamps: true }
-);
+
+  name: String,
+  position: String,
+  phone: String,
+  workEmail: String,
+  bio: String,
+  avatar: String,
+
+  // ✅ THÊM / ĐẢM BẢO FIELD NÀY
+  companyId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Company",
+    default: null,
+  },
+
+}, { timestamps: true });
 
 export default mongoose.model("Recruiter", recruiterSchema);

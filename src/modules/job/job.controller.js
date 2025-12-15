@@ -8,94 +8,93 @@ import { generateAndSaveJobEmbedding } from "../embedding/embedding.serivice.js"
 // Tạo job (với embedding info trong response)
 export const createJob = async (req, res) => {
   try {
-    // 1) CHECK LOGIN
-    if (!req.user || !req.user._id) {
-      return res.status(401).json({ message: "Bạn cần đăng nhập để đăng tin" });
-    }
+    const userId = req.user._id;
 
-    // 2) FIND RECRUITER PROFILE
-    const recruiter = await Recruiter.findOne({ userId: req.user._id });
+    // 1️⃣ Lấy recruiter theo user
+    const recruiter = await Recruiter.findOne({ userId });
     if (!recruiter) {
       return res.status(403).json({
-        message: "Bạn cần tạo hồ sơ Nhà tuyển dụng trước khi đăng tin"
+        success: false,
+        message: "Bạn cần tạo hồ sơ nhà tuyển dụng trước",
       });
     }
 
-    // 3) BUILD JOB DATA
-    const jobData = {
-      title: req.body.title,
-      description: req.body.description,
-      requirement: req.body.requirement,
-      salary: req.body.salary,
-      location: req.body.location,
-      type: req.body.type,
-      companyId: recruiter.companyId || null,
-      recruiterId: recruiter._id,
-    };
-
-    // 4) CREATE NEW JOB
-    const newJob = new Job(jobData);
-    await newJob.save();
-
-    // 5) GENERATE EMBEDDING (KHÔNG nằm trong catch)
-    let embeddingInfo = null;
-    try {
-      embeddingInfo = await generateAndSaveJobEmbedding(newJob._id.toString());
-      console.log(`✅ Embedding generated for job ${newJob._id}`);
-    } catch (embeddingError) {
-      console.error(`⚠️ Failed to generate embedding for job ${newJob._id}:`, embeddingError.message);
+    if (!recruiter.companyId) {
+      return res.status(403).json({
+        success: false,
+        message: "Bạn cần tạo công ty trước khi đăng job",
+      });
     }
 
-    // 6) RESPONSE
-    return res.status(201).json({
-      success: true,
-      message: "Đăng tin thành công",
-      job: newJob,
-      embedding: embeddingInfo
-        ? {
-            dimensions: embeddingInfo.embeddingDimensions,
-            generatedAt: embeddingInfo.embeddingUpdatedAt
-          }
-        : null
+    // 2️⃣ Lấy dữ liệu từ FE
+    const {
+      title,
+      description,
+      requirements,
+      salary,
+      location,
+      jobType,
+      experience, // nếu FE có
+    } = req.body;
+
+    // 3️⃣ Tạo job
+    const job = await Job.create({
+      title,
+      description,
+      requirements,
+      salary,
+      location,
+      jobType,
+      experience,
+      recruiterId: recruiter._id,
+      companyId: recruiter.companyId,
+      status: "pending", // ⛔ mặc định
     });
 
+    return res.status(201).json({
+      success: true,
+      message: "Tạo tin tuyển dụng thành công, chờ duyệt",
+      data: job,
+    });
   } catch (error) {
-    console.error("❌ Lỗi tạo job:", error);
+    console.error("Create job error:", error);
     return res.status(500).json({
       success: false,
-      message: "Lỗi server khi đăng tin",
-      error: error.message,
+      message: "Lỗi server khi tạo job",
     });
   }
 };
-
 // Lấy job theo ID
 export const getJobById = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id)
-      .populate({ 
-        path: 'recruiterId', 
-        select: 'userId position followers companyId',
-        populate: [
-          { path: 'userId', select: 'name email' },
-          { path: 'companyId', select: 'name industry size country logo address backgroundImage images' }
-        ]
+      .populate({
+        path: "recruiterId",
+        select: "userId position followers",
+        populate: {
+          path: "userId",
+          select: "name email",
+        },
       })
-      .populate({ path: 'companyId', select: 'name industry size country logo address backgroundImage images' });
+      .populate({
+        path: "companyId",
+        select: "name industry size country logo address backgroundImage images",
+      });
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    res.json({
+    return res.json({
       success: true,
-      job   // FE cần đúng key này
+      job,
     });
-
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("❌ getJobById error:", error);
+    return res.status(500).json({ message: error.message });
   }
 };
+
 // Lấy toàn bộ job (sắp xếp theo saveCount cho "hot jobs")
 // Lấy toàn bộ job (sắp xếp theo mức độ HOT)
 export const getAllJobs = async (req, res) => {
@@ -318,22 +317,22 @@ export const getRecruiterStats = async (req, res) => {
 };
 export const applyJob = async (req, res) => {
   try {
-    const jobId = req.params.id;
+    const jobId = req.params.id;   // ✔ sửa lại
     const { name, email, message } = req.body;
 
     if (!req.file) {
-      return res.status(400).json({ message: "Vui lòng tải lên CV dạng PDF." });
+      return res.status(400).json({ message: "Vui lòng tải lên CV." });
     }
 
     const application = new Application({
-  jobId: new mongoose.Types.ObjectId(jobId),
-  userId: new mongoose.Types.ObjectId(req.user.id),                // ⭐ THÊM DÒNG NÀY
-  name,
-  email,
-  message,
-  cvFile: req.file.path,
-  status: "pending",
-});
+      jobId: new mongoose.Types.ObjectId(jobId),
+      userId: new mongoose.Types.ObjectId(req.user.id),
+      name,
+      email,
+      message,
+      cvFile: req.file.path,
+      status: "pending",
+    });
 
     await application.save();
 
@@ -377,3 +376,22 @@ export const searchJobs = async (req, res) => {
   }
   
 };
+export const getJobsByCompany = async (req, res) => {
+  try {
+    const { companyId } = req.params;
+
+    const jobs = await Job.find({ companyId })
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      data: jobs,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server",
+    });
+  }
+};
+

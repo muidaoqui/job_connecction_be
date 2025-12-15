@@ -188,13 +188,14 @@ export const saveMyRecruiterProfile = async (req, res) => {
     }
 
     let data = {
-      userId, // 🔥 QUAN TRỌNG: gán userId vào đây
-      name: req.body.name,
-      position: req.body.position,
-      phone: req.body.phone,
-      workEmail: req.body.workEmail,
-      bio: req.body.bio,
-    };
+  userId,
+  name: req.body.fullName,
+  position: req.body.position,
+  phone: req.body.phone,
+  workEmail: req.body.workEmail,
+  bio: req.body.bio,
+  companyId: req.body.companyId || null, // ✅ THÊM DÒNG NÀY
+};
 
     // Nếu có avatar
     if (req.file) {
