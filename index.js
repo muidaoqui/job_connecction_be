@@ -56,6 +56,14 @@ app.use(
 app.use(express.json());
 app.use(morgan("dev"));
 
+app.use("/api/admin", adminRoutes);
+
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
+// Protected route to serve resume files - verify ownership before serving
+
 app.use("/uploads", (req, res, next) => {
   res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
   next();
@@ -69,7 +77,15 @@ app.get("/uploads/resumes/:filename", verifyToken, async (req, res) => {
     const { filename } = req.params;
     const userId = req.user.id;
 
-    const resume = await Resume.findOne({ filename, userId });
+    // Verify the resume belongs to the requesting user
+    const resume = await Resume.findOne({
+      filename,
+      userId,
+    });
+
+    // const resume = await Resume.findOne({ filename, userId });
+
+    // const resume = await Resume.findOne({ filename, userId });
 
     if (!resume) {
       console.log(

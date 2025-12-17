@@ -6,23 +6,23 @@ import {
   updateJob,
   deleteJob,
   updateApplicationStatus,
-  incrementSaveCount,
-  decrementSaveCount,
   saveJob,
   unsaveJob,
   getRecruiterStats,
   applyJob,
-  searchJobs
+  searchJobs,
+  getJobsByCompany
 } from "./job.controller.js";
 
 import { verifyToken } from "../auth/auth.middleware.js";
-import { uploadCV } from "./uploadCV.js";         // Giữ bản đúng
 import Application from "../job/application.model.js";
-import { getJobsByCompany } from "./job.controller.js";
+import { uploadCV } from "./uploadCV.js";
 
 const router = express.Router();
 
-/* ---------------- APPLY JOB (LUÔN ĐỂ TRÊN) ---------------- */
+/* =========================================================
+   APPLY JOB (PHẢI ĐỂ TRÊN /:id)
+========================================================= */
 router.post(
   "/:id/apply",
   verifyToken,
@@ -30,7 +30,9 @@ router.post(
   applyJob
 );
 
-/* ---------------- APPLICATION LIST ---------------- */
+/* =========================================================
+   APPLICATIONS (ADMIN / RECRUITER)
+========================================================= */
 router.get("/applications/all", async (req, res) => {
   try {
     const apps = await Application.find()
@@ -45,22 +47,32 @@ router.get("/applications/all", async (req, res) => {
 
 router.put("/applications/:id/status", updateApplicationStatus);
 
-/* ---------------- CRUD JOB ---------------- */
+/* =========================================================
+   JOB CRUD
+========================================================= */
 router.post("/", verifyToken, createJob);
 router.get("/", getAllJobs);
 
-/* ---------------- JOB SEARCH ---------------- */
+/* =========================================================
+   SEARCH + STATS
+========================================================= */
 router.get("/search", searchJobs);
-
-/* ---------------- RECRUITER STATS ---------------- */
 router.get("/stats/:id", getRecruiterStats);
 
-/* ---------------- SAVE / UNSAVE JOB (phải đặt TRÊN /:id) ---------------- */
+/* =========================================================
+   SAVE / UNSAVE JOB (PHẢI TRƯỚC /:id)
+========================================================= */
 router.post("/:id/save", verifyToken, saveJob);
 router.post("/:id/unsave", verifyToken, unsaveJob);
+
+/* =========================================================
+   JOB BY COMPANY
+========================================================= */
 router.get("/company/:companyId", getJobsByCompany);
 
-/* ---------------- GET / UPDATE / DELETE JOB (ĐỂ SAU CÙNG) ---------------- */
+/* =========================================================
+   GET / UPDATE / DELETE JOB (ĐỂ SAU CÙNG)
+========================================================= */
 router.get("/:id", getJobById);
 router.put("/:id", updateJob);
 router.delete("/:id", deleteJob);

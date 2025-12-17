@@ -1,30 +1,36 @@
 import multer from "multer";
 import path from "path";
 
-// Cấu hình lưu file vào thư mục uploads/resumes/
+/* =========================================================
+   STORAGE CONFIG
+========================================================= */
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: (req, file, cb) => {
     cb(null, "uploads/resumes/");
   },
-  filename: function (req, file, cb) {
+  filename: (req, file, cb) => {
     const uniqueName = Date.now() + "-" + file.originalname;
     cb(null, uniqueName);
   }
 });
 
-// Chỉ chấp nhận PDF, DOC, DOCX
+/* =========================================================
+   FILE FILTER (PDF, DOC, DOCX)
+========================================================= */
 const fileFilter = (req, file, cb) => {
   const allowed = [".pdf", ".doc", ".docx"];
-
   const ext = path.extname(file.originalname).toLowerCase();
+
   if (allowed.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type"), false);
+    cb(new Error("Invalid file type. Only PDF, DOC, DOCX allowed"));
   }
 };
 
-// Export Multer INSTANCE để route tự gọi .single("resume")
+/* =========================================================
+   EXPORT MULTER INSTANCE
+========================================================= */
 export const uploadCV = multer({
   storage,
   fileFilter
