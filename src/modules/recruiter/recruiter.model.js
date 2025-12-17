@@ -1,3 +1,4 @@
+// recruiter.model.js
 import mongoose from "mongoose";
 
 const recruiterSchema = new mongoose.Schema(
@@ -6,32 +7,21 @@ const recruiterSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      unique: true, // 1 user chỉ có 1 recruiter profile
     },
+
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       default: null,
     },
 
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    companyId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Company",
-      default: null,
-    },
-
-    // Hồ sơ nhà tuyển dụng
-    fullName: { type: String, required: true },
-    position: { type: String, required: true },
-    phone: { type: String, required: true },
-    workEmail: { type: String, required: true },
-    bio: { type: String, default: "" },
-
-    followers: { type: Number, default: 0 },
+    name: String,
+    position: String,
+    phone: String,
+    workEmail: String,
+    bio: String,
+    avatar: String,
   },
   { timestamps: true }
 );

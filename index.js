@@ -10,11 +10,19 @@ import authRoutes from "./src/modules/auth/auth.route.js";
 import adminRoutes from "./src/modules/admin/admin.route.js";
 import jobRoutes from "./src/modules/job/job.route.js";
 import candidateRoutes from "./src/modules/candidate/candidate.route.js";
-import recruiterRoutes from "./src/modules/recruiter/recruiter.route.js";
 import { verifyToken } from "./src/modules/auth/auth.middleware.js";
 import Resume from "./src/modules/candidate/resume.model.js";
 import recruiterAppRoutes from "./src/modules/candidate/applications/recruiter-application.route.js";
+import recruiterRoutes from "./src/modules/recruiter/recruiter.route.js";
+import { fileURLToPath } from "url";
 import companyRoutes from "./src/modules/recruiter/company/company.route.js";
+import embeddingRoutes from "./src/modules/embedding/embedding.route.js";
+import ragRouters from "./src/modules/RAG/rag.route.js";
+// import translateRoute from "./src/modules/translate_cv/translate.route.js";
+// Đường dẫn tuyệt đối của thư mục hiện tại
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+console.log("🔥 Loaded recruiterRoutes from:", recruiterRoutes);
 
 dotenv.config();
 
@@ -98,14 +106,26 @@ app.get("/uploads/resumes/:filename", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Error serving file" });
   }
 });
-
+// ROUTES CHÍNH
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/candidate", candidateRoutes);
-app.use("/api/recruiter", recruiterRoutes);
 app.use("/api/company", companyRoutes);
+
+// ROUTE HỒ SƠ RECRUITER (QUAN TRỌNG)
+app.use("/api/recruiter", recruiterRoutes);
+
+// ROUTE ỨNG TUYỂN RECRUITER
 app.use("/api/recruiter/applications", recruiterAppRoutes);
 
+// STATIC
+app.use("/uploads", express.static("uploads"));
+
+app.use("/api/embeddings", embeddingRoutes);
+app.use("/api/rags", ragRouters);
+// app.use("/api/translate", translateRoute);
+
+// KẾT NỐI MONGO DB
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -122,6 +142,20 @@ app.get("/", (req, res) => {
   res.json({ message: "Backend is running!" });
 });
 
+app.get("/health", (req, res) => {
+  res.json({ status: "OK", message: "Server is running" });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route ${req.originalUrl} not found`,
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`✅ Server listening on port ${PORT}`);
 });
+
+export default app;
