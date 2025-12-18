@@ -25,32 +25,34 @@ export const sendOtpController = async (req, res) => {
   const { email } = req.body;
 
   try {
-    let user = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (!user) {
-      user = new User({
-        email,
-        password: "temp",
-        role: "candidate",
-      });
+      return res.status(404).json({ message: "Email chưa đăng ký" });
     }
 
-    // tạo OTP
+    if (user.emailVerified) {
+      return res.status(400).json({ message: "Email đã xác thực" });
+    }
+
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     user.otpCode = otp;
     user.otpExpire = Date.now() + 10 * 60 * 1000;
-
     await user.save();
 
-    await sendEmail(email, "OTP xác thực", `Mã OTP của bạn: ${otp}`);
+    await sendEmail(
+      email,
+      "OTP xác thực",
+      `Mã OTP của bạn: ${otp} (có hiệu lực 10 phút)`
+    );
 
     res.json({ message: "Đã gửi OTP" });
   } catch (err) {
-    console.log(err);
     res.status(500).json({ message: "Lỗi gửi OTP" });
   }
 };
+
 
 
 // ============================
@@ -61,25 +63,37 @@ export const verifyOtpController = async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "Không tồn tại user" });
+    if (!user) return res.status(404).json({ message: "User không tồn tại" });
 
-    if (user.otpCode !== otp)
+    if (user.emailVerified) {
+      return res.status(400).json({ message: "Email đã xác thực" });
+    }
+
+    if (!user.otpCode || !user.otpExpire) {
+      return res.status(400).json({ message: "OTP không hợp lệ" });
+    }
+
+    if (user.otpExpire < Date.now()) {
+      return res.status(400).json({ message: "OTP đã hết hạn" });
+    }
+
+    if (String(user.otpCode) !== String(otp)) {
       return res.status(400).json({ message: "OTP sai" });
-
-    if (user.otpExpire < Date.now())
-      return res.status(400).json({ message: "OTP hết hạn" });
+    }
 
     user.emailVerified = true;
     user.otpCode = undefined;
     user.otpExpire = undefined;
+    user.otpAttempts = 0;
 
     await user.save();
 
     res.json({ message: "Xác thực email thành công" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Lỗi xác thực OTP" });
   }
 };
+
 
 
 // ============================
