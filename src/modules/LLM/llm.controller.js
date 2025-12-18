@@ -1,4 +1,4 @@
-import { translateText, summarizeText, testModel, getModelInfo } from "./llm.service.js";
+import { translateText, summarizeText, testModel, getModelInfo, generateText } from "./llm.service.js";
 
 export const translateController = async (req, res) => {
   try {
@@ -160,6 +160,36 @@ export const modelInfoController = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to get model info",
+      error: err.message
+    });
+  }
+};
+
+export const generateTextController = async (req, res) => {
+  try {
+    const { prompt, maxTokens = 150 } = req.body;
+    if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing or invalid prompt"
+      });
+    }
+    const startTime = Date.now();
+    const result = await generateText(prompt, maxTokens);
+    const duration = Date.now() - startTime;
+    res.json({
+      success: true,
+      result,
+      prompt,
+      maxTokens,
+      output_length: result.length,
+      duration_ms: duration
+    });
+  } catch (err) {
+    console.error("Generate text controller error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Text generation error",
       error: err.message
     });
   }

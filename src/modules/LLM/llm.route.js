@@ -3,7 +3,8 @@ import {
   translateController, 
   summarizeController, 
   testController,
-  modelInfoController 
+  modelInfoController,
+  generateTextController 
 } from "./llm.controller.js";
 
 const router = express.Router();
@@ -11,6 +12,7 @@ const router = express.Router();
 // Main endpoints
 router.post("/translate", translateController);
 router.post("/summarize", summarizeController);
+router.post("/generate-text", generateTextController);
 
 // Debug/Test endpoints
 router.post("/test", testController);

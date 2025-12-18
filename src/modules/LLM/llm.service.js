@@ -154,6 +154,39 @@ export async function summarizeText(input, language = "Vietnamese") {
   }
 }
 
+export async function generateText(prompt, maxTokens = 150) {
+  if (!prompt || typeof prompt !== 'string' || prompt.trim() === '') {
+    throw new Error("Prompt is required and must be a non-empty string");
+  }
+  await initModel();
+  try {
+    console.log(`Generating text for prompt of length ${prompt.length}...`);
+    
+    const response = await openai.chat.completions.create({ 
+      model: modelInfo.id,
+      messages: [
+        {
+          role: "user",
+          content: prompt.trim()
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: maxTokens,
+      top_p: 0.9,
+    }); 
+    const result = response.choices[0].message.content.trim();
+    console.log(`Generated text: ${result.substring(0, 100)}...`);
+    return result;
+  } catch (error) {
+    console.error("Text generation error:", {
+      message: error.message,
+      status: error.status,
+      promptLength: prompt.length
+    });
+    throw new Error(`Text generation failed: ${error.message}`);
+  }
+}
+
 // Function để test model trực tiếp
 export async function testModel(prompt = "Hello, how are you?", useSystem = true) {
   await initModel();
