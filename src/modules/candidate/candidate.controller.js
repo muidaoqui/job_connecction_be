@@ -352,24 +352,19 @@ export const removeViewedJob = async (req, res) => {
 // Upload avatar
 export const uploadAvatar = async (req, res) => {
   try {
-    const userId = req.user.id;
-
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
+    const { id: userId } = req.user;
+    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
     const avatarUrl = `${req.protocol}://${req.get("host")}/uploads/avatars/${req.file.filename}`;
-    let candidate = await Candidate.findOne({ userId });
+    let candidate = await Candidate.findOne({ _id: userId });
 
     if (!candidate) {
-      candidate = new Candidate({ userId, avatarUrl });
+      // Tạo mới với _id trùng với userId
+      candidate = new Candidate({ _id: userId, avatarUrl });
       await candidate.save();
     } else {
-      candidate = await Candidate.findOneAndUpdate(
-        { userId },
-        { avatarUrl },
-        { new: true }
-      );
+      candidate.avatarUrl = avatarUrl;
+      await candidate.save();
     }
 
     res.status(200).json({ avatarUrl, message: "Avatar uploaded successfully" });
@@ -378,6 +373,7 @@ export const uploadAvatar = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 
 

@@ -89,8 +89,13 @@ app.use(morgan("dev"));
 // Public avatars
 app.use(
   "/uploads/avatars",
+  (req, res, next) => {
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    next();
+  },
   express.static(path.join(process.cwd(), "uploads/avatars"))
 );
+
 
 // Allow cross-origin resource load
 app.use("/uploads", (req, res, next) => {
