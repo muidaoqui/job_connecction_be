@@ -1,4 +1,4 @@
-import { translateText, summarizeText, testModel, getModelInfo } from "./translate.service.js";
+import { translateText, summarizeText, testModel, getModelInfo } from "./llm.service.js";
 
 export const translateController = async (req, res) => {
   try {
@@ -54,7 +54,7 @@ export const translateController = async (req, res) => {
 
 export const summarizeController = async (req, res) => {
   try {
-    const { text, language = "Vietnamese" } = req.body;
+    const { text, language = "Vietnamese", translateToVietnamese = true } = req.body;
     
     if (!text || typeof text !== 'string') {
       return res.status(400).json({ 
@@ -80,19 +80,40 @@ export const summarizeController = async (req, res) => {
     console.log(`[${new Date().toISOString()}] Summarizing ${text.length} chars in ${language}`);
     
     const startTime = Date.now();
-    const result = await summarizeText(text, language);
+    
+    // Bước 1: Tóm tắt văn bản
+    const summary = await summarizeText(text, language);
+    
+    let result = summary;
+    let translated = null;
+    
+    // Bước 2: Nếu cần dịch sang tiếng Việt và văn bản không phải tiếng Việt
+    if (translateToVietnamese && language !== "Vietnamese") {
+      console.log('Translating summary to Vietnamese...');
+      try {
+        translated = await translateText(summary, language, "Vietnamese");
+        result = translated; // Kết quả cuối cùng là bản dịch
+      } catch (translateErr) {
+        console.error("Translation error:", translateErr);
+        // Nếu dịch lỗi, vẫn trả về bản tóm tắt gốc
+      }
+    }
+    
     const duration = Date.now() - startTime;
     
-    console.log(`Summarization completed in ${duration}ms`);
+    console.log(`Summarization ${translated ? '+ Translation ' : ''}completed in ${duration}ms`);
     
     res.json({ 
       success: true,
-      result,
+      result, // Kết quả cuối cùng (đã dịch nếu có)
+      summary: summary, // Bản tóm tắt gốc
+      translated: translated, // Bản dịch (nếu có)
       language,
       input_length: text.length,
       output_length: result.length,
       compression_ratio: (text.length / result.length).toFixed(2),
-      duration_ms: duration
+      duration_ms: duration,
+      was_translated: !!translated
     });
   } catch (err) {
     console.error("Summarization controller error:", err);
