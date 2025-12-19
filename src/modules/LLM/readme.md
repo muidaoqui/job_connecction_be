@@ -1,6 +1,5 @@
 # Flowchart Hệ Thống Chatbot Tuyển Dụng
 <img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/19fa1077-f91e-47ce-aa13-b3a2a0d1768a" />
-<img width="405" height="554" alt="image" src="https://github.com/user-attachments/assets/b1352a05-9438-44de-8b14-b14b496c6070" />
 
 
 ## 1. Luồng Chính - Chat với Candidate
@@ -295,8 +294,8 @@ Database error              →  500 Error
 - **Auto Summarization**: Tự động tóm tắt khi conversation dài
 - **Stateful**: Lưu trữ lịch sử đầy đủ
 
-### ⚠️ Điểm Cần Cải Thiện:
-- **LLM Integration**: `generateText` đang format messages thủ công, nên dùng proper message format
-- **Concurrency**: Không xử lý concurrent requests từ cùng candidate
-- **Error Recovery**: Nếu summarization fail, toàn bộ flow bị block
-- **Prompt Engineering**: System prompt đơn giản, có thể optimize thêm
+### Demo:
+<div align="center">
+<img width="405" height="554" alt="image" src="https://github.com/user-attachments/assets/b1352a05-9438-44de-8b14-b14b496c6070" />
+<img width="405" height="554" alt="image" src="https://github.com/user-attachments/assets/803cd05b-7cb7-4300-899a-36b70b00a4b1" />
+<div/>
