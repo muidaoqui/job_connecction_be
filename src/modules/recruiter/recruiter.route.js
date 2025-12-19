@@ -1,9 +1,11 @@
 import express from "express";
-import { getMyRecruiterProfile, saveMyRecruiterProfile } from "./recruiter.controller.js";
+import { getMyRecruiterProfile, saveMyRecruiterProfile, getRecruiterByCompany} from "./recruiter.controller.js";
 import { verifyToken } from "../auth/auth.middleware.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { getApplicantsForRecruiter } from "./recruiter.controller.js";
+import { getApplicantsByJob } from "../candidate/applications/job-application.controller.js";
 
 // Tạo folder upload nếu chưa có
 const avatarFolder = "uploads/avatars";
@@ -23,10 +25,20 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 const router = express.Router();
-
+// GET hồ sơ recruiter theo companyId
+router.get("/", getRecruiterByCompany);
 // GET hồ sơ recruiter
 router.get("/profile/me", verifyToken, getMyRecruiterProfile);
-
+router.get(
+  "/applications",
+  verifyToken,
+  getApplicantsForRecruiter
+);
+router.get(
+  "/applications/job/:jobId",
+  verifyToken,
+  getApplicantsByJob
+);
 // POST lưu hồ sơ recruiter
 router.post("/profile/me", verifyToken, upload.single("avatar"), saveMyRecruiterProfile);
 

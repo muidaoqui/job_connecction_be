@@ -1,5 +1,6 @@
 import Company from "./company.model.js";
-import  Recruiter  from "../recruiter.model.js";   
+import  Recruiter  from "../recruiter.model.js";  
+import SavedCompany from "../../candidate/saved-companies/saved-companies.model.js"; 
 export const createOrUpdateCompany = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -203,3 +204,84 @@ export const getCompanyById = async (req, res) => {
     });
   }
 };
+
+//follow company
+export const followCompany = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id: companyId } = req.params;
+
+    // 1. Check company tồn tại
+    const company = await Company.findById(companyId);
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    // 2. Check đã follow chưa
+    const existed = await SavedCompany.findOne({ userId, companyId });
+    if (existed) {
+      return res.status(400).json({ message: "Already followed this company" });
+    }
+
+    // 3. Lưu follow
+    const saved = await SavedCompany.create({
+      userId,
+      companyId,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Followed company successfully",
+      data: saved,
+    });
+  } catch (error) {
+    console.error("Follow company error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+export const unfollowCompany = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id: companyId } = req.params;
+
+    const removed = await SavedCompany.findOneAndDelete({
+      userId,
+      companyId,
+    });
+
+    if (!removed) {
+      return res.status(404).json({ message: "You haven't followed this company" });
+    }
+
+    res.json({
+      success: true,
+      message: "Unfollowed company successfully",
+    });
+  } catch (error) {
+    console.error("Unfollow company error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// GET /api/company/following
+export const getFollowingCompanies = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const companies = await SavedCompany.find({ userId })
+      .populate("companyId")
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: companies,
+    });
+  } catch (error) {
+    console.error("Get following companies error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+

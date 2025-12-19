@@ -112,18 +112,44 @@ export const updateProfile = async (req, res) => {
 export const uploadResume = async (req, res) => {
   try {
     const userId = req.user.id;
-    const filePath = req.file.path;
 
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    // normalize path
+    const filePath = req.file.path.replace(/\\/g, "/");
+
+    /* ===============================
+       1. LƯU VÀO RESUME MODEL
+    =============================== */
+    const resume = await Resume.create({
+      userId,
+      filename: req.file.filename,
+      path: filePath,
+    });
+
+    /* ===============================
+       2. CẬP NHẬT MAIN RESUME (NẾU CHƯA CÓ)
+    =============================== */
     let candidate = await Candidate.findById(userId);
+
     if (!candidate) {
-      candidate = new Candidate({ _id: userId, resumePath: filePath });
+      candidate = new Candidate({
+        _id: userId,
+        mainResumePath: filePath,
+      });
       await candidate.save();
-    } else {
-      candidate.resumePath = filePath;
+    } else if (!candidate.mainResumePath) {
+      candidate.mainResumePath = filePath;
       await candidate.save();
     }
 
-    res.status(200).json({ message: "Resume uploaded", resumePath: filePath });
+    return res.status(201).json({
+      message: "Resume uploaded successfully",
+      resume,
+    });
+
   } catch (error) {
     console.error("Upload resume error:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -155,29 +181,38 @@ export const listResumes = async (req, res) => {
 
 export const setMainResume = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
     const { mainResumePath } = req.body;
-    
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
     if (!mainResumePath) {
-      return res.status(400).json({ message: "mainResumePath is required" });
+      return res
+        .status(400)
+        .json({ message: "mainResumePath is required" });
     }
 
-    let candidate = await Candidate.findOne({ userId });
+    const candidate = await Candidate.findById(userId);
     if (!candidate) {
-      candidate = new Candidate({ userId, mainResumePath });
-      await candidate.save();
-    } else {
-      candidate.mainResumePath = mainResumePath;
-      await candidate.save();
+      return res.status(404).json({ message: "Candidate not found" });
     }
 
-    console.log(`✅ Set main resume for user ${userId}: ${mainResumePath}`);
-    res.status(200).json({ message: "Main resume set successfully", mainResumePath });
-  } catch (error) {
-    console.error("❌ Error setting main resume:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    candidate.mainResumePath = mainResumePath;
+    await candidate.save();
+
+    return res.json({
+      message: "Main resume updated",
+      mainResumePath,
+    });
+  } catch (err) {
+    console.error("❌ Set main resume error:", err);
+    res.status(500).json({ message: err.message });
   }
 };
+
+
 
 // Lấy danh sách ứng tuyển
 export const getApplications = async (req, res) => {
@@ -317,24 +352,19 @@ export const removeViewedJob = async (req, res) => {
 // Upload avatar
 export const uploadAvatar = async (req, res) => {
   try {
-    const userId = req.user.id;
-
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
+    const { id: userId } = req.user;
+    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
     const avatarUrl = `${req.protocol}://${req.get("host")}/uploads/avatars/${req.file.filename}`;
-    let candidate = await Candidate.findOne({ userId });
+    let candidate = await Candidate.findOne({ _id: userId });
 
     if (!candidate) {
-      candidate = new Candidate({ userId, avatarUrl });
+      // Tạo mới với _id trùng với userId
+      candidate = new Candidate({ _id: userId, avatarUrl });
       await candidate.save();
     } else {
-      candidate = await Candidate.findOneAndUpdate(
-        { userId },
-        { avatarUrl },
-        { new: true }
-      );
+      candidate.avatarUrl = avatarUrl;
+      await candidate.save();
     }
 
     res.status(200).json({ avatarUrl, message: "Avatar uploaded successfully" });
@@ -343,6 +373,7 @@ export const uploadAvatar = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 
 

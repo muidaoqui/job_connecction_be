@@ -1,8 +1,8 @@
-import Application from "../job/application.model.js";
 import SavedJob from "../saved-job/saved-job.model.js";
 import JobView from "../job-view/job-view.model.js";
-import Job from "../../job/job.model.js";
-
+import Application from "../../job/application.model.js";
+import Job from "../../job/job.model.js"; // ✅ ĐÚNG
+import Recruiter from "../../recruiter/recruiter.model.js";
 export const getApplications = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -14,33 +14,90 @@ export const getApplications = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+export const getApplicantsByJob = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { jobId } = req.params;
+
+    // 1️⃣ Lấy recruiter theo user đang đăng nhập
+    const recruiter = await Recruiter.findOne({ userId });
+    if (!recruiter) {
+      return res.status(403).json({
+        message: "Bạn không phải là nhà tuyển dụng",
+      });
+    }
+
+    // 2️⃣ Kiểm tra job có thuộc recruiter này không
+    const job = await Job.findOne({
+      _id: jobId,
+      recruiterId: recruiter._id,
+    });
+
+    if (!job) {
+      return res.status(403).json({
+        message: "Bạn không có quyền xem ứng viên của job này",
+      });
+    }
+
+    // 3️⃣ Lấy danh sách ứng viên theo job
+    const applications = await Application.find({ jobId })
+      .populate("userId", "fullName firstName lastName name email")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      data: applications,
+    });
+  } catch (error) {
+    console.error("❌ getApplicantsByJob error:", error);
+    return res.status(500).json({
+      message: "Lỗi server",
+    });
+  }
+};
+
+
 
 export const applyJob = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, message } = req.body;
+    const { message } = req.body;
 
     if (!req.file) {
       return res.status(400).json({ message: "Resume file is required" });
     }
 
-    const newApplication = new JobApplication({
+    // ✅ LẤY USER TỪ TOKEN (KHÔNG CẦN IMPORT User)
+    const user = req.user;
+
+    const fullName =
+      user.fullName ||
+      `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+      user.name ||
+      user.email?.split("@")[0];
+
+    const newApplication = new Application({
       jobId: id,
-      userId: req.user.id,
-      name,
-      email,
+      userId: user.id,
+      name: fullName,
+      email: user.email,
       message,
-      resumePath: `/uploads/resumes/${req.file.filename}`,
+      cvFile: req.file.path,
+      status: "pending",
     });
 
     await newApplication.save();
 
-    res.status(201).json({ message: "Application submitted successfully" });
+    return res.status(201).json({
+      success: true,
+      message: "Application submitted successfully",
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server error" });
+    console.error("❌ applyJob error:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
+
  
 
 export const withdrawApplication = async (req, res) => {
