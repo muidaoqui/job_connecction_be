@@ -299,3 +299,4 @@ Database error              →  500 Error
 <img width="405" height="554" alt="image" src="https://github.com/user-attachments/assets/b1352a05-9438-44de-8b14-b14b496c6070" />
 <img width="405" height="554" alt="image" src="https://github.com/user-attachments/assets/803cd05b-7cb7-4300-899a-36b70b00a4b1" />
 <div/>
+<img width="723" height="860" alt="image" src="https://github.com/user-attachments/assets/4c880c89-eb4e-4f5d-8887-d50a5be186ea" />
