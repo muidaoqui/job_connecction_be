@@ -18,6 +18,7 @@ import { fileURLToPath } from "url";
 import companyRoutes from "./src/modules/recruiter/company/company.route.js";
 import embeddingRoutes from "./src/modules/embedding/embedding.route.js";
 import LLMRoute from "./src/modules/LLM/llm.route.js";
+import ragRouters from "./src/modules/RAG/rag.route.js";
 // Đường dẫn tuyệt đối của thư mục hiện tại
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
