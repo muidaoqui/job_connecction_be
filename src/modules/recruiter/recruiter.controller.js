@@ -31,16 +31,18 @@ export const getApplicantsForRecruiter = async (req, res) => {
 /* ================================
    📌 LẤY THÔNG TIN RECRUITER THEO USER ID
 ================================ */
-export const getRecruiterByUserId = async (req, res) => {
+export const getRecruiterByCompany = async (req, res) => {
   try {
-    const userId = req.params.userId || req.user?.id;
-    const recruiter = await Recruiter.findOne({ userId })
-      .populate("userId", "name email")
-      .populate("companyId");
+    const { companyId } = req.query;
 
-    if (!recruiter) return res.status(404).json({ message: "Recruiter profile not found" });
+    if (!companyId) {
+      return res.status(400).json({ message: "companyId is required" });
+    }
 
-    res.json({ success: true, recruiter });
+    const recruiters = await Recruiter.find({ companyId })
+      .populate("userId", "name email");
+
+    res.status(200).json({ data: recruiters });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

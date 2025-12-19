@@ -1,5 +1,5 @@
 import express from "express";
-import { getMyRecruiterProfile, saveMyRecruiterProfile } from "./recruiter.controller.js";
+import { getMyRecruiterProfile, saveMyRecruiterProfile, getRecruiterByCompany} from "./recruiter.controller.js";
 import { verifyToken } from "../auth/auth.middleware.js";
 import multer from "multer";
 import path from "path";
@@ -25,7 +25,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 const router = express.Router();
-
+// GET hồ sơ recruiter theo companyId
+router.get("/", getRecruiterByCompany);
 // GET hồ sơ recruiter
 router.get("/profile/me", verifyToken, getMyRecruiterProfile);
 router.get(
