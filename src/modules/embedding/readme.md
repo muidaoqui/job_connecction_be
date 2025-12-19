@@ -1,5 +1,5 @@
 # HỆ THỐNG TÌM KIẾM NGỮ NGHĨA & GỢI Ý (SEMANTIC SEARCH FLOW)
-
+<img width="2816" height="1536" alt="image" src="https://github.com/user-attachments/assets/515d6bc7-38c1-42cf-a974-292ce71ac06f" />
 ## Tổng Quan
 
 Hệ thống sử dụng **Vector Embeddings** và **Semantic Search** để:
