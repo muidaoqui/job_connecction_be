@@ -104,27 +104,14 @@ app.use("/uploads", (req, res, next) => {
 });
 
 /* ================= PROTECTED RESUME DOWNLOAD ================= */
-app.get("/uploads/resumes/:filename", verifyToken, async (req, res) => {
-  try {
-    const { filename } = req.params;
-    const userId = req.user.id;
-
-    const resume = await Resume.findOne({ filename, userId });
-    if (!resume) {
-      return res.status(403).json({ message: "Access denied" });
-    }
-
-    const filePath = path.join(resumesDir, filename);
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ message: "File not found" });
-    }
-
-    res.download(filePath);
-  } catch (error) {
-    console.error("❌ Error serving resume:", error);
-    res.status(500).json({ message: "Error serving file" });
-  }
-});
+app.use(
+  "/uploads/resumes",
+  (req, res, next) => {
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    next();
+  },
+  express.static(path.join(process.cwd(), "uploads/resumes"))
+);
 
 /* ================= API ROUTES ================= */
 app.use("/api/auth", authRoutes);
