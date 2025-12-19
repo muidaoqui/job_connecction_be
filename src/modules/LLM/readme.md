@@ -1,5 +1,6 @@
 # Flowchart Hệ Thống Chatbot Tuyển Dụng
 <img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/19fa1077-f91e-47ce-aa13-b3a2a0d1768a" />
+<img width="405" height="554" alt="image" src="https://github.com/user-attachments/assets/b1352a05-9438-44de-8b14-b14b496c6070" />
 
 
 ## 1. Luồng Chính - Chat với Candidate
