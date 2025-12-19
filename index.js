@@ -17,8 +17,7 @@ import recruiterRoutes from "./src/modules/recruiter/recruiter.route.js";
 import { fileURLToPath } from "url";
 import companyRoutes from "./src/modules/recruiter/company/company.route.js";
 import embeddingRoutes from "./src/modules/embedding/embedding.route.js";
-// import ragRouters from "./src/modules/RAG/rag.route.js";
-// import LLMRoute from "./src/modules/LLM/llm.route.js";
+import LLMRoute from "./src/modules/LLM/llm.route.js";
 // Đường dẫn tuyệt đối của thư mục hiện tại
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -106,8 +105,8 @@ app.use("/api/recruiter/applications", recruiterAppRoutes);
 app.use("/uploads", express.static("uploads"));
 
 app.use("/api/embeddings", embeddingRoutes);
-app.use("/api/rags", ragRouters);
-app.use("/api/llm", LLMRoute);
+// app.use("/api/rags", ragRouters);
+// app.use("/api/llm", LLMRoute);
 
 // KẾT NỐI MONGO DB
 mongoose

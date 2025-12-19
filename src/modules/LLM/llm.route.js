@@ -7,16 +7,21 @@ import {
   generateTextController 
 } from "./llm.controller.js";
 
+import { chatController, getConversationController } from "./chat.controller.js";
+import { verifyToken } from "../auth/auth.middleware.js";
 const router = express.Router();
 
 // Main endpoints
 router.post("/translate", translateController);
 router.post("/summarize", summarizeController);
 router.post("/generate-text", generateTextController);
-
+router.post("/chat", verifyToken, chatController);
+router.get("/conversation", verifyToken, getConversationController);
 // Debug/Test endpoints
 router.post("/test", testController);
 router.get("/model-info", modelInfoController);
+
+
 
 // Health check
 router.get("/health", (req, res) => {
