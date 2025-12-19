@@ -17,6 +17,7 @@ import {
 import { verifyToken } from "../auth/auth.middleware.js";
 import Application from "../job/application.model.js";
 import { uploadCV } from "./uploadCV.js";
+import { getRecruiterDashboardStats } from "./job.controller.js";
 
 const router = express.Router();
 
@@ -69,7 +70,11 @@ router.post("/:id/unsave", verifyToken, unsaveJob);
    JOB BY COMPANY
 ========================================================= */
 router.get("/company/:companyId", getJobsByCompany);
-
+router.get(
+  "/recruiter/stats",
+  verifyToken,
+  getRecruiterDashboardStats
+);
 /* =========================================================
    GET / UPDATE / DELETE JOB (ĐỂ SAU CÙNG)
 ========================================================= */

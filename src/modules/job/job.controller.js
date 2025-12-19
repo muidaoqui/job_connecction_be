@@ -4,7 +4,48 @@ import Application from "./application.model.js";
 import SavedJob from "../candidate/saved-job/saved-job.model.js";
 import Recruiter from "../recruiter/recruiter.model.js";
 import { generateAndSaveJobEmbedding } from "../embedding/embedding.serivice.js";
+export const getRecruiterDashboardStats = async (req, res) => {
+  try {
+    const userId = req.user._id;
 
+    // 1️⃣ Lấy recruiter
+    const recruiter = await Recruiter.findOne({ userId });
+    if (!recruiter) {
+      return res.status(404).json({ message: "Recruiter not found" });
+    }
+
+    // 2️⃣ Lấy job của recruiter
+    const jobs = await Job.find({ recruiterId: recruiter._id }).select("_id");
+    const jobIds = jobs.map((j) => j._id);
+
+    // 3️⃣ Đếm stats
+    const postedJobs = jobs.length;
+
+    const totalApplicants = await Application.countDocuments({
+      jobId: { $in: jobIds },
+    });
+
+    const pending = await Application.countDocuments({
+      jobId: { $in: jobIds },
+      status: "pending",
+    });
+
+    const accepted = await Application.countDocuments({
+      jobId: { $in: jobIds },
+      status: "accepted",
+    });
+
+    return res.json({
+      postedJobs,
+      newApplicants: totalApplicants,
+      pending,
+      accepted,
+    });
+  } catch (error) {
+    console.error("Dashboard stats error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 // Tạo job (với embedding info trong response)
 export const createJob = async (req, res) => {
   try {
@@ -19,26 +60,15 @@ export const createJob = async (req, res) => {
       });
     }
 
-    // 3) BUILD JOB DATA
-    const jobData = {
-      ...req.body,
-      recruiterId: recruiterProfile._id,
-    };
-
-    // 4) CREATE NEW JOB
-    const newJob = new Job(jobData);
-    await newJob.save();
-
-    // 5) GENERATE EMBEDDING (KHÔNG nằm trong catch)
-    let embeddingInfo = null;
-    try {
-      embeddingInfo = await generateAndSaveJobEmbedding(newJob._id.toString());
-      console.log(`✅ Embedding generated for job ${newJob._id}`);
-    } catch (embeddingError) {
-      console.error(`⚠️ Failed to generate embedding for job ${newJob._id}:`, embeddingError.message);
+    // 2️⃣ Kiểm tra công ty
+    if (!recruiter.companyId) {
+      return res.status(400).json({
+        success: false,
+        message: "Bạn chưa tạo công ty, không thể đăng tin",
+      });
     }
 
-    // 2️⃣ Lấy dữ liệu từ FE
+    // 3️⃣ Lấy dữ liệu từ FE
     const {
       title,
       description,
@@ -46,10 +76,10 @@ export const createJob = async (req, res) => {
       salary,
       location,
       jobType,
-      experience, // nếu FE có
+      experience,
     } = req.body;
 
-    // 3️⃣ Tạo job
+    // 4️⃣ Tạo job (CHỈ 1 LẦN)
     const job = await Job.create({
       title,
       description,
@@ -60,8 +90,19 @@ export const createJob = async (req, res) => {
       experience,
       recruiterId: recruiter._id,
       companyId: recruiter.companyId,
-      status: "pending", // ⛔ mặc định
+      status: "pending",
     });
+
+    // 5️⃣ Generate embedding (không làm crash job)
+    try {
+      await generateAndSaveJobEmbedding(job._id.toString());
+      console.log(`✅ Embedding generated for job ${job._id}`);
+    } catch (embeddingError) {
+      console.error(
+        `⚠️ Failed to generate embedding for job ${job._id}:`,
+        embeddingError.message
+      );
+    }
 
     return res.status(201).json({
       success: true,
@@ -76,6 +117,7 @@ export const createJob = async (req, res) => {
     });
   }
 };
+
 // Lấy job theo ID
 export const getJobById = async (req, res) => {
   try {
