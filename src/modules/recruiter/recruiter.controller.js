@@ -138,20 +138,29 @@ export const updateRecruiterProfile = async (req, res) => {
 export const followRecruiter = async (req, res) => {
   try {
     const recruiterId = req.params.id;
+    const userId = req.user.id;
 
-    const recruiter = await Recruiter.findByIdAndUpdate(
-      recruiterId,
-      { $inc: { followers: 1 } },
-      { new: true }
-    );
+    const recruiter = await Recruiter.findById(recruiterId);
+    if (!recruiter)
+      return res.status(404).json({ message: "Recruiter not found" });
 
-    if (!recruiter) return res.status(404).json({ message: "Recruiter not found" });
+    if (recruiter.followers.includes(userId)) {
+      return res.status(400).json({ message: "Already followed" });
+    }
 
-    res.json({ success: true, followers: recruiter.followers });
+    recruiter.followers.push(userId);
+    await recruiter.save();
+
+    res.json({
+      success: true,
+      followers: recruiter.followers.length,
+      isFollowing: true
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 /* ================================
    📌 BỎ THEO DÕI RECRUITER
@@ -159,20 +168,27 @@ export const followRecruiter = async (req, res) => {
 export const unfollowRecruiter = async (req, res) => {
   try {
     const recruiterId = req.params.id;
+    const userId = req.user.id;
 
-    const recruiter = await Recruiter.findByIdAndUpdate(
-      recruiterId,
-      { $inc: { followers: -1 } },
-      { new: true }
+    const recruiter = await Recruiter.findById(recruiterId);
+    if (!recruiter)
+      return res.status(404).json({ message: "Recruiter not found" });
+
+    recruiter.followers = recruiter.followers.filter(
+      id => id.toString() !== userId
     );
+    await recruiter.save();
 
-    if (!recruiter) return res.status(404).json({ message: "Recruiter not found" });
-
-    res.json({ success: true, followers: recruiter.followers });
+    res.json({
+      success: true,
+      followers: recruiter.followers.length,
+      isFollowing: false
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 /* ================================
    📌 LẤY HỒ SƠ CỦA USER ĐANG ĐĂNG NHẬP

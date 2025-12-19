@@ -72,6 +72,13 @@ const companySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
   },
   { timestamps: true }
 );
