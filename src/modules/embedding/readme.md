@@ -753,3 +753,6 @@ function buildJobText(job) {
 - ✅ Tìm kiếm ngữ nghĩa phức tạp
 - ✅ Matching jobs/candidates
 - ❌ Tìm kiếm đơn giản, cần real-time
+### Sản Phẩm
+<img width="1886" height="699" alt="image" src="https://github.com/user-attachments/assets/c887a6e6-ef91-4010-a732-37e3486e3480" />
+<img width="1553" height="660" alt="image" src="https://github.com/user-attachments/assets/91956561-39eb-426d-9b23-9d7345474398" />
