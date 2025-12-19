@@ -6,32 +6,43 @@ const recruiterSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      unique: true, // 1 user = 1 recruiter profile
     },
+
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       default: null,
     },
 
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    companyId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Company",
-      default: null,
-    },
-
-    // Hồ sơ nhà tuyển dụng
-    fullName: { type: String, required: true },
-    position: { type: String, required: true },
-    phone: { type: String, required: true },
-    workEmail: { type: String, required: true },
+    // Hồ sơ recruiter (sẵn có)
+    fullName: { type: String },
+    position: { type: String },
+    phone: { type: String },
+    workEmail: { type: String },
     bio: { type: String, default: "" },
 
     followers: { type: Number, default: 0 },
+
+    verificationStatus: {
+      type: String,
+      enum: ["unverified", "pending", "verified", "rejected"],
+      default: "unverified",
+    },
+
+    verificationData: {
+      businessLicense: String,
+      idCardFront: String,
+      idCardBack: String,
+
+      companyName: String,
+      taxCode: String,
+      address: String,
+      website: String,
+      phone: String,
+
+      note: String, // admin note
+    },
   },
   { timestamps: true }
 );

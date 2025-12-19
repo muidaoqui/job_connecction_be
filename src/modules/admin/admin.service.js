@@ -1,8 +1,8 @@
 import User from "../auth/auth.model.js";
 import CandidateSchema from "../candidate/candidate.model.js";
-import RecruiterSchema from "../recruiter/recruiter.model.js";
+import Recruiter from "../recruiter/recruiter.model.js";
 import Job from "../job/job.model.js";
-
+import mongoose from "mongoose";
 export const getAllUsers = async (filters) => {
   const query = {};
 
@@ -55,6 +55,35 @@ export const getJobsService = async () => {
   return await Job.find().populate("recruiterId").populate("companyId");
 };
 
+export const submitRecruiterVerification = async ({ userId, body, files }) => {
+  let recruiter = await Recruiter.findOne({ userId });
+
+  // 🔥 CHƯA CÓ → TẠO MỚI
+  if (!recruiter) {
+    recruiter = new Recruiter({
+      userId,
+      phone: body.phone,
+      verificationStatus: "unverified",
+    });
+  }
+
+  recruiter.verificationStatus = "pending";
+  recruiter.verificationData = {
+    companyName: body.companyName,
+    taxCode: body.taxCode,
+    address: body.address,
+    website: body.website,
+    phone: body.phone,
+
+    businessLicense: files.businessLicense?.[0]?.path,
+    idCardFront: files.idCardFront?.[0]?.path,
+    idCardBack: files.idCardBack?.[0]?.path,
+  };
+
+  await recruiter.save();
+  return recruiter;
+};
+
 export const approveJobService = async (jobId) => {
   const job = await Job.findById(jobId);
 
@@ -81,4 +110,41 @@ export const rejectJobService = async (jobId) => {
   await job.save();
 
   return job;
+};
+
+export const getPendingRecruiters = async () => {
+  return await Recruiter.find({ verificationStatus: "pending" })
+    .populate("userId", "username email")
+    .lean();
+};
+
+export const approveRecruiter = async (id) => {
+  return await Recruiter.findByIdAndUpdate(
+    id,
+    { verificationStatus: "verified" },
+    { new: true }
+  );
+};
+
+export const rejectRecruiter = async (id, reason) => {
+  return await Recruiter.findByIdAndUpdate(
+    id,
+    {
+      verificationStatus: "rejected",
+      "verificationData.note": reason,
+    },
+    { new: true }
+  );
+};
+
+export const getRecruiterByUserId = async (userId) => {
+  const recruiter = await Recruiter.findOne({
+    userId: new mongoose.Types.ObjectId(userId),
+  });
+
+  if (!recruiter) {
+    return { verificationStatus: "unverified" };
+  }
+
+  return recruiter;
 };

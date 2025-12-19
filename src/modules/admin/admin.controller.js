@@ -83,3 +83,74 @@ export const rejectJob = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
+export const verifyRecruiter = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("recruiter id:  ", userId);
+    console.log("FILES:", req.files);
+    console.log("BODY:", req.body);
+
+    const recruiter = await adminService.submitRecruiterVerification({
+      userId,
+      body: req.body,
+      files: req.files,
+    });
+
+    res.status(200).json({
+      message: "Gửi yêu cầu xác thực thành công",
+      data: recruiter,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({
+      message: error.message || "Gửi yêu cầu xác thực thất bại",
+    });
+  }
+};
+
+export const getPendingRecruitersController = async (req, res) => {
+  try {
+    const list = await adminService.getPendingRecruiters();
+    res.json(list);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const approveRecruiterController = async (req, res) => {
+  try {
+    const result = await adminService.approveRecruiter(req.params.id);
+    res.json({ message: "Approved successfully", data: result });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const rejectRecruiterController = async (req, res) => {
+  try {
+    const result = await adminService.rejectRecruiter(
+      req.params.id,
+      req.body.reason
+    );
+    res.json({ message: "Rejected successfully", data: result });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getRecruiterByUserIdController = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const recruiter = await adminService.getRecruiterByUserId(userId);
+
+    res.status(200).json(recruiter);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({
+      message: error.message || "Không thể lấy trạng thái recruiter",
+    });
+  }
+};
