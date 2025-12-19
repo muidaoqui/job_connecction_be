@@ -1,4 +1,5 @@
 # Flowchart Hệ Thống Chatbot Tuyển Dụng
+![Uploading image.png…]()
 
 ## 1. Luồng Chính - Chat với Candidate
 
