@@ -17,7 +17,12 @@ import recruiterRoutes from "./src/modules/recruiter/recruiter.route.js";
 import recruiterAppRoutes from "./src/modules/candidate/applications/recruiter-application.route.js";
 import companyRoutes from "./src/modules/recruiter/company/company.route.js";
 import embeddingRoutes from "./src/modules/embedding/embedding.route.js";
-import ragRoutes from "./src/modules/RAG/rag.route.js";
+import LLMRoute from "./src/modules/LLM/llm.route.js";
+import ragRouters from "./src/modules/RAG/rag.route.js";
+// Đường dẫn tuyệt đối của thư mục hiện tại
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+console.log("🔥 Loaded recruiterRoutes from:", recruiterRoutes);
 
 /* ================= MIDDLEWARE / MODELS ================= */
 import { verifyToken } from "./src/modules/auth/auth.middleware.js";
@@ -34,8 +39,6 @@ console.log("NODE_ENV =", process.env.NODE_ENV);
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 /* ================= ENSURE UPLOAD DIRS ================= */
 const uploadsDir = path.join(process.cwd(), "uploads");
@@ -124,9 +127,23 @@ app.use("/api/company", companyRoutes);
 app.use("/api/recruiter", recruiterRoutes);
 app.use("/api/recruiter/applications", recruiterAppRoutes);
 
-// // AI / Search
-// app.use("/api/embeddings", embeddingRoutes);
-// app.use("/api/rags", ragRoutes);
+// AI / Search
+app.use("/api/embeddings", embeddingRoutes);
+// app.use("/api/rags", ragRouters);
+// app.use("/api/llm", LLMRoute);
+
+// KẾT NỐI MONGO DB
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
+
+mongoose.connection.on("connected", () => {
+  console.log("👉 Connected to DB:", mongoose.connection.name);
+});
 
 /* ================= HEALTH ================= */
 app.get("/", (req, res) => {

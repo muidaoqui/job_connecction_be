@@ -55,8 +55,8 @@ export const searchJobsByVector = async (queryText, limit = 10, numCandidates = 
     try {
         // 1. Generate embedding cho query text
         const queryVector = await getEmbedding(queryText);
-        const queryVectorArray = Array.isArray(queryVector) 
-            ? queryVector 
+        const queryVectorArray = Array.isArray(queryVector)
+            ? queryVector
             : Array.from(queryVector);
 
         // 2. Vector search với MongoDB Atlas
@@ -79,7 +79,8 @@ export const searchJobsByVector = async (queryText, limit = 10, numCandidates = 
                     location: 1,
                     salary: 1,
                     jobType: 1,
-                    company: 1,
+                    companyId: 1,
+                    recruiterId: 1,
                     createdAt: 1,
                     embeddingText: 1,
                     score: { $meta: "vectorSearchScore" }
@@ -95,8 +96,8 @@ export const searchJobsByVector = async (queryText, limit = 10, numCandidates = 
 // Vector search jobs by existing embedding (dùng cho similar jobs)
 export const searchJobsByEmbedding = async (embedding, limit = 10, numCandidates = 100) => {
     try {
-        const embeddingArray = Array.isArray(embedding) 
-            ? embedding 
+        const embeddingArray = Array.isArray(embedding)
+            ? embedding
             : Array.from(embedding);
 
         const results = await Job.aggregate([
@@ -110,6 +111,26 @@ export const searchJobsByEmbedding = async (embedding, limit = 10, numCandidates
                 }
             },
             {
+                $addFields: {
+                    score: { $meta: "vectorSearchScore" }
+                }
+            },
+            // Join với companies để lấy name và logo
+            {
+                $lookup: {
+                    from: "companies",
+                    localField: "companyId",
+                    foreignField: "_id",
+                    as: "company"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$company",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
                 $project: {
                     _id: 1,
                     title: 1,
@@ -118,10 +139,12 @@ export const searchJobsByEmbedding = async (embedding, limit = 10, numCandidates
                     location: 1,
                     salary: 1,
                     jobType: 1,
-                    company: 1,
+                    companyId: 1,
                     createdAt: 1,
                     embeddingText: 1,
-                    score: { $meta: "vectorSearchScore" }
+                    score: 1,
+                    companyName: "$company.name",
+                    companyLogo: "$company.logo"
                 }
             }
         ]);
@@ -154,7 +177,7 @@ export const generateAndSaveCandidateEmbedding = async (candidateId) => {
         ]);
 
         // 3. Tính tuổi từ dateOfBirth
-        const age = candidate.dateOfBirth 
+        const age = candidate.dateOfBirth
             ? Math.floor((Date.now() - new Date(candidate.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
             : '';
 
@@ -169,7 +192,7 @@ export const generateAndSaveCandidateEmbedding = async (candidateId) => {
 
         // Education
         if (educations.length > 0) {
-            const eduText = educations.map(edu => 
+            const eduText = educations.map(edu =>
                 `${edu.degree} in ${edu.fieldOfStudy} from ${edu.school}${edu.grade ? ` (Grade: ${edu.grade})` : ''}`
             ).join('; ');
             textParts.push(`Education: ${eduText}`);
@@ -177,7 +200,7 @@ export const generateAndSaveCandidateEmbedding = async (candidateId) => {
 
         // Experience
         if (experiences.length > 0) {
-            const expText = experiences.map(exp => 
+            const expText = experiences.map(exp =>
                 `${exp.jobTitle} at ${exp.company}`
             ).join('; ');
             textParts.push(`Experience: ${expText}`);
@@ -185,7 +208,7 @@ export const generateAndSaveCandidateEmbedding = async (candidateId) => {
 
         // Projects
         if (projects.length > 0) {
-            const projText = projects.map(proj => 
+            const projText = projects.map(proj =>
                 `${proj.projectName}: ${proj.description || ''}${proj.skills?.length ? ` (Skills: ${proj.skills.join(', ')})` : ''}`
             ).join('; ');
             textParts.push(`Projects: ${projText}`);
@@ -193,7 +216,7 @@ export const generateAndSaveCandidateEmbedding = async (candidateId) => {
 
         // Skills
         if (skills.length > 0) {
-            const skillText = skills.map(skill => 
+            const skillText = skills.map(skill =>
                 `${skill.skillName} (${skill.proficiency || 'N/A'}${skill.yearsOfExperience ? `, ${skill.yearsOfExperience} years` : ''})`
             ).join('; ');
             textParts.push(`Skills: ${skillText}`);
@@ -203,8 +226,8 @@ export const generateAndSaveCandidateEmbedding = async (candidateId) => {
 
         // 5. Generate embedding
         const embeddingRaw = await getEmbedding(textToEmbed);
-        const embedding = Array.isArray(embeddingRaw) 
-            ? embeddingRaw 
+        const embedding = Array.isArray(embeddingRaw)
+            ? embeddingRaw
             : Array.from(embeddingRaw);
 
         // 6. Cập nhật DB
@@ -230,8 +253,8 @@ export const searchCandidatesByVector = async (queryText, limit = 10, numCandida
     try {
         // 1. Generate embedding cho query text
         const queryVector = await getEmbedding(queryText);
-        const queryVectorArray = Array.isArray(queryVector) 
-            ? queryVector 
+        const queryVectorArray = Array.isArray(queryVector)
+            ? queryVector
             : Array.from(queryVector);
 
         // 2. Vector search với MongoDB Atlas
@@ -285,8 +308,8 @@ export const searchCandidatesByVector = async (queryText, limit = 10, numCandida
 // Vector search candidates by existing embedding
 export const searchCandidatesByEmbedding = async (embedding, limit = 10, numCandidates = 100) => {
     try {
-        const embeddingArray = Array.isArray(embedding) 
-            ? embedding 
+        const embeddingArray = Array.isArray(embedding)
+            ? embedding
             : Array.from(embedding);
 
         const results = await Candidate.aggregate([
