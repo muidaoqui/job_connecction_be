@@ -1,5 +1,5 @@
 import { chatWithCandidate, getConversationByCandidate } from "./chat.service.js";
-
+import User from "../auth/auth.model.js";
 export const chatController = async (req, res) => {
   try {
     const { message } = req.body;
@@ -40,14 +40,17 @@ export const getConversationController = async (req, res) => {
       });
     }
     const conversation = await getConversationByCandidate(candidateId);
+    const user = await User.findById(candidateId);
     if (!conversation) {
       return res.status(404).json({
         success: false,
+        name: user.name,
         message: "Conversation not found"
       });
     }
     res.json({
       success: true,
+      name: user.name,
       conversation
     });
   } catch (error) {

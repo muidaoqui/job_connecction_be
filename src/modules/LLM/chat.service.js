@@ -35,9 +35,14 @@ ${text}
 
 /* ========= Chat chính ========= */
 export async function chatWithCandidate(candidateId, userMessage) {
-  // 1. Load candidate
-  const candidate = await Candidate.findById(candidateId).lean();
-  if (!candidate) throw new Error("Candidate not found");
+  // 1. Load candidate hoặc tạo mới nếu chưa có
+  let candidate = await Candidate.findById(candidateId).lean();
+  if (!candidate) {
+    // Tạo candidate mới với _id là userId
+    candidate = await Candidate.create({ _id: candidateId });
+    candidate = candidate.toObject(); // convert to plain object
+    console.log(`✅ Auto-created candidate for user ${candidateId}`);
+  }
 
   // 2. Load hoặc tạo conversation
   let conversation = await Conversation.findOne({ candidateId });
