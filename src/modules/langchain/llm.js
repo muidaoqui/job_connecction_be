@@ -1,7 +1,8 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { FoundryLocalManager } from "foundry-local-sdk";
-
-const alias = "qwen2.5-1.5b-instruct-cuda-gpu:4";
+import dotenv from "dotenv";
+dotenv.config();
+const alias = process.env.MODEL_ALIAS || "qwen2.5-1.5b-instruct-generic-gpu:4";
 const manager = new FoundryLocalManager();
 
 let llm;

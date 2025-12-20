@@ -1,8 +1,11 @@
+
 import { OpenAI } from "openai";
 import { FoundryLocalManager } from "foundry-local-sdk";
+import dotenv from "dotenv";
+dotenv.config();
 
-// Thay đổi alias sang Qwen model
-const alias = "qwen2.5-1.5b-instruct-cuda-gpu:4";
+// Lấy alias từ biến môi trường
+const alias = process.env.MODEL_ALIAS || "qwen2.5-1.5b-instruct-generic-gpu:4";
 const foundryLocalManager = new FoundryLocalManager();
 let modelInfo = null;
 let openai = null;
