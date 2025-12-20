@@ -12,7 +12,9 @@ export const verifyToken = async (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
+    console.log("Received token:", token);
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded token id:", decoded._id);
 
     if (!decoded._id) {
       return res.status(401).json({ message: "Token không hợp lệ" });

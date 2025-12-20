@@ -167,6 +167,15 @@ export const login = async (req, res) => {
     if (!user.emailVerified)
       return res.status(400).json({ message: "Chưa xác thực email" });
 
+    if (user.status === "banned") {
+      return res.status(403).json({
+        message:
+          "Tài khoản đã bị khóa, vui lòng liên hệ Quản tri viên để được hỗ trợ",
+        code: "USER_BANNED",
+      });
+    }
+
+    // Tạo token
     const token = generateToken(user);
 
     res.json({

@@ -1,4 +1,3 @@
-// recruiter.model.js
 import mongoose from "mongoose";
 
 const recruiterSchema = new mongoose.Schema(
@@ -16,12 +15,35 @@ const recruiterSchema = new mongoose.Schema(
       default: null,
     },
 
-    name: String,
+    // Hồ sơ recruiter
+    fullName: String,
     position: String,
     phone: String,
     workEmail: String,
-    bio: String,
-    avatar: String,
+    bio: { type: String, default: "" },
+
+    followers: { type: Number, default: 0 },
+
+    // Trạng thái xác minh
+    verificationStatus: {
+      type: String,
+      enum: ["unverified", "pending", "verified", "rejected"],
+      default: "unverified",
+    },
+
+    verificationData: {
+      businessLicense: String,
+      idCardFront: String,
+      idCardBack: String,
+
+      companyName: String,
+      taxCode: String,
+      address: String,
+      website: String,
+      phone: String,
+
+      note: String, // admin note
+    },
   },
   { timestamps: true }
 );

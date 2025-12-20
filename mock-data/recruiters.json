@@ -1,30 +1,232 @@
 [
   {
-    "_id": {
-      "$oid": "691d9eef033278b708728c93"
-    },
-    "company_id": "65b706c6a46660f06535c5c1",
-    "position": "HR Manager"
+    "_id": { "$oid": "691d9eef033278b708728c93" },
+    "userId": { "$oid": "65a701c6b12345f06535c100" },
+    "companyId": { "$oid": "65b706c6a46660f06535c5c1" },
+    "fullName": "Nguyen Van A",
+    "position": "HR Manager",
+    "phone": "0912345678",
+    "workEmail": "nguyenvana@company1.com",
+    "bio": "Experienced HR Manager.",
+    "followers": 10,
+    "verificationStatus": "pending",
+    "verificationData": {
+      "businessLicense": "license1.jpg",
+      "idCardFront": "front1.jpg",
+      "idCardBack": "back1.jpg",
+      "companyName": "Sunrise Corp",
+      "taxCode": "123456789",
+      "address": "District 1, HCMC",
+      "website": "https://company1.com",
+      "phone": "0912345678",
+      "note": "Waiting for approval"
+    }
   },
   {
-    "_id": {
-      "$oid": "691d9eef033278b708728c94"
-    },
-    "company_id": "65b706c6a46660f06535c5c2",
-    "position": "Talent Acquisition Specialist"
+    "_id": { "$oid": "691d9eef033278b708728c94" },
+    "userId": { "$oid": "65a701c6b12345f06535c101" },
+    "companyId": { "$oid": "65b706c6a46660f06535c5c2" },
+    "fullName": "Tran Thi B",
+    "position": "Talent Acquisition Specialist",
+    "phone": "0933556677",
+    "workEmail": "tranthib@company2.com",
+    "bio": "3 years experience in recruiting.",
+    "followers": 5,
+    "verificationStatus": "pending",
+    "verificationData": {
+      "businessLicense": "license2.jpg",
+      "idCardFront": "front2.jpg",
+      "idCardBack": "back2.jpg",
+      "companyName": "FutureTech",
+      "taxCode": "987654321",
+      "address": "Hanoi, Vietnam",
+      "website": "https://company2.com",
+      "phone": "0933556677",
+      "note": ""
+    }
   },
   {
-    "_id": {
-      "$oid": "691d9eef033278b708728c95"
-    },
-    "company_id": "65b706c6a46660f06535c5c3",
-    "position": "Senior Recruiter"
+    "_id": { "$oid": "691d9eef033278b708728c95" },
+    "userId": { "$oid": "65a701c6b12345f06535c102" },
+    "companyId": { "$oid": "65b706c6a46660f06535c5c3" },
+    "fullName": "Le Hoang C",
+    "position": "Senior Recruiter",
+    "phone": "0988123456",
+    "workEmail": "lehoangc@company3.com",
+    "bio": "Recruiting senior-level positions.",
+    "followers": 20,
+    "verificationStatus": "pending",
+    "verificationData": {
+      "businessLicense": "license3.jpg",
+      "idCardFront": "front3.jpg",
+      "idCardBack": "back3.jpg",
+      "companyName": "Mega Holdings",
+      "taxCode": "1122334455",
+      "address": "Da Nang City",
+      "website": "https://company3.com",
+      "phone": "0988123456",
+      "note": ""
+    }
   },
   {
-    "_id": {
-      "$oid": "691d9eef033278b708728c96"
-    },
-    "company_id": "65b706c6a46660f06535c5c4",
-    "position": "Headhunter"
+    "_id": { "$oid": "691d9eef033278b708728c96" },
+    "userId": { "$oid": "65a701c6b12345f06535c103" },
+    "companyId": { "$oid": "65b706c6a46660f06535c5c4" },
+    "fullName": "Pham Quynh D",
+    "position": "Headhunter",
+    "phone": "0909111222",
+    "workEmail": "phamd@headhunt.com",
+    "bio": "Specialized in executive search.",
+    "followers": 30,
+    "verificationStatus": "pending",
+    "verificationData": {
+      "businessLicense": "license4.jpg",
+      "idCardFront": "front4.jpg",
+      "idCardBack": "back4.jpg",
+      "companyName": "Elite Hunters",
+      "taxCode": "5566778899",
+      "address": "Thu Duc City",
+      "website": "https://headhunt.com",
+      "phone": "0909111222",
+      "note": "Urgent approval"
+    }
+  },
+  {
+    "_id": { "$oid": "691d9eef033278b708728c97" },
+    "userId": { "$oid": "65a701c6b12345f06535c104" },
+    "companyId": { "$oid": "65b706c6a46660f06535c5c1" },
+    "fullName": "Vo Minh E",
+    "position": "HR Supervisor",
+    "phone": "0977889900",
+    "workEmail": "vominhe@company1.com",
+    "bio": "",
+    "followers": 3,
+    "verificationStatus": "pending",
+    "verificationData": {
+      "businessLicense": "license5.jpg",
+      "idCardFront": "front5.jpg",
+      "idCardBack": "back5.jpg",
+      "companyName": "Sunrise Corp",
+      "taxCode": "123456789",
+      "address": "District 1, HCMC",
+      "website": "https://company1.com",
+      "phone": "0977889900",
+      "note": ""
+    }
+  },
+  {
+    "_id": { "$oid": "691d9eef033278b708728c98" },
+    "userId": { "$oid": "65a701c6b12345f06535c105" },
+    "companyId": { "$oid": "65b706c6a46660f06535c5c2" },
+    "fullName": "Nguyen Thi F",
+    "position": "Recruitment Consultant",
+    "phone": "0911223344",
+    "workEmail": "nguyenf@company2.com",
+    "bio": "",
+    "followers": 12,
+    "verificationStatus": "pending",
+    "verificationData": {
+      "businessLicense": "license6.jpg",
+      "idCardFront": "front6.jpg",
+      "idCardBack": "back6.jpg",
+      "companyName": "FutureTech",
+      "taxCode": "987654321",
+      "address": "Hanoi",
+      "website": "https://company2.com",
+      "phone": "0911223344",
+      "note": ""
+    }
+  },
+  {
+    "_id": { "$oid": "691d9eef033278b708728c99" },
+    "userId": { "$oid": "65a701c6b12345f06535c106" },
+    "companyId": { "$oid": "65b706c6a46660f06535c5c3" },
+    "fullName": "Pham Huu G",
+    "position": "Junior Recruiter",
+    "phone": "0903344556",
+    "workEmail": "phamg@company3.com",
+    "bio": "",
+    "followers": 2,
+    "verificationStatus": "pending",
+    "verificationData": {
+      "businessLicense": "license7.jpg",
+      "idCardFront": "front7.jpg",
+      "idCardBack": "back7.jpg",
+      "companyName": "Mega Holdings",
+      "taxCode": "1122334455",
+      "address": "Da Nang",
+      "website": "https://company3.com",
+      "phone": "0903344556",
+      "note": ""
+    }
+  },
+  {
+    "_id": { "$oid": "691d9eef033278b708728c9a" },
+    "userId": { "$oid": "65a701c6b12345f06535c107" },
+    "companyId": { "$oid": "65b706c6a46660f06535c5c4" },
+    "fullName": "Hoang My H",
+    "position": "Technical Recruiter",
+    "phone": "0933445566",
+    "workEmail": "hoangh@headhunt.com",
+    "bio": "",
+    "followers": 9,
+    "verificationStatus": "pending",
+    "verificationData": {
+      "businessLicense": "license8.jpg",
+      "idCardFront": "front8.jpg",
+      "idCardBack": "back8.jpg",
+      "companyName": "Elite Hunters",
+      "taxCode": "5566778899",
+      "address": "Thu Duc",
+      "website": "https://headhunt.com",
+      "phone": "0933445566",
+      "note": ""
+    }
+  },
+  {
+    "_id": { "$oid": "691d9eef033278b708728c9b" },
+    "userId": { "$oid": "65a701c6b12345f06535c108" },
+    "companyId": { "$oid": "65b706c6a46660f06535c5c2" },
+    "fullName": "Vu Hoai I",
+    "position": "Recruitment Manager",
+    "phone": "0901112233",
+    "workEmail": "vui@company2.com",
+    "bio": "",
+    "followers": 6,
+    "verificationStatus": "pending",
+    "verificationData": {
+      "businessLicense": "license9.jpg",
+      "idCardFront": "front9.jpg",
+      "idCardBack": "back9.jpg",
+      "companyName": "FutureTech",
+      "taxCode": "987654321",
+      "address": "Hanoi",
+      "website": "https://company2.com",
+      "phone": "0901112233",
+      "note": ""
+    }
+  },
+  {
+    "_id": { "$oid": "691d9eef033278b708728c9c" },
+    "userId": { "$oid": "65a701c6b12345f06535c109" },
+    "companyId": { "$oid": "65b706c6a46660f06535c5c3" },
+    "fullName": "Pham Bao J",
+    "position": "HR Coordinator",
+    "phone": "0977665544",
+    "workEmail": "baoj@company3.com",
+    "bio": "",
+    "followers": 4,
+    "verificationStatus": "pending",
+    "verificationData": {
+      "businessLicense": "license10.jpg",
+      "idCardFront": "front10.jpg",
+      "idCardBack": "back10.jpg",
+      "companyName": "Mega Holdings",
+      "taxCode": "1122334455",
+      "address": "Da Nang",
+      "website": "https://company3.com",
+      "phone": "0977665544",
+      "note": ""
+    }
   }
 ]
