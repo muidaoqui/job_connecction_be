@@ -3,84 +3,189 @@ import Job from "./job.model.js";
 import Application from "./application.model.js";
 import SavedJob from "../candidate/saved-job/saved-job.model.js";
 import Recruiter from "../recruiter/recruiter.model.js";
-
-// Tạo job
-export const createJob = async (req, res) => {
+import { generateAndSaveJobEmbedding } from "../embedding/embedding.serivice.js";
+export const getRecruiterDashboardStats = async (req, res) => {
   try {
-    // Ensure authenticated
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: "Vui lòng đăng nhập" });
+    const userId = req.user._id;
+
+    // 1️⃣ Lấy recruiter
+    const recruiter = await Recruiter.findOne({ userId });
+    if (!recruiter) {
+      return res.status(404).json({ message: "Recruiter not found" });
     }
 
-    // Ensure the authenticated user has a recruiter profile
-    const recruiterProfile = await Recruiter.findOne({ userId: req.user.id });
-    if (!recruiterProfile) {
-      return res.status(403).json({ message: "Bạn cần có hồ sơ nhà tuyển dụng để đăng tin" });
-    }
+    // 2️⃣ Lấy job của recruiter
+    const jobs = await Job.find({ recruiterId: recruiter._id }).select("_id");
+    const jobIds = jobs.map((j) => j._id);
 
-    // Build job data and force recruiterId from server-side profile (prevent spoofing)
-    const jobData = {
-      ...req.body,
-      recruiterId: recruiterProfile._id,
-    };
+    // 3️⃣ Đếm stats
+    const postedJobs = jobs.length;
 
-    const job = new Job(jobData);
-    await job.save();
+    const totalApplicants = await Application.countDocuments({
+      jobId: { $in: jobIds },
+    });
 
-    res.status(201).json({ success: true, job });
+    const pending = await Application.countDocuments({
+      jobId: { $in: jobIds },
+      status: "pending",
+    });
+
+    const accepted = await Application.countDocuments({
+      jobId: { $in: jobIds },
+      status: "accepted",
+    });
+
+    return res.json({
+      postedJobs,
+      newApplicants: totalApplicants,
+      pending,
+      accepted,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Dashboard stats error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
+// Tạo job (với embedding info trong response)
+export const createJob = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    // 1️⃣ Lấy recruiter theo user
+    const recruiter = await Recruiter.findOne({ userId });
+    if (!recruiter) {
+      return res.status(403).json({
+        success: false,
+        message: "Bạn cần tạo hồ sơ nhà tuyển dụng trước",
+      });
+    }
+
+    // 2️⃣ Kiểm tra công ty
+    if (!recruiter.companyId) {
+      return res.status(400).json({
+        success: false,
+        message: "Bạn chưa tạo công ty, không thể đăng tin",
+      });
+    }
+
+    // 3️⃣ Lấy dữ liệu từ FE
+    const {
+      title,
+      description,
+      requirements,
+      salary,
+      location,
+      jobType,
+      experience,
+    } = req.body;
+
+    // 4️⃣ Tạo job (CHỈ 1 LẦN)
+    const job = await Job.create({
+      title,
+      description,
+      requirements,
+      salary,
+      location,
+      jobType,
+      experience,
+      recruiterId: recruiter._id,
+      companyId: recruiter.companyId,
+      status: "pending",
+    });
+
+    // 5️⃣ Generate embedding (không làm crash job)
+    try {
+      await generateAndSaveJobEmbedding(job._id.toString());
+      console.log(`✅ Embedding generated for job ${job._id}`);
+    } catch (embeddingError) {
+      console.error(
+        `⚠️ Failed to generate embedding for job ${job._id}:`,
+        embeddingError.message
+      );
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: "Tạo tin tuyển dụng thành công, chờ duyệt",
+      data: job,
+    });
+  } catch (error) {
+    console.error("Create job error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server khi tạo job",
+    });
+  }
+};
+
 // Lấy job theo ID
 export const getJobById = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id)
-      .populate({ 
-        path: 'recruiterId', 
-        select: 'userId position followers companyId',
-        populate: [
-          { path: 'userId', select: 'name email' },
-          { path: 'companyId', select: 'name industry size country logo address backgroundImage images' }
-        ]
+      .populate({
+        path: "recruiterId",
+        select: "userId position followers",
+        populate: {
+          path: "userId",
+          select: "name email",
+        },
       })
-      .populate({ path: 'companyId', select: 'name industry size country logo address backgroundImage images' });
+      .populate({
+        path: "companyId",
+        select: "name industry size country logo address backgroundImage images",
+      });
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    res.json({
+    return res.json({
       success: true,
-      job   // FE cần đúng key này
+      job,
     });
-
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("❌ getJobById error:", error);
+    return res.status(500).json({ message: error.message });
   }
 };
+
 // Lấy toàn bộ job (sắp xếp theo saveCount cho "hot jobs")
+// Lấy toàn bộ job (sắp xếp theo mức độ HOT)
 export const getAllJobs = async (req, res) => {
   try {
-    // Populate recruiter basic info and company details, sort by saveCount descending (most saved = hottest)
-    const jobs = await Job.find()
-      .populate({ 
-        path: 'recruiterId', 
-        select: 'userId position followers companyId',
-        populate: [
-          { path: 'userId', select: 'name' },
-          { path: 'companyId', select: 'name industry size country logo backgroundImage images' }
-        ]
-      })
-      .populate({ path: 'companyId', select: 'name industry size country logo backgroundImage images' })
-      .sort({ saveCount: -1 });
-    res.json(jobs);
+    const { companyId } = req.query;
 
+    const filter = companyId ? { companyId } : {};
+
+    const jobs = await Job.find(filter)
+      .populate({
+        path: "recruiterId",
+        select: "userId position companyId",
+        populate: {
+          path: "userId",
+          select: "name email"
+        }
+      })
+      .populate({
+        path: "companyId",
+        select: "name industry size country logo address backgroundImage images"
+      })
+      .sort({ createdAt: -1 });
+
+    return res.json({
+      success: true,
+      data: jobs
+    });
   } catch (error) {
-    console.error("Get jobs error:", error);
-    res.status(500).json({ message: error.message });
+    console.error("🔥 Lỗi getAllJobs:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server khi lấy danh sách công việc"
+    });
   }
 };
+
+
 
 // Increment saveCount when job is saved by user
 export const incrementSaveCount = async (req, res) => {
@@ -270,15 +375,16 @@ export const getRecruiterStats = async (req, res) => {
 };
 export const applyJob = async (req, res) => {
   try {
-    const jobId = req.params.id;
+    const jobId = req.params.id;   // ✔ sửa lại
     const { name, email, message } = req.body;
 
     if (!req.file) {
-      return res.status(400).json({ message: "Vui lòng tải lên CV dạng PDF." });
+      return res.status(400).json({ message: "Vui lòng tải lên CV." });
     }
 
     const application = new Application({
       jobId: new mongoose.Types.ObjectId(jobId),
+      userId: new mongoose.Types.ObjectId(req.user.id),
       name,
       email,
       message,
@@ -328,3 +434,22 @@ export const searchJobs = async (req, res) => {
   }
   
 };
+export const getJobsByCompany = async (req, res) => {
+  try {
+    const { companyId } = req.params;
+
+    const jobs = await Job.find({ companyId })
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      data: jobs,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server",
+    });
+  }
+};
+

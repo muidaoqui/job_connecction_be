@@ -4,101 +4,122 @@ import sendEmail from "../../utils/sendEmail.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { Role } from "../../common/enum/role.js";
-// Tạo token JWT
+
+
+// ============================
+// 🔥 Tạo JWT chuẩn nhất
+// ============================
 const generateToken = (user) => {
-  return jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
-  });
+  return jwt.sign(
+    { _id: user._id.toString(), role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
 };
 
-// Gửi OTP
+
+// ============================
+// 🔥 Gửi OTP
+// ============================
 export const sendOtpController = async (req, res) => {
   const { email } = req.body;
 
   try {
-    let user = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (!user) {
-      user = new User({ email, password: "temp", role: "candidate" });
+      return res.status(404).json({ message: "Email chưa đăng ký" });
     }
 
-    // Tạo OTP
+    if (user.emailVerified) {
+      return res.status(400).json({ message: "Email đã xác thực" });
+    }
+
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
     user.otpCode = otp;
-    user.otpExpire = Date.now() + 10 * 60 * 1000; // 10 phút
+    user.otpExpire = Date.now() + 10 * 60 * 1000;
     await user.save();
 
     await sendEmail(
       email,
-      "Mã xác thực tài khoản",
-      `Mã OTP của bạn là: ${otp}`
+      "OTP xác thực",
+      `Mã OTP của bạn: ${otp} (có hiệu lực 10 phút)`
     );
 
-    res.status(200).json({ message: "Đã gửi mã OTP đến email" });
+    res.json({ message: "Đã gửi OTP" });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Lỗi gửi OTP" });
   }
 };
 
-// Xác thực OTP
+
+
+// ============================
+// 🔥 Xác thực OTP
+// ============================
 export const verifyOtpController = async (req, res) => {
   const { email, otp } = req.body;
 
   try {
     const user = await User.findOne({ email });
-    if (!user)
-      return res.status(404).json({ message: "Người dùng không tồn tại" });
+    if (!user) return res.status(404).json({ message: "User không tồn tại" });
 
-    if (user.otpCode !== otp)
-      return res.status(400).json({ message: "Mã OTP sai" });
-    if (user.otpExpire < Date.now())
-      return res.status(400).json({ message: "Mã OTP đã hết hạn" });
+    if (user.emailVerified) {
+      return res.status(400).json({ message: "Email đã xác thực" });
+    }
+
+    if (!user.otpCode || !user.otpExpire) {
+      return res.status(400).json({ message: "OTP không hợp lệ" });
+    }
+
+    if (user.otpExpire < Date.now()) {
+      return res.status(400).json({ message: "OTP đã hết hạn" });
+    }
+
+    if (String(user.otpCode) !== String(otp)) {
+      return res.status(400).json({ message: "OTP sai" });
+    }
 
     user.emailVerified = true;
     user.otpCode = undefined;
     user.otpExpire = undefined;
+    user.otpAttempts = 0;
+
     await user.save();
 
     res.json({ message: "Xác thực email thành công" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Lỗi xác thực OTP" });
   }
 };
 
-// Đăng ký
+
+
+// ============================
+// 🔥 Đăng ký chuẩn
+// ============================
 export const register = async (req, res) => {
-  const { name, email, password, role } = req.body;
-
   try {
-    let user = await User.findOne({ email });
+    const { name, email, password, role } = req.body;
 
-    if (user && user.emailVerified) {
-      return res.status(400).json({ message: "Email đã được sử dụng" });
-    }
+    let user = await User.findOne({ email });
 
     let otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpire = Date.now() + 10 * 60 * 1000;
 
     if (!user) {
-      if (role && !["candidate", "recruiter"].includes(role)) {
-        return res.status(400).json({ message: "Vai trò không hợp lệ" });
-      }
-      if (role === Role.CANDIDATE) {
-        user = new User({ email, password, role: role || "candidate" });
-      }
-      if (role === Role.RECRUITER) {
-        user = new User({ email, password, role: "recruiter" });
-      }
+      // tạo user mới
       user = new User({
         name,
         email,
         password,
         role: role || "candidate",
         otpCode: otp,
-        otpExpire: otpExpire,
+        otpExpire,
       });
     } else {
+      // update user cũ
       user.name = name;
       user.password = password;
       user.role = role || "candidate";
@@ -108,45 +129,25 @@ export const register = async (req, res) => {
 
     await user.save();
 
-    // Tạo OTP ngay sau khi register
-    otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.otpCode = otp;
-    user.otpExpire = Date.now() + 10 * 60 * 1000;
-    await user.save();
+    await sendEmail(email, "Mã OTP đăng ký", `OTP của bạn: ${otp}`);
 
-    await sendEmail(
-      email,
-      "Mã xác thực tài khoản",
-      `Mã OTP của bạn là: ${otp}`
-    );
-    await user.save();
-
-    await sendEmail(
-      email,
-      "Mã xác thực tài khoản",
-      `Mã OTP của bạn là: ${otp}`
-    );
-
-    res.status(201).json({
+    res.json({
       message: "Đăng ký thành công, vui lòng xác thực email",
       user: {
         email: user.email,
         role: user.role,
-        emailVerified: user.emailVerified,
       },
     });
   } catch (err) {
-    console.error("Lỗi đăng ký:", err);
-    if (err.name === "ValidationError") {
-      return res
-        .status(400)
-        .json({ message: "Lỗi xác thực dữ liệu: " + err.message });
-    }
-    res.status(500).json({ message: err.message || "Đăng ký thất bại" });
+    console.log(err);
+    res.status(500).json({ message: err.message });
   }
 };
 
-// Đăng nhập
+
+// ============================
+// 🔥 Đăng nhập chuẩn nhất
+// ============================
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -154,25 +155,17 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user)
-      return res.status(404).json({ message: "Người dùng không tồn tại" });
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
 
-    // Nếu user chưa đặt password (tạo tạm "temp") → yêu cầu đổi mật khẩu hoặc OTP
-    if (!user.password || user.password === "temp") {
-      return res.status(400).json({
-        message: "Người dùng chưa đặt mật khẩu. Vui lòng xác thực OTP.",
-      });
-    }
+    if (!user.password || user.password === "temp")
+      return res.status(400).json({ message: "Chưa xác thực OTP" });
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch)
-      return res.status(400).json({ message: "Mật khẩu không đúng" });
+      return res.status(400).json({ message: "Mật khẩu sai" });
 
-    // Nếu email chưa xác thực
-    if (!user.emailVerified) {
-      return res
-        .status(400)
-        .json({ message: "Chưa xác thực email", needVerification: true });
-    }
+    if (!user.emailVerified)
+      return res.status(400).json({ message: "Chưa xác thực email" });
 
     if (user.status === "banned") {
       return res.status(403).json({
@@ -192,66 +185,64 @@ export const login = async (req, res) => {
         _id: user._id,
         email: user.email,
         role: user.role,
-        emailVerified: user.emailVerified,
       },
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// Quên mật khẩu
+
+// ============================
+// 🔥 Quên mật khẩu
+// ============================
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "Không tìm thấy email" });
+    if (!user)
+      return res.status(404).json({ message: "Không tìm thấy email" });
 
     const resetToken = crypto.randomBytes(32).toString("hex");
 
     user.resetToken = resetToken;
-    user.resetTokenExpire = Date.now() + 15 * 60 * 1000; // 15 phút
+    user.resetTokenExpire = Date.now() + 15 * 60 * 1000;
+
     await user.save();
 
-    // 👉 GỬI LINK RESET THEO DẠNG QUERY PARAM
     const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
 
-    await sendEmail(
-      email,
-      "Đặt lại mật khẩu",
-      `Bấm vào link để đặt lại mật khẩu: ${resetUrl}`
-    );
+    await sendEmail(email, "Reset mật khẩu", resetUrl);
 
-    res.json({ message: "Email reset mật khẩu đã được gửi!" });
+    res.json({ message: "Đã gửi email reset" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// Reset mật khẩu
+
+// ============================
+// 🔥 Reset password
+// ============================
 export const resetPassword = async (req, res) => {
   try {
-    const token = req.query.token; // 👉 LẤY TOKEN TỪ QUERY
+    const token = req.query.token;
 
     const user = await User.findOne({
       resetToken: token,
       resetTokenExpire: { $gt: Date.now() },
     });
-    if (!user)
-      return res
-        .status(400)
-        .json({ message: "Token không hợp lệ hoặc đã hết hạn" });
 
     if (!user)
       return res
         .status(400)
-        .json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+        .json({ message: "Token không hợp lệ hoặc hết hạn" });
 
     user.password = req.body.password;
     user.resetToken = undefined;
     user.resetTokenExpire = undefined;
+
     await user.save();
 
     res.json({ message: "Đặt lại mật khẩu thành công" });

@@ -1,18 +1,20 @@
 import Company from "./company.model.js";
-import Recruiter from "../recruiter.model.js";
+import  Recruiter  from "../recruiter.model.js";  
+import SavedCompany from "../../candidate/saved-companies/saved-companies.model.js"; 
 export const createOrUpdateCompany = async (req, res) => {
   try {
     const userId = req.user._id;
 
     // 🔥 1. Kiểm tra profile recruiter
-    const recruiter = await Recruiter.findOne({ userId });
+    let recruiter = await Recruiter.findOne({ userId: req.user._id });
 
-    if (!recruiter) {
-      return res.status(403).json({
-        success: false,
-        message: "Bạn cần tạo hồ sơ Nhà tuyển dụng trước",
-      });
-    }
+// 👉 Nếu chưa có recruiter → báo tạo hồ sơ recruiter
+if (!recruiter) {
+  return res.status(403).json({
+    success: false,
+    message: "Bạn cần tạo hồ sơ Nhà tuyển dụng trước",
+  });
+}
 
     // Lấy dữ liệu gửi lên
     const {
@@ -120,13 +122,41 @@ export const createOrUpdateCompany = async (req, res) => {
 export const getCompanyByUser = async (req, res) => {
   try {
     const userId = req.user._id;
+
+    // 1️⃣ Tìm recruiter
+    const recruiter = await Recruiter.findOne({ userId });
+
+    // 2️⃣ Nếu recruiter có companyId → lấy theo companyId
+    if (recruiter?.companyId) {
+      const company = await Company.findById(recruiter.companyId);
+      return res.status(200).json({
+        success: true,
+        data: company,
+      });
+    }
+
+    // 3️⃣ 🔥 FALLBACK: recruiter chưa có companyId → tìm theo userId
     const company = await Company.findOne({ userId });
+
+    if (!company) {
+      return res.status(200).json({
+        success: true,
+        data: null,
+      });
+    }
+
+    // 4️⃣ 🔥 TỰ ĐỘNG SYNC LẠI recruiter.companyId
+    if (recruiter) {
+      recruiter.companyId = company._id;
+      await recruiter.save();
+    }
 
     return res.status(200).json({
       success: true,
-      data: company || null,
+      data: company,
     });
   } catch (err) {
+    console.error("getCompanyByUser error:", err);
     return res.status(500).json({
       success: false,
       message: "Lỗi server khi lấy thông tin công ty",
@@ -150,3 +180,108 @@ export const getCompanyList = async (req, res) => {
     res.status(500).json({ success: false, message: "Lỗi server" });
   }
 };
+export const getCompanyById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const company = await Company.findById(id);
+
+    if (!company) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy công ty",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: company,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server",
+    });
+  }
+};
+
+//follow company
+export const followCompany = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id: companyId } = req.params;
+
+    // 1. Check company tồn tại
+    const company = await Company.findById(companyId);
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    // 2. Check đã follow chưa
+    const existed = await SavedCompany.findOne({ userId, companyId });
+    if (existed) {
+      return res.status(400).json({ message: "Already followed this company" });
+    }
+
+    // 3. Lưu follow
+    const saved = await SavedCompany.create({
+      userId,
+      companyId,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Followed company successfully",
+      data: saved,
+    });
+  } catch (error) {
+    console.error("Follow company error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+export const unfollowCompany = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id: companyId } = req.params;
+
+    const removed = await SavedCompany.findOneAndDelete({
+      userId,
+      companyId,
+    });
+
+    if (!removed) {
+      return res.status(404).json({ message: "You haven't followed this company" });
+    }
+
+    res.json({
+      success: true,
+      message: "Unfollowed company successfully",
+    });
+  } catch (error) {
+    console.error("Unfollow company error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// GET /api/company/following
+export const getFollowingCompanies = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const companies = await SavedCompany.find({ userId })
+      .populate("companyId")
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: companies,
+    });
+  } catch (error) {
+    console.error("Get following companies error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+

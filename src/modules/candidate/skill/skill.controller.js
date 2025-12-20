@@ -1,71 +1,105 @@
 import Skill from "./skill.model.js";
+import Candidate from "../candidate.model.js";
+import { generateAndSaveCandidateEmbedding } from "../../embedding/embedding.serivice.js";
 
-// Lấy danh sách kỹ năng
-export const getSkills = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const skills = await Skill.find({ userId }).sort({ createdAt: -1 });
-    res.status(200).json(skills);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
-// Tạo kỹ năng mới
+// Create skill
 export const createSkill = async (req, res) => {
   try {
     const userId = req.user.id;
     const { skillName, proficiency } = req.body;
 
-    // Kiểm tra kỹ năng đã tồn tại
-    const existingSkill = await Skill.findOne({ userId, skillName });
-    if (existingSkill) {
-      return res.status(400).json({ message: "Kỹ năng này đã tồn tại" });
+    if (!skillName || typeof skillName !== "string") {
+      return res.status(400).json({ message: "skillName is required" });
     }
 
     const skill = new Skill({
       userId,
-      skillName,
-      proficiency,
+      skillName: skillName.trim(),
+      proficiency: proficiency || "beginner",
     });
 
     await skill.save();
-    res.status(201).json({ message: "Skill created successfully", skill });
+
+    // Try to update candidate embedding (silent fail)
+    try {
+      // Candidate._id is userId in your schema
+      await generateAndSaveCandidateEmbedding(userId.toString());
+    } catch (err) {
+      console.error(
+        "Failed to regenerate candidate embedding after createSkill:",
+        err.message
+      );
+    }
+
+    return res.status(201).json(skill);
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    console.error("Create skill error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
-// Cập nhật kỹ năng
+// Get skills for logged-in user
+export const getSkills = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const skills = await Skill.find({ userId }).sort({ createdAt: -1 }).lean();
+    return res.status(200).json(skills);
+  } catch (error) {
+    console.error("Get skills error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Update skill (only owner)
 export const updateSkill = async (req, res) => {
   try {
+    const userId = req.user.id;
     const { id } = req.params;
-    const { proficiency } = req.body;
+    const update = req.body;
 
-    const skill = await Skill.findByIdAndUpdate(
-      id,
-      { proficiency },
+    const skill = await Skill.findOneAndUpdate(
+      { _id: id, userId },
+      { $set: update },
       { new: true }
-    );
+    ).lean();
+    if (!skill) return res.status(404).json({ message: "Skill not found" });
 
-    res.status(200).json({ message: "Skill updated successfully", skill });
+    try {
+      await generateAndSaveCandidateEmbedding(userId.toString());
+    } catch (err) {
+      console.error(err.message);
+    }
+
+    return res.status(200).json(skill);
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    console.error("Update skill error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
-// Xóa kỹ năng
+// Delete skill (only owner)
 export const deleteSkill = async (req, res) => {
   try {
+    const userId = req.user.id;
     const { id } = req.params;
-    await Skill.findByIdAndDelete(id);
-    res.status(200).json({ message: "Skill deleted successfully" });
+
+    const skill = await Skill.findOneAndDelete({ _id: id, userId });
+    if (!skill) return res.status(404).json({ message: "Skill not found" });
+
+    try {
+      await generateAndSaveCandidateEmbedding(userId.toString());
+    } catch (err) {
+      console.error(err.message);
+    }
+
+    return res.status(200).json({ message: "Skill deleted" });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    console.error("Delete skill error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
-// Tăng số lượng endorsement
+// Endorse skill (increment endorsements) - optional
 export const endorseSkill = async (req, res) => {
   try {
     const { id } = req.params;
@@ -73,9 +107,11 @@ export const endorseSkill = async (req, res) => {
       id,
       { $inc: { endorsements: 1 } },
       { new: true }
-    );
-    res.status(200).json({ message: "Skill endorsed successfully", skill });
+    ).lean();
+    if (!skill) return res.status(404).json({ message: "Skill not found" });
+    return res.status(200).json(skill);
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    console.error("Endorse skill error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

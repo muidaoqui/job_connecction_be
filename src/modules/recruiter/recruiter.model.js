@@ -6,7 +6,7 @@ const recruiterSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true, // 1 user = 1 recruiter profile
+      unique: true, // 1 user chỉ có 1 recruiter profile
     },
 
     companyId: {
@@ -15,15 +15,16 @@ const recruiterSchema = new mongoose.Schema(
       default: null,
     },
 
-    // Hồ sơ recruiter (sẵn có)
-    fullName: { type: String },
-    position: { type: String },
-    phone: { type: String },
-    workEmail: { type: String },
+    // Hồ sơ recruiter
+    fullName: String,
+    position: String,
+    phone: String,
+    workEmail: String,
     bio: { type: String, default: "" },
 
     followers: { type: Number, default: 0 },
 
+    // Trạng thái xác minh
     verificationStatus: {
       type: String,
       enum: ["unverified", "pending", "verified", "rejected"],
