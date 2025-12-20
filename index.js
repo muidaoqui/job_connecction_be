@@ -129,8 +129,8 @@ app.use("/api/recruiter/applications", recruiterAppRoutes);
 
 // AI / Search
 app.use("/api/embeddings", embeddingRoutes);
-// app.use("/api/rags", ragRouters);
-// app.use("/api/llm", LLMRoute);
+app.use("/api/rags", ragRouters);
+app.use("/api/llm", LLMRoute);
 
 // KẾT NỐI MONGO DB
 mongoose
