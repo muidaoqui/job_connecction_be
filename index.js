@@ -124,9 +124,9 @@ app.use("/api/company", companyRoutes);
 app.use("/api/recruiter", recruiterRoutes);
 app.use("/api/recruiter/applications", recruiterAppRoutes);
 
-// AI / Search
-app.use("/api/embeddings", embeddingRoutes);
-app.use("/api/rags", ragRoutes);
+// // AI / Search
+// app.use("/api/embeddings", embeddingRoutes);
+// app.use("/api/rags", ragRoutes);
 
 /* ================= HEALTH ================= */
 app.get("/", (req, res) => {
