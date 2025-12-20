@@ -6,6 +6,7 @@ import path from "path";
 import fs from "fs";
 import { getApplicantsForRecruiter } from "./recruiter.controller.js";
 import { getApplicantsByJob } from "../candidate/applications/job-application.controller.js";
+import { authorizeRoles } from "../auth/auth.middleware.js";
 
 // Tạo folder upload nếu chưa có
 const avatarFolder = "uploads/avatars";
@@ -32,6 +33,7 @@ router.get("/profile/me", verifyToken, getMyRecruiterProfile);
 router.get(
   "/applications",
   verifyToken,
+  authorizeRoles("recruiter"),
   getApplicantsForRecruiter
 );
 router.get(
