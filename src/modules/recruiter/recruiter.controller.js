@@ -236,15 +236,16 @@ export const saveMyRecruiterProfile = async (req, res) => {
     // Kiểm tra xem đã có hồ sơ recruiter chưa
     let profile = await Recruiter.findOne({ userId });
 
-    if (profile) {
-      // CẬP NHẬT
-      profile = await Recruiter.findOneAndUpdate({ userId }, data, {
-        new: true,
-      });
-    } else {
-      // TẠO MỚI
-      profile = await Recruiter.create(data);
-    }
+if (profile) {
+  profile = await Recruiter.findOneAndUpdate({ userId }, data, { new: true });
+} else {
+  profile = await Recruiter.create(data);
+
+  // 🔥 RẤT QUAN TRỌNG
+  await User.findByIdAndUpdate(userId, {
+    role: "recruiter",
+  });
+}
 
     res.json({
       success: true,
