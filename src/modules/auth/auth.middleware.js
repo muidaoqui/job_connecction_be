@@ -38,7 +38,21 @@ export const verifyToken = async (req, res, next) => {
     return res.status(401).json({ message: "Token không hợp lệ hoặc hết hạn" });
   }
 };
-
+export const verifyRecruiter = (req, res, next) => {
+  try {
+    // role có thể là "recruiter" hoặc "RECRUITER"
+    if (req.user?.role !== "recruiter") {
+      return res.status(403).json({
+        message: "Chỉ nhà tuyển dụng mới có quyền truy cập",
+      });
+    }
+    next();
+  } catch (err) {
+    return res.status(401).json({
+      message: "Không có quyền truy cập",
+    });
+  }
+};
 // =============================
 // 2) Middleware authorizeRoles
 // =============================
