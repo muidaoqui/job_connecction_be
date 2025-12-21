@@ -38,7 +38,7 @@ console.log("NODE_ENV =", process.env.NODE_ENV);
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-
+app.use("/uploads", express.static("uploads"));
 
 /* ================= ENSURE UPLOAD DIRS ================= */
 const uploadsDir = path.join(process.cwd(), "uploads");
@@ -98,7 +98,6 @@ app.use(
   },
   express.static(path.join(process.cwd(), "uploads/avatars"))
 );
-
 
 // Allow cross-origin resource load
 app.use("/uploads", (req, res, next) => {
