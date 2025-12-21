@@ -3,56 +3,29 @@ import JobView from "../job-view/job-view.model.js";
 import Application from "../../job/application.model.js";
 import Job from "../../job/job.model.js"; // ✅ ĐÚNG
 import Recruiter from "../../recruiter/recruiter.model.js";
-export const getApplications = async (req, res) => {
+export const getApplicationsForUser = async (req, res) => {
   try {
+    if (!req.user?.id) return res.status(401).json({ message: 'Unauthorized' });
+
     const userId = req.user.id;
     const applications = await Application.find({ userId })
-      .populate("jobId")
+      .populate('jobId')            // populate job detail
       .sort({ appliedDate: -1 });
-    res.json(applications);
+
+    return res.json({ applications }); // hoặc { data: applications } nếu muốn
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
-export const getApplicantsByJob = async (req, res) => {
+export const getApplicantsByJob = async (req,res) => {
   try {
-    const userId = req.user.id;
     const { jobId } = req.params;
-
-    // 1️⃣ Lấy recruiter theo user đang đăng nhập
-    const recruiter = await Recruiter.findOne({ userId });
-    if (!recruiter) {
-      return res.status(403).json({
-        message: "Bạn không phải là nhà tuyển dụng",
-      });
-    }
-
-    // 2️⃣ Kiểm tra job có thuộc recruiter này không
-    const job = await Job.findOne({
-      _id: jobId,
-      recruiterId: recruiter._id,
-    });
-
-    if (!job) {
-      return res.status(403).json({
-        message: "Bạn không có quyền xem ứng viên của job này",
-      });
-    }
-
-    // 3️⃣ Lấy danh sách ứng viên theo job
     const applications = await Application.find({ jobId })
-      .populate("userId", "fullName firstName lastName name email")
-      .sort({ createdAt: -1 });
-
-    return res.status(200).json({
-      success: true,
-      data: applications,
-    });
-  } catch (error) {
-    console.error("❌ getApplicantsByJob error:", error);
-    return res.status(500).json({
-      message: "Lỗi server",
-    });
+      .populate('userId')
+      .sort({ appliedDate: -1 });
+    return res.json({ data: applications });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
 };
 

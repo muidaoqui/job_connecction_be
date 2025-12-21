@@ -1,23 +1,30 @@
 import Application from "../../job/application.model.js";
 import Job from "../../job/job.model.js";
+import Recruiter from "../../recruiter/recruiter.model.js";
 
 // Lấy toàn bộ đơn của recruiter
 export const getAllApplicationsByRecruiter = async (req, res) => {
   try {
-    const { recruiterId } = req.params;
+    // kiểm tra quyền: req.user phải là recruiter
+    if (!req.user?.id) return res.status(401).json({ message: 'Unauthorized' });
 
-    const jobs = await Job.find({ recruiterId }).select("_id");
-    const jobIds = jobs.map(j => j._id);
+    // companyId có thể lưu trong req.user.companyId hoặc yêu cầu param
+    const companyId = req.user.companyId || req.params.companyId;
+    if (!companyId) return res.status(400).json({ message: 'companyId missing' });
 
-    const applications = await Application.find({
-      jobId: { $in: jobIds }
-    })
-      .populate("userId", "name email")
-      .populate("jobId", "title");
+    // lấy tất cả job id của company
+    const jobs = await Job.find({ company: mongoose.Types.ObjectId(companyId) }).select('_id');
+    const jobIds = jobs.map((j) => j._id);
 
-    res.status(200).json({ success: true, applications });
+    // tìm applications thuộc jobIds
+    const applications = await Application.find({ jobId: { $in: jobIds } })
+      .populate('userId')   // populate candidate info
+      .populate('jobId')    // populate job info
+      .sort({ appliedDate: -1 });
+
+    return res.json({ apps: applications }); // phù hợp với frontend hiện tại
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
