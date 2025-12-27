@@ -1,222 +1,309 @@
-# RAG + HR Agent - Hệ thống Tuyển dụng Thông Minh
+# 🚀 RAG + Agent System - Nền tảng Tuyển dụng Thông minh
 
-Hệ thống AI Agent sử dụng RAG (Retrieval-Augmented Generation) để hỗ trợ HR phân tích, tối ưu Job Description và benchmark lương.
-![alt text](image.png)
-## 🌟 Tính năng
+> Hệ thống AI Agent sử dụng RAG (Retrieval-Augmented Generation) kết hợp LLM để hỗ trợ toàn diện quy trình tuyển dụng cho cả **Nhà tuyển dụng (HR)** và **Ứng viên (Candidate)**.
 
-### 1. **Phân tích Job Description (JD Analysis)**
-- Đánh giá độ dài và readability score
-- Trích xuất skills và phát hiện skill gaps
-- Phát hiện seniority level (Junior/Mid/Senior/Lead)
-- Tính điểm competitiveness (0-100)
-- So sánh với market trends và best practices
+![System Architecture](image.png)
 
-### 2. **Tối ưu Job Description (JD Optimization)**
-- Gợi ý điều chỉnh seniority level
-- Phân loại skills: Must-have vs Nice-to-have
-- Phát hiện missing critical elements
-- Cải thiện tone và language
-- Recommendations về structure
+---
 
-### 3. **Benchmark Lương (Salary Benchmarking)**
-- Market range (min-max-median)
-- Competitor average
-- Location-adjusted compensation
-- Confidence level based on data availability
-- Market insights và recommendations
+## 📋 Mục lục
 
-### 4. **Chat với HR Agent**
-- Multi-turn conversation
-- Context-aware responses
-- Tự động retrieve relevant knowledge
-- Session management với conversation history
+- [Tính năng chính](#-tính-năng-chính)
+- [Kiến trúc hệ thống](#️-kiến-trúc-hệ-thống)
+- [Cài đặt](#-cài-đặt)
+- [API Endpoints](#-api-endpoints)
+- [Hướng dẫn sử dụng](#-hướng-dẫn-sử-dụng)
+- [Cấu trúc dự án](#-cấu-trúc-dự-án)
+- [Testing](#-testing)
 
-## 🎓 Candidate Agent (Hỗ trợ Ứng viên)
+---
 
-### 1. **Upload & Parse CV**
-- Hỗ trợ PDF và DOCX format
-- Tự động trích xuất thông tin:
-  - Personal info (name, email, phone, LinkedIn, GitHub)
-  - Skills (technical + soft skills)
-  - Work experience (company, role, period, achievements)
-  - Education (degree, institution, graduation year)
-  - Projects và certifications
-- Tính toán years of experience
-- Phát hiện career level (Junior/Mid/Senior/Lead)
+## ✨ Tính năng chính
 
-### 2. **CV Analysis (Phân tích CV)**
-- **Strengths Assessment**: Top 3-5 competitive advantages
-- **Gap Analysis**: So sánh skills với market requirements
-- **Career Level Evaluation**: Đánh giá level hiện tại và readiness cho level tiếp theo
-- **Skill Priority Matrix**: 
-  - High priority (cần học ngay)
-  - Medium priority (nên cải thiện)
-  - Low priority (nice to have)
-- **Red Flags Detection**: Employment gaps, job hopping, skill mismatches
-- **Salary Range Estimation**: Dựa trên experience và skills
+### 🎯 HR Agent - Hỗ trợ Nhà tuyển dụng
 
-### 3. **Job Matching (Tìm việc phù hợp)**
-- **Semantic Search**: Tìm jobs dựa trên CV embedding
-- **Fit Score Calculation**: 
+<table>
+<tr>
+<td width="50%">
+
+#### 📊 Phân tích Job Description
+- ✅ Đánh giá độ dài & readability score
+- ✅ Trích xuất skills & phát hiện skill gaps
+- ✅ Nhận diện seniority level tự động
+- ✅ Tính điểm competitiveness (0-100)
+- ✅ So sánh với market trends
+
+</td>
+<td width="50%">
+
+#### 💡 Tối ưu Job Description
+- ✅ Gợi ý điều chỉnh seniority level
+- ✅ Phân loại Must-have vs Nice-to-have
+- ✅ Phát hiện missing critical elements
+- ✅ Cải thiện tone & language
+- ✅ Recommendations về structure
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+#### 💰 Benchmark Lương
+- ✅ Market range (min-max-median)
+- ✅ Competitor average
+- ✅ Location-adjusted compensation
+- ✅ Confidence level & data quality
+- ✅ Market insights
+
+</td>
+<td width="50%">
+
+#### 💬 Chat với AI Agent
+- ✅ Multi-turn conversation
+- ✅ Context-aware responses
+- ✅ Auto retrieve relevant knowledge
+- ✅ Session management
+
+</td>
+</tr>
+</table>
+
+---
+
+### 🎓 Candidate Agent - Hỗ trợ Ứng viên
+
+<table>
+<tr>
+<td width="50%">
+
+#### 📄 Upload & Parse CV
+- 📤 Hỗ trợ PDF & DOCX format
+- 🔍 Auto extract:
+  - Personal info
+  - Technical & soft skills
+  - Work experience & achievements
+  - Education & certifications
+- 📊 Tính years of experience
+- 🎯 Phát hiện career level
+
+</td>
+<td width="50%">
+
+#### 🔬 CV Analysis
+- 💪 Strengths Assessment (Top 3-5)
+- ⚠️ Gap Analysis vs market
+- 📈 Career Level Evaluation
+- 🎯 Skill Priority Matrix
+- 🚩 Red Flags Detection
+- 💵 Salary Range Estimation
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+#### 🎯 Job Matching
+- 🔍 Semantic Search based CV
+- 📊 Fit Score Calculation:
   - Skills match rate
-  - Experience level match
-  - Years of experience alignment
-- **Ranked Recommendations**: Top 10-20 jobs phù hợp nhất
-- **AI Explanations**: Giải thích tại sao job phù hợp với candidate
+  - Experience level alignment
+  - Years of experience fit
+- 🏆 Top 10-20 ranked jobs
+- 💬 AI Explanation cho mỗi match
 
-### 4. **CV Optimization (Tối ưu CV cho ATS)**
-- **Keyword Extraction**: Trích xuất keywords từ target JD
-- **ATS-Friendly Rewriting**: Viết lại CV theo chuẩn ATS
-- **ATS Compatibility Check**:
-  - Keyword match score (40%)
+</td>
+<td width="50%">
+
+#### ✨ CV Optimization (ATS-Ready)
+- 🔑 Keyword extraction từ JD
+- 📝 ATS-friendly rewriting
+- ✅ ATS Compatibility Check:
+  - Keyword match (40%)
   - Format compliance (25%)
-  - Readability score (15%)
+  - Readability (15%)
   - Structure validation (20%)
-- **Actionable Suggestions**: Cụ thể từng điểm cần sửa
+- 💡 Actionable suggestions
 
-## 🏗️ Kiến trúc
+</td>
+</tr>
+</table>
 
+---
+
+## 🏗️ Kiến trúc Hệ thống
+
+```mermaid
+graph TB
+    subgraph Input["🎯 INPUT LAYER"]
+        HR[HR nhập JD]
+        Candidate[Candidate upload CV]
+    end
+    
+    subgraph Controller["🤖 AGENT CONTROLLERS"]
+        HRAgent[HR Agent Controller]
+        CandidateAgent[Candidate Agent Controller]
+    end
+    
+    subgraph RAG["🔍 RAG PIPELINE"]
+        VectorStore[📚 Vector Stores - ChromaDB]
+        Embedding[🧮 OpenAI Embeddings]
+        Retrieval[🎯 Semantic Search - Top-K]
+    end
+    
+    subgraph LLM["🧠 LLM PROCESSING"]
+        GPT[GPT-4o-mini / Qwen2.5-7B]
+    end
+    
+    subgraph Memory["💾 PERSISTENCE"]
+        MongoDB[(MongoDB)]
+        Session[Agent Memory & Sessions]
+    end
+    
+    HR --> HRAgent
+    Candidate --> CandidateAgent
+    
+    HRAgent --> RAG
+    CandidateAgent --> RAG
+    
+    VectorStore --> Retrieval
+    Embedding --> VectorStore
+    
+    Retrieval --> GPT
+    GPT --> Session
+    Session --> MongoDB
+    
+    style Input fill:#e8f5e9
+    style Controller fill:#fff3e0
+    style RAG fill:#e3f2fd
+    style LLM fill:#f3e5f5
+    style Memory fill:#fce4ec
 ```
-┌─────────────────┐
-│   HR nhập JD    │
-└────────┬────────┘
-         │
-         v
-┌─────────────────────────────────────┐
-│      HR Agent Controller            │
-│  (Task Classification & Routing)    │
-└────────┬────────────────────────────┘
-         │
-         v
-┌────────────────────────────────────────────┐
-│           RAG Pipeline                      │
-│  ┌──────────────────────────────────────┐  │
-│  │  Vector Stores (ChromaDB)            │  │
-│  │  • Market Trends                     │  │
-│  │  • JD Templates & Best Practices     │  │
-│  │  • Salary Database                   │  │
-│  └──────────────────────────────────────┘  │
-│                    │                        │
-│                    v                        │
-│  ┌──────────────────────────────────────┐  │
-│  │  Semantic Search (Top-K Retrieval)   │  │
-│  │  OpenAI Embeddings                   │  │
-│  └──────────────────────────────────────┘  │
-│                    │                        │
-│                    v                        │
-│  ┌──────────────────────────────────────┐  │
-│  │  Context Assembly & Ranking          │  │
-│  └──────────────────────────────────────┘  │
-└────────┬───────────────────────────────────┘
-         │
-         v
-┌─────────────────────────────────────┐
-│      LLM (GPT-4o-mini)              │
-│  • JD Analysis Prompts              │
-│  • Optimization Prompts             │
-│  • Salary Benchmark Prompts         │
-└────────┬────────────────────────────┘
-         │
-         v
-┌─────────────────────────────────────┐
-│      Agent Memory (MongoDB)         │
-│  • Session Management               │
-│  • Conversation History             │
-│  • JD Versions Tracking             │
-└─────────────────────────────────────┘
-```
+
+### 📊 Vector Store Collections
+
+| Collection | Purpose | Documents |
+|------------|---------|-----------|
+| **HR Collections** |
+| `hr_market_trends` | Job market trends, skill demands | ~500 docs |
+| `hr_jd_templates` | JD templates, best practices | ~200 docs |
+| `hr_salary_data` | Salary benchmarks, compensation | ~1000 docs |
+| **Candidate Collections** |
+| `candidate_skill_standards` | Skill requirements by level | ~300 docs |
+| `candidate_job_postings` | Available job postings | ~2000 docs |
+| `candidate_cv_templates` | ATS-friendly CV templates | ~100 docs |
+
+---
 
 ## 📦 Cài đặt
 
-### 1. Prerequisites
-
-- Node.js >= 18
-- MongoDB
-- ChromaDB server (optional, có thể chạy local)
-- OpenAI API key
-
-### 2. Install Dependencies
+### Prerequisites
 
 ```bash
+# Required
+✅ Node.js >= 18
+✅ MongoDB >= 5.0
+✅ OpenAI API key
+
+# Optional
+🔹 ChromaDB (hoặc sử dụng in-memory)
+🔹 Ollama (nếu muốn dùng local LLM)
+```
+
+### Installation Steps
+
+#### 1️⃣ Clone & Install Dependencies
+
+```bash
+git clone <repository-url>
+cd job_connection_be
 npm install
 ```
 
-### 3. Environment Variables
-
-Tạo file `.env` từ `.env.example`:
+#### 2️⃣ Environment Setup
 
 ```bash
 cp .env.example .env
 ```
 
-Cấu hình các biến môi trường:
+**Cấu hình `.env`:**
 
 ```env
-# MongoDB
+# ============================================
+# DATABASE
+# ============================================
 MONGO_URI=mongodb://localhost:27017/job_connection
 
+# ============================================
+# AI/ML SERVICES
+# ============================================
 # OpenAI
-OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_API_KEY=sk-your-api-key-here
 LLM_MODEL=gpt-4o-mini
 
-# ChromaDB (optional)
+# ChromaDB (Optional - defaults to in-memory)
 CHROMA_URL=http://localhost:8000
 
-# Server
+# ============================================
+# SERVER CONFIG
+# ============================================
 PORT=8080
 NODE_ENV=development
 ```
 
-### 4. Chạy ChromaDB (Optional)
+#### 3️⃣ Start ChromaDB (Optional)
 
-Nếu muốn sử dụng ChromaDB local:
-
+**Option A: Python**
 ```bash
-# Install ChromaDB
 pip install chromadb
-
-# Run ChromaDB server
 chroma run --path ./chroma_data
 ```
 
-Hoặc sử dụng Docker:
-
+**Option B: Docker**
 ```bash
 docker run -p 8000:8000 chromadb/chroma
 ```
 
-### 5. Seed Vector Stores
-
-Populate vector stores với sample data:
+#### 4️⃣ Seed Vector Stores
 
 ```bash
+# Seed HR Agent data
 node scripts/seed-vector-stores.js
+
+# Seed Candidate Agent data (coming soon)
+node scripts/seed-candidate-vectors.js
 ```
 
-### 6. Start Server
+#### 5️⃣ Start Server
 
 ```bash
-# Development
+# Development mode (with hot reload)
 npm run dev
 
-# Production
+# Production mode
 npm start
 ```
 
-## 🚀 API Endpoints
+✅ Server running at: `http://localhost:8080`
 
-### HR Agent Endpoints
-![alt text](image-1.png)
-#### 1. Analyze Job Description
+---
 
-```bash
+## 🌐 API Endpoints
+
+### 🎯 HR Agent APIs
+
+![HR Agent Flow](image-1.png)
+
+#### **1. Analyze Job Description**
+
+```http
 POST /api/rags/hr-agent/analyze-jd
+Content-Type: application/json
 ```
 
-**Request:**
+**Request Body:**
 ```json
 {
-  "jdText": "We are looking for a Senior Software Engineer...",
+  "jdText": "We are looking for a Senior Software Engineer with 5+ years...",
   "metadata": {
     "position": "Senior Software Engineer",
     "company": "ABC Corp",
@@ -232,42 +319,65 @@ POST /api/rags/hr-agent/analyze-jd
   "data": {
     "basic_stats": {
       "word_count": 450,
-      "readability_score": 65.2
+      "readability_score": 65.2,
+      "reading_time_minutes": 2
     },
     "extracted_features": {
-      "skills": ["React", "Node.js", "AWS"],
-      "seniority_level": { "level": "senior", "confidence": 85 }
+      "skills": ["React", "Node.js", "AWS", "Docker"],
+      "seniority_level": {
+        "level": "senior",
+        "confidence": 85
+      }
     },
     "llm_analysis": {
-      "length_analysis": { "assessment": "optimal" },
-      "skill_gaps": [...],
-      "competitiveness_score": { "score": 78 }
+      "length_analysis": {
+        "assessment": "optimal",
+        "recommendation": "Length is appropriate for senior role"
+      },
+      "skill_gaps": [
+        "Missing soft skills requirements",
+        "No mention of team collaboration"
+      ],
+      "competitiveness_score": {
+        "score": 78,
+        "factors": {
+          "salary": 85,
+          "benefits": 70,
+          "growth": 80
+        }
+      }
     }
   }
 }
 ```
 
-#### 2. Optimize Job Description
+---
 
-```bash
+#### **2. Optimize Job Description**
+
+```http
 POST /api/rags/hr-agent/optimize-jd
+Content-Type: application/json
 ```
 
-**Request:**
+**Request Body:**
 ```json
 {
-  "jdText": "...",
+  "jdText": "We need a developer...",
   "focusAreas": ["skills", "tone", "structure"]
 }
 ```
 
-#### 3. Benchmark Salary
+---
 
-```bash
+#### **3. Benchmark Salary**
+
+```http
 POST /api/rags/hr-agent/benchmark-salary
+Content-Type: application/json
 ```
 
-**Request:**
+**Request Body:**
 ```json
 {
   "position": "Senior Software Engineer",
@@ -277,65 +387,69 @@ POST /api/rags/hr-agent/benchmark-salary
 }
 ```
 
-#### 4. Chat with Agent
-
-```bash
-POST /api/rags/hr-agent/chat
-```
-
-**Request:**
+**Response:**
 ```json
 {
-  "message": "Phân tích JD này giúp tôi",
-  "sessionId": "optional-session-id",
-  "jdContext": "optional JD text"
+  "success": true,
+  "data": {
+    "market_range": {
+      "min": 30000000,
+      "median": 40000000,
+      "max": 55000000,
+      "currency": "VND"
+    },
+    "competitor_average": 42000000,
+    "location_adjustment": 1.15,
+    "confidence_level": 0.85,
+    "insights": [
+      "Salary is competitive for HCMC market",
+      "Consider adding stock options to attract top talent"
+    ]
+  }
 }
 ```
 
-#### 5. Get Conversation History
+---
 
-```bash
+#### **4. Chat with HR Agent**
+
+```http
+POST /api/rags/hr-agent/chat
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "message": "Làm sao để viết JD tốt cho Senior Engineer?",
+  "sessionId": "optional-session-id",
+  "jdContext": "optional JD text for context"
+}
+```
+
+---
+
+#### **5. Get Conversation History**
+
+```http
 GET /api/rags/hr-agent/history/:sessionId
 ```
 
-### Vector Store Endpoints
+---
 
-#### Add Documents
+### 🎓 Candidate Agent APIs
 
-```bash
-POST /api/rags/vector-store/add
-```
+#### **1. Upload CV**
 
-**Request:**
-```json
-{
-  "collectionName": "marketTrends",
-  "documents": ["Market trend 1", "Market trend 2"],
-  "metadatas": [
-    { "source": "report1", "date": "2024-01" },
-    { "source": "report2", "date": "2024-02" }
-  ]
-}
-```
-
-#### Get Statistics
-
-```bash
-GET /api/rags/vector-store/stats
-```
-
-### Candidate Agent Endpoints
-
-#### 1. Upload CV
-
-```bash
+```http
 POST /api/rags/candidate-agent/upload-cv
+Content-Type: multipart/form-data
 ```
 
-**Request (multipart/form-data):**
+**cURL Example:**
 ```bash
 curl -X POST http://localhost:8080/api/rags/candidate-agent/upload-cv \
-  -F "cv=@/path/to/cv.pdf" \
+  -F "cv=@/path/to/resume.pdf" \
   -F "userId=user123"
 ```
 
@@ -356,9 +470,14 @@ curl -X POST http://localhost:8080/api/rags/candidate-agent/upload-cv \
       "personalInfo": {
         "name": "Nguyen Van A",
         "email": "nguyenvana@example.com",
-        "phone": "+84 123 456 789"
+        "phone": "+84 123 456 789",
+        "linkedin": "linkedin.com/in/nguyenvana",
+        "github": "github.com/nguyenvana"
       },
-      "skills": ["React", "Node.js", "MongoDB", "..."],
+      "skills": {
+        "technical": ["React", "Node.js", "MongoDB", "Docker"],
+        "soft": ["Leadership", "Communication", "Problem-solving"]
+      },
       "yearsOfExperience": 5.2,
       "careerLevel": {
         "level": "senior",
@@ -369,13 +488,16 @@ curl -X POST http://localhost:8080/api/rags/candidate-agent/upload-cv \
 }
 ```
 
-#### 2. Analyze CV
+---
 
-```bash
+#### **2. Analyze CV**
+
+```http
 POST /api/rags/candidate-agent/analyze-cv
+Content-Type: application/json
 ```
 
-**Request:**
+**Request Body:**
 ```json
 {
   "userId": "user123"
@@ -390,14 +512,14 @@ POST /api/rags/candidate-agent/analyze-cv
     "analysis": {
       "overall_score": 78,
       "strengths": [
-        "Strong full-stack development skills",
-        "5+ years experience with modern tech stack",
-        "Leadership experience in team projects"
+        "💪 Strong full-stack development skills (React + Node.js)",
+        "🚀 5+ years experience with modern tech stack",
+        "👥 Leadership experience in team projects"
       ],
       "critical_gaps": [
-        "Missing cloud platform experience (AWS/Azure)",
-        "No CI/CD pipeline knowledge",
-        "Limited DevOps skills"
+        "⚠️ Missing cloud platform experience (AWS/Azure)",
+        "⚠️ No CI/CD pipeline knowledge",
+        "⚠️ Limited DevOps skills"
       ],
       "level_assessment": {
         "current": "senior",
@@ -405,7 +527,18 @@ POST /api/rags/candidate-agent/analyze-cv
         "timeline_to_next": "6-12 months with cloud and DevOps upskilling"
       },
       "skill_priority_matrix": {
-        "high_priority": ["AWS", "Docker", "Kubernetes"],
+        "high_priority": [
+          {
+            "skill": "AWS",
+            "reason": "Required by 85% of senior roles",
+            "learning_time": "2-3 months"
+          },
+          {
+            "skill": "Docker/Kubernetes",
+            "reason": "Essential for modern deployment",
+            "learning_time": "1-2 months"
+          }
+        ],
         "medium_priority": ["System Design", "Microservices"],
         "low_priority": ["GraphQL", "TypeScript"]
       },
@@ -416,22 +549,25 @@ POST /api/rags/candidate-agent/analyze-cv
       ],
       "salary_range_vnd": "35M - 50M",
       "recommendations": [
-        "Complete AWS certification to boost cloud skills",
-        "Build a microservices project to demonstrate architecture knowledge",
-        "Contribute to open-source DevOps tools"
+        "📚 Complete AWS certification to boost cloud skills",
+        "🛠️ Build a microservices project for portfolio",
+        "🌟 Contribute to open-source DevOps tools"
       ]
     }
   }
 }
 ```
 
-#### 3. Match Jobs
+---
 
-```bash
+#### **3. Match Jobs**
+
+```http
 POST /api/rags/candidate-agent/match-jobs
+Content-Type: application/json
 ```
 
-**Request:**
+**Request Body:**
 ```json
 {
   "userId": "user123",
@@ -458,32 +594,41 @@ POST /api/rags/candidate-agent/match-jobs
         "salary": "40M - 55M VND",
         "fitScore": 92,
         "skillMatchRate": 85,
+        "experienceLevelMatch": 95,
         "matchedSkills": ["React", "Node.js", "MongoDB", "REST API"],
-        "explanation": "Excellent match! Your 5 years of full-stack experience with React and Node.js aligns perfectly with their requirements. The role focuses on building scalable web applications, which matches your project history."
+        "missingSkills": ["AWS", "Docker"],
+        "explanation": "🎯 Excellent match! Your 5 years of full-stack experience with React and Node.js aligns perfectly with their requirements. The role focuses on building scalable web applications, which matches your project history.",
+        "prepTips": [
+          "Brush up on AWS basics for technical interview",
+          "Prepare system design case studies"
+        ]
       },
       {
         "jobId": "job_002",
         "title": "Backend Engineer",
         "company": "Fintech Corp",
         "fitScore": 88,
-        "explanation": "Strong fit based on your backend expertise. However, they prefer candidates with cloud experience (AWS), which you can develop."
+        "explanation": "💪 Strong fit based on your backend expertise. They prefer AWS experience, which you can develop."
       }
     ]
   }
 }
 ```
 
-#### 4. Optimize CV for Target JD
+---
 
-```bash
+#### **4. Optimize CV for Target JD**
+
+```http
 POST /api/rags/candidate-agent/optimize-cv
+Content-Type: application/json
 ```
 
-**Request:**
+**Request Body:**
 ```json
 {
   "userId": "user123",
-  "targetJD": "We are looking for a Senior Full-stack Developer with React, Node.js, AWS experience..."
+  "targetJD": "We are looking for a Senior Full-stack Developer with React, Node.js, AWS..."
 }
 ```
 
@@ -492,7 +637,7 @@ POST /api/rags/candidate-agent/optimize-cv
 {
   "success": true,
   "data": {
-    "optimized_cv": "NGUYEN VAN A\nSenior Full-stack Developer\n...\n\nSKILLS\n• Frontend: React, Redux, JavaScript, HTML5, CSS3\n• Backend: Node.js, Express, RESTful APIs\n• Cloud: AWS (EC2, S3, Lambda) - Currently learning\n• Database: MongoDB, PostgreSQL\n...",
+    "optimized_cv": "NGUYEN VAN A\nSenior Full-stack Developer\nEmail: nguyenvana@example.com | Phone: +84 123 456 789\nLinkedIn: linkedin.com/in/nguyenvana | GitHub: github.com/nguyenvana\n\nPROFESSIONAL SUMMARY\nResults-driven Senior Full-stack Developer with 5+ years of experience building scalable web applications using React and Node.js. Proven track record of delivering high-performance solutions and leading cross-functional teams.\n\nTECHNICAL SKILLS\n• Frontend: React, Redux, JavaScript (ES6+), HTML5, CSS3, Responsive Design\n• Backend: Node.js, Express.js, RESTful APIs, GraphQL\n• Cloud & DevOps: AWS (EC2, S3, Lambda) - Currently upskilling, Docker (Basic)\n• Databases: MongoDB, PostgreSQL, Redis\n• Tools: Git, JIRA, CI/CD pipelines\n\nWORK EXPERIENCE\n\nSenior Full-stack Developer | ABC Tech Company\nJanuary 2021 - Present\n• Developed and maintained 15+ RESTful APIs serving 50K+ daily active users using Node.js and Express\n• Optimized React application performance, reducing load time by 40% through code splitting and lazy loading\n• Led a team of 3 developers in migrating legacy systems to modern tech stack\n• Technologies: React, Node.js, MongoDB, AWS S3, Docker\n\nFull-stack Developer | XYZ Startup\nJune 2018 - December 2020\n• Built responsive web applications from scratch using React and Node.js\n• Implemented real-time features using WebSockets, improving user engagement by 30%\n• Collaborated with designers and product managers in Agile environment\n\nEDUCATION\nBachelor of Computer Science | University of Technology\nGraduated: 2018 | GPA: 3.5/4.0\n\nCERTIFICATIONS\n• AWS Solutions Architect Associate (In Progress)\n• MongoDB Certified Developer\n\nPROJECTS\nE-commerce Platform: Full-stack web app with React frontend and Node.js backend, handling 10K+ transactions\nReal-time Chat Application: WebSocket-based chat using Socket.io and MongoDB\n",
     "ats_score": {
       "overall_score": 85,
       "scores": {
@@ -502,26 +647,43 @@ POST /api/rags/candidate-agent/optimize-cv
         "structure_score": 85
       },
       "ats_friendly": true,
+      "matched_keywords": [
+        "React", "Node.js", "AWS", "RESTful API", "MongoDB",
+        "Full-stack", "Senior", "Scalable", "Team Lead"
+      ],
+      "missing_keywords": [
+        "Kubernetes", "Microservices", "CI/CD"
+      ],
       "issues": [
         {
           "type": "warning",
-          "message": "Keyword 'AWS' appears only once - consider adding more context"
+          "severity": "medium",
+          "message": "AWS mentioned but limited context - add more projects or certifications"
         }
       ],
       "suggestions": [
-        "Add AWS projects or certifications to strengthen cloud experience",
-        "Use more action verbs: 'Developed', 'Implemented', 'Optimized'",
-        "Quantify achievements with metrics (e.g., 'Improved performance by 40%')"
+        "✅ Add AWS projects or certifications to strengthen cloud experience",
+        "✅ Use more action verbs: 'Architected', 'Spearheaded', 'Orchestrated'",
+        "✅ Quantify more achievements with metrics (e.g., 'Reduced deployment time by 50%')",
+        "✅ Add a 'Professional Development' section mentioning ongoing AWS learning"
       ]
     },
-    "keywords_matched": 15
+    "keywords_matched": 15,
+    "keywords_missing": 3,
+    "improvement_areas": [
+      "Cloud experience (AWS/Azure)",
+      "DevOps practices (CI/CD, Kubernetes)",
+      "System architecture examples"
+    ]
   }
 }
 ```
 
-#### 5. Get Candidate Profile
+---
 
-```bash
+#### **5. Get Candidate Profile**
+
+```http
 GET /api/rags/candidate-agent/profile/:userId
 ```
 
@@ -539,148 +701,275 @@ GET /api/rags/candidate-agent/profile/:userId
         "confidence": 80
       },
       "skillCount": 18,
-      "topSkills": ["React", "Node.js", "MongoDB", "..."]
+      "topSkills": ["React", "Node.js", "MongoDB", "JavaScript", "REST API"]
     },
     "totalVersions": 3,
     "currentVersion": 3,
-    "jobMatches": 12
+    "jobMatches": 12,
+    "lastActivity": "2024-01-15T10:30:00Z"
   }
 }
 ```
 
-## 📊 Testing
+---
 
-### Test với Sample JD
+### 📊 Vector Store Management APIs
+
+#### **Add Documents**
+
+```http
+POST /api/rags/vector-store/add
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "collectionName": "marketTrends",
+  "documents": [
+    "AI and Machine Learning skills are in high demand in 2024",
+    "Remote work preferences increasing among tech professionals"
+  ],
+  "metadatas": [
+    { "source": "industry-report-2024", "date": "2024-01", "category": "trends" },
+    { "source": "workplace-survey", "date": "2024-02", "category": "preferences" }
+  ]
+}
+```
+
+---
+
+#### **Get Vector Store Statistics**
+
+```http
+GET /api/rags/vector-store/stats
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "collections": {
+      "hr_market_trends": { "document_count": 487 },
+      "hr_jd_templates": { "document_count": 215 },
+      "hr_salary_data": { "document_count": 1024 },
+      "candidate_skill_standards": { "document_count": 312 },
+      "candidate_job_postings": { "document_count": 1856 },
+      "candidate_cv_templates": { "document_count": 98 }
+    },
+    "total_documents": 3992
+  }
+}
+```
+
+---
+
+## 🧪 Testing
+
+### Test HR Agent
 
 ```bash
-# Read sample JD
-cat data/hr-knowledge-base/sample-jd-senior-engineer.md
-
-# Analyze it
+# 1. Test with sample JD
 curl -X POST http://localhost:8080/api/rags/hr-agent/analyze-jd \
   -H "Content-Type: application/json" \
-  -d "{\"jdText\": \"$(cat data/hr-knowledge-base/sample-jd-senior-engineer.md)\"}"
+  -d @data/hr-knowledge-base/sample-jd-senior-engineer.json
+
+# 2. Test chat flow
+curl -X POST http://localhost:8080/api/rags/hr-agent/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Làm sao để viết JD tốt cho Senior Engineer?",
+    "sessionId": "test-session-123"
+  }'
+
+# 3. Test salary benchmark
+curl -X POST http://localhost:8080/api/rags/hr-agent/benchmark-salary \
+  -H "Content-Type: application/json" \
+  -d '{
+    "position": "Senior Software Engineer",
+    "experience": 5,
+    "location": "Ho Chi Minh City",
+    "skills": ["React", "Node.js", "AWS"]
+  }'
 ```
 
-### Test Chat Flow
+### Test Candidate Agent
 
 ```bash
-# Start conversation
-curl -X POST http://localhost:8080/api/rags/hr-agent/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Xin chào, tôi cần giúp đỡ về JD"}'
+# 1. Upload CV
+curl -X POST http://localhost:8080/api/rags/candidate-agent/upload-cv \
+  -F "cv=@sample-cv.pdf" \
+  -F "userId=test-user-123"
 
-# Continue conversation (use sessionId from previous response)
-curl -X POST http://localhost:8080/api/rags/hr-agent/chat \
+# 2. Analyze CV
+curl -X POST http://localhost:8080/api/rags/candidate-agent/analyze-cv \
   -H "Content-Type: application/json" \
-  -d '{"message": "Làm sao để viết JD tốt cho Senior Engineer?", "sessionId": "your-session-id"}'
+  -d '{"userId": "test-user-123"}'
+
+# 3. Match jobs
+curl -X POST http://localhost:8080/api/rags/candidate-agent/match-jobs \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "test-user-123",
+    "preferences": {
+      "location": "Ho Chi Minh City",
+      "topK": 10
+    }
+  }'
+
+# 4. Get profile
+curl http://localhost:8080/api/rags/candidate-agent/profile/test-user-123
 ```
 
-## 🔧 Configuration
+---
 
-### Vector Store Collections
+## 📁 Cấu trúc Dự án
 
-- **marketTrends**: Job market trends, skill demands, industry insights
-- **jdTemplates**: JD templates, best practices, writing guidelines
-- **salaryData**: Salary benchmarks, compensation data, location adjustments
+```
+job_connection_be/
+│
+├── 📂 src/modules/RAG/
+│   │
+│   ├── 🎯 HR Agent Files
+│   │   ├── rag.controller.js           # API controllers
+│   │   ├── rag.service.js              # Business logic & RAG pipeline
+│   │   ├── rag.llm.js                  # LLM service (GPT/Qwen)
+│   │   ├── rag.memory.js               # Agent memory manager
+│   │   ├── agent-session.model.js      # MongoDB session model
+│   │   └── rag.route.js                # Route definitions
+│   │
+│   ├── 🎓 Candidate Agent Files
+│   │   ├── candidate-agent.controller.js   # API controllers
+│   │   ├── candidate-agent.service.js      # Workflows & analysis
+│   │   ├── candidate-cv-parser.js          # CV parser (PDF/DOCX)
+│   │   ├── candidate-cv.model.js           # CV database model
+│   │   ├── candidate-ats-checker.js        # ATS compatibility
+│   │   └── candidate-agent.route.js        # Route definitions
+│   │
+│   └── 🔧 Shared Infrastructure
+│       ├── rag.vectorstore.js          # Vector store manager (ChromaDB)
+│       ├── rag.embeddings.js           # Embeddings service (OpenAI)
+│       └── rag.utils.js                # Utility functions
+│
+├── 📂 data/
+│   ├── hr-knowledge-base/              # HR Agent training data
+│   │   ├── market-trends.json
+│   │   ├── jd-templates.json
+│   │   ├── salary-data.json
+│   │   └── sample-jd-senior-engineer.md
+│   │
+│   └── candidate-knowledge-base/       # Candidate Agent data
+│       ├── skill-standards.json
+│       ├── job-postings.json
+│       └── cv-templates.json
+│
+├── 📂 scripts/
+│   ├── seed-vector-stores.js           # Seed HR vectors
+│   └── seed-candidate-vectors.js       # Seed Candidate vectors
+│
+├── 📂 uploads/
+│   ├── cvs/                            # Uploaded CV files
+│   └── resumes/                        # Resume files
+│
+├── 📄 .env                             # Environment variables
+├── 📄 .env.example                     # Environment template
+├── 📄 package.json                     # Dependencies
+└── 📄 README.md                        # This file
+```
+
+---
+
+## 🔄 System Workflows
+
+### HR Agent Workflow
+```
+📄 JD Input 
+    ↓
+🔍 Parse & Extract Features
+    ↓
+🧮 Generate Embeddings
+    ↓
+📚 RAG Retrieval (Market/Templates/Salary)
+    ↓
+🧠 LLM Analysis
+    ↓
+📊 Structured Output (Analysis/Optimization/Benchmark)
+    ↓
+💾 Save to Agent Memory
+```
+
+### Candidate Agent Workflow
+```
+📤 CV Upload (PDF/DOCX)
+    ↓
+🔍 Parse CV (Skills, Experience, Education)
+    ↓
+🧮 Generate CV Embeddings
+    ↓
+📚 RAG Retrieval (Skills/Jobs/Templates)
+    ↓
+🧠 LLM Analysis & Matching
+    ↓
+📊 Output (Analysis/Job Matches/Optimized CV)
+    ↓
+💾 Save to User Profile
+```
+
+---
+
+## ⚙️ Configuration
 
 ### LLM Models
 
 Có thể thay đổi model trong `.env`:
 
 ```env
-# OpenAI
-LLM_MODEL=gpt-4o-mini  # hoặc gpt-4, gpt-3.5-turbo
+# OpenAI Models (Recommended for production)
+LLM_MODEL=gpt-4o-mini       # Fastest, cost-effective
+# LLM_MODEL=gpt-4           # Most accurate
+# LLM_MODEL=gpt-3.5-turbo   # Balanced
 
-# Hoặc sử dụng local model (cần cài Ollama)
+# Local Models (Requires Ollama)
 # LLM_MODEL=qwen2.5:7b-instruct
+# LLM_MODEL=llama3:8b
 ```
 
-## 📁 Project Structure
+### Vector Store Configuration
 
-```
-job_connecction_be/
-├── src/modules/RAG/
-│   # HR Agent Files
-│   ├── rag.controller.js           # HR Agent API controllers
-│   ├── rag.service.js              # HR Agent business logic & RAG pipeline
-│   ├── rag.llm.js                  # LLM service (Qwen2.5 local model)
-│   ├── rag.memory.js               # Agent memory manager
-│   ├── agent-session.model.js      # MongoDB session model
-│   │
-│   # Candidate Agent Files
-│   ├── candidate-agent.controller.js   # Candidate Agent API controllers
-│   ├── candidate-agent.service.js      # Candidate Agent workflows
-│   ├── candidate-agent.route.js        # Candidate Agent routes
-│   ├── candidate-cv-parser.js          # CV parser (PDF/DOCX)
-│   ├── candidate-cv.model.js           # Candidate CV database model
-│   ├── candidate-ats-checker.js        # ATS compatibility checker
-│   │
-│   # Shared Infrastructure
-│   ├── rag.route.js                # Main route definitions
-│   ├── rag.vectorstore.js          # Vector store manager (ChromaDB)
-│   ├── rag.embeddings.js           # Embeddings service (OpenAI)
-│   └── rag.utils.js                # Utility functions
-│
-├── data/
-│   ├── hr-knowledge-base/          # HR Agent data
-│   │   ├── market-trends.json
-│   │   ├── jd-templates.json
-│   │   ├── salary-data.json
-│   │   └── sample-jd-senior-engineer.md
-│   │
-│   └── candidate-knowledge-base/   # Candidate Agent data (to be created)
-│       ├── skill-standards.json
-│       ├── job-postings.json
-│       └── cv-templates.json
-│
-├── scripts/
-│   ├── seed-vector-stores.js       # Seed HR vector stores
-│   └── seed-candidate-vectors.js   # Seed Candidate vector stores (to be created)
-│
-├── uploads/
-│   ├── cvs/                        # Uploaded CV files
-│   └── resumes/                    # Resume files
-│
-└── .env
+```env
+# Use ChromaDB server
+CHROMA_URL=http://localhost:8000
+
+# Or use in-memory (for development)
+# Leave CHROMA_URL empty to use in-memory
 ```
 
-## 🔄 System Workflow
+---
 
-### HR Agent Workflow
+## 🚀 Deployment
+
+### Production Checklist
+
+- [ ] Set `NODE_ENV=production`
+- [ ] Configure MongoDB Atlas or production database
+- [ ] Set up ChromaDB persistent storage
+- [ ] Add rate limiting and authentication
+- [ ] Set up logging and monitoring
+- [ ] Configure CORS for your frontend domain
+- [ ] Set up SSL/TLS certificates
+- [ ] Configure environment variables securely
+- [ ] Set up backup strategy for MongoDB and vector stores
+
+### Docker Deployment (Coming Soon)
+
+```bash
+# Build and run with docker-compose
+docker-compose up -d
 ```
-JD Input → Parse → RAG (Market/Templates/Salary) → LLM Analysis → Output
-```
 
-### Candidate Agent Workflow
-```
-CV Upload → Parse → Embedding → RAG (Skills/Jobs/Templates) → LLM Analysis → Output
-```
-
-## 📊 Vector Store Collections
-
-### HR Agent Collections (3)
-- `hr_market_trends` - Job market trends and skill demands
-- `hr_jd_templates` - JD templates and best practices  
-- `hr_salary_data` - Salary benchmarks and compensation data
-
-### Candidate Agent Collections (3)
-- `candidate_skill_standards` - Skill requirements by level
-- `candidate_job_postings` - Available job postings
-- `candidate_cv_templates` - ATS-friendly CV templates
+---
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## 📝 License
-
-MIT
-
-## 🙋 Support
-
-For issues and questions, please open an issue on GitHub.
+Chúng tôi luôn chào đ
