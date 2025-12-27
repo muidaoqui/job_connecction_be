@@ -17,8 +17,8 @@ import recruiterRoutes from "./src/modules/recruiter/recruiter.route.js";
 import recruiterAppRoutes from "./src/modules/candidate/applications/recruiter-application.route.js";
 import companyRoutes from "./src/modules/recruiter/company/company.route.js";
 import embeddingRoutes from "./src/modules/embedding/embedding.route.js";
-// import LLMRoute from "./src/modules/LLM/llm.route.js";
-// import ragRouters from "./src/modules/RAG/rag.route.js";
+import LLMRoute from "./src/modules/LLM/llm.route.js";
+import ragRouters from "./src/modules/RAG/rag.route.js";
 // Đường dẫn tuyệt đối của thư mục hiện tại
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -72,6 +72,13 @@ app.use(
       // Cho phép Postman / server-to-server
       if (!origin) return callback(null, true);
 
+      // Cho phép Chrome extensions
+      if (origin && origin.startsWith("chrome-extension://")) {
+        console.log("✅ Allowing Chrome extension:", origin);
+        return callback(null, true);
+      }
+
+      // Cho phép các origins trong whitelist
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
@@ -128,8 +135,8 @@ app.use("/api/recruiter/applications", recruiterAppRoutes);
 
 // AI / Search
 app.use("/api/embeddings", embeddingRoutes);
-// app.use("/api/rags", ragRouters);
-// app.use("/api/llm", LLMRoute);
+app.use("/api/rags", ragRouters);
+app.use("/api/llm", LLMRoute);
 
 // KẾT NỐI MONGO DB
 mongoose

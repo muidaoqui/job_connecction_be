@@ -1,40 +1,18 @@
 // rag.service.js
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-// import { HNSWLib } from '@langchain/community/vectorstores/hnswlib';
-// import { HuggingFaceTransformersEmbeddings } from '@langchain/community/embeddings/hf_transformers';
 import { Document } from "@langchain/core/documents";
-// import { ChatOpenAI } from '@langchain/openai'; // Hoặc thay bằng LLM local như Ollama nếu cần fully local
-// import { RetrievalQAChain } from 'langchain/chains';
-// import fs from 'fs/promises';
-// import path from 'path';
+import vectorStore from './rag.vectorstore.js';
+import embeddingsService from './rag.embeddings.js';
+import llmService from './rag.llm.js';
+import memoryManager from './rag.memory.js';
+import { extractSkillsFromJD, detectSeniorityLevel, calculateReadabilityScore } from './rag.utils.js';
 
-// Khởi tạo embeddings local (sử dụng model từ HuggingFace, chạy local qua Transformers.js)
-// const embeddings = new HuggingFaceTransformersEmbeddings({
-//   model: 'Xenova/all-MiniLM-L6-v2', // Model embedding nhỏ, multilingual, chạy local
-// });
-
-// Vector store local (HNSWLib - lưu trên disk)
-// let vectorStore = null;
-// const vectorStorePath = path.join(__dirname, '../../vectorstore'); // Lưu local
-
-// // Hàm load hoặc init vector store
-// async function loadVectorStore() {
-//   if (vectorStore) return vectorStore;
-//   if (fs.existsSync(vectorStorePath)) {
-//     vectorStore = await HNSWLib.load(vectorStorePath, embeddings);
-//   } else {
-//     vectorStore = await HNSWLib.fromDocuments([], embeddings);
-//     await vectorStore.save(vectorStorePath);
-//   }
-//   return vectorStore;
-// }
 /**
  * Upload document và chia thành chunks
  * @param {string} text - Nội dung document
  * @param {object} metadata - Metadata (fileName, userId, etc.)
  * @returns {Promise<object>} - Kết quả upload
  */
-// Hàm upload và process document (ví dụ text từ PDF đã extract)
 export async function uploadDocument(text, metadata = {}) {
   const splitter = new RecursiveCharacterTextSplitter({
     chunkSize: 1000,
@@ -45,38 +23,309 @@ export async function uploadDocument(text, metadata = {}) {
     new Document({ pageContent: text, metadata }),
   ]);
 
-  // TODO: Uncomment khi đã setup vector store
-  // const store = await loadVectorStore();
-  // await store.addDocuments(docs);
-  // await store.save(vectorStorePath);
-
-  return { 
-    success: true, 
+  return {
+    success: true,
     chunks: docs.length,
     chunkDetails: docs.map((doc, idx) => ({
       chunkId: idx,
       length: doc.pageContent.length,
-      preview: doc.pageContent,
+      preview: doc.pageContent.substring(0, 100) + '...',
     }))
   };
 }
 
-// Hàm query RAG
-// export async function queryRAG(question) {
-//   const store = await loadVectorStore();
+/**
+ * ============================================
+ * RAG PIPELINE FUNCTIONS
+ * ============================================
+ */
 
-//   // LLM (sử dụng OpenAI làm ví dụ; thay bằng Ollama cho local: new Ollama({ model: 'llama3' }))
-//   const llm = new ChatOpenAI({ model: 'gpt-4o-mini', temperature: 0 });
+/**
+ * Retrieve relevant context từ vector stores
+ * @param {string} query - Search query
+ * @param {Array} collections - Collections to search
+ * @param {number} topK - Number of results per collection
+ */
+export async function retrieveRelevantContext(query, collections = ['marketTrends', 'jdTemplates', 'salaryData'], topK = 3) {
+  try {
+    await vectorStore.initialize();
 
-//   // Chain RAG đơn giản
-//   const chain = RetrievalQAChain.fromLLM(llm, store.asRetriever(4), {
-//     returnSourceDocuments: true,
-//   });
+    const results = await vectorStore.multiSearch(query, collections, topK);
 
-//   const result = await chain.invoke({ query: question });
-//   return {
-//     answer: result.text,
-//     sources: result.sourceDocuments.map(doc => doc.metadata),
-//   };
-// }
+    // Format context
+    let contextText = '';
+    for (const [collectionName, docs] of Object.entries(results)) {
+      if (docs.length > 0) {
+        contextText += `\n=== ${collectionName.toUpperCase()} ===\n`;
+        docs.forEach((doc, idx) => {
+          contextText += `[${idx + 1}] ${doc.document}\n`;
+          if (doc.metadata?.source) {
+            contextText += `   Source: ${doc.metadata.source}\n`;
+          }
+        });
+      }
+    }
 
+    return {
+      contextText,
+      sources: results,
+      totalResults: Object.values(results).reduce((sum, docs) => sum + docs.length, 0),
+    };
+  } catch (error) {
+    console.error('❌ Error retrieving context:', error);
+    // Return empty context if vector store not available
+    return {
+      contextText: '',
+      sources: {},
+      totalResults: 0,
+      error: error.message,
+    };
+  }
+}
+
+/**
+ * ============================================
+ * HR AGENT FUNCTIONS
+ * ============================================
+ */
+
+/**
+ * Analyze Job Description
+ * @param {string} jdText - JD content
+ * @param {object} metadata - JD metadata (position, company, location)
+ */
+export async function analyzeJobDescription(jdText, metadata = {}) {
+  try {
+    console.log('🔍 Analyzing Job Description...');
+
+    // 1. Extract basic features
+    const wordCount = jdText.split(/\s+/).length;
+    const skills = extractSkillsFromJD(jdText);
+    const seniorityLevel = detectSeniorityLevel(jdText);
+    const readabilityScore = calculateReadabilityScore(jdText);
+
+    // 2. Retrieve relevant context from vector stores
+    const query = `Job description analysis for ${metadata.position || 'position'}: ${jdText.substring(0, 500)}`;
+    const context = await retrieveRelevantContext(query, ['marketTrends', 'jdTemplates'], 3);
+
+    // 3. Generate analysis using LLM
+    llmService.initialize();
+    const llmAnalysis = await llmService.analyzeJD(jdText, context.contextText);
+
+    // 4. Combine results
+    const analysis = {
+      basic_stats: {
+        word_count: wordCount,
+        character_count: jdText.length,
+        readability_score: readabilityScore,
+      },
+      extracted_features: {
+        skills: skills,
+        seniority_level: seniorityLevel,
+      },
+      llm_analysis: llmAnalysis,
+      context_sources: context.sources,
+      metadata: metadata,
+      timestamp: new Date().toISOString(),
+    };
+
+    console.log('✅ JD Analysis completed');
+    return analysis;
+  } catch (error) {
+    console.error('❌ Error analyzing JD:', error);
+    throw error;
+  }
+}
+
+/**
+ * Optimize Job Description
+ * @param {string} jdText - JD content
+ * @param {Array} focusAreas - Areas to focus on
+ */
+export async function optimizeJobDescription(jdText, focusAreas = []) {
+  try {
+    console.log('💡 Optimizing Job Description...');
+
+    // 1. Retrieve best practices from vector store
+    const query = `Job description optimization best practices: ${jdText.substring(0, 500)}`;
+    const context = await retrieveRelevantContext(query, ['jdTemplates'], 5);
+
+    // 2. Generate optimization suggestions using LLM
+    llmService.initialize();
+    const suggestions = await llmService.optimizeJD(jdText, context.contextText, focusAreas);
+
+    // 3. Add context sources
+    const result = {
+      suggestions: suggestions,
+      context_sources: context.sources,
+      focus_areas: focusAreas,
+      timestamp: new Date().toISOString(),
+    };
+
+    console.log('✅ JD Optimization completed');
+    return result;
+  } catch (error) {
+    console.error('❌ Error optimizing JD:', error);
+    throw error;
+  }
+}
+
+/**
+ * Benchmark Salary
+ * @param {string} position - Job position
+ * @param {number} experience - Years of experience
+ * @param {string} location - Location
+ * @param {Array} skills - Required skills
+ */
+export async function benchmarkSalary(position, experience, location, skills = []) {
+  try {
+    console.log('💰 Benchmarking Salary...');
+
+    // 1. Retrieve salary data from vector store
+    const query = `Salary data for ${position} with ${experience} years experience in ${location}, skills: ${skills.join(', ')}`;
+    const context = await retrieveRelevantContext(query, ['salaryData'], 5);
+
+    // 2. Generate salary recommendation using LLM
+    llmService.initialize();
+    const recommendation = await llmService.benchmarkSalary(position, experience, location, skills, context.contextText);
+
+    // 3. Add context sources
+    const result = {
+      recommendation: recommendation,
+      context_sources: context.sources,
+      input: {
+        position,
+        experience,
+        location,
+        skills,
+      },
+      timestamp: new Date().toISOString(),
+    };
+
+    console.log('✅ Salary Benchmark completed');
+    return result;
+  } catch (error) {
+    console.error('❌ Error benchmarking salary:', error);
+    throw error;
+  }
+}
+
+/**
+ * Chat with HR Agent (multi-turn conversation)
+ * @param {string} message - User message
+ * @param {string} sessionId - Session ID
+ * @param {string} jdContext - Optional JD context
+ */
+export async function chatWithAgent(message, sessionId = null, jdContext = null) {
+  try {
+    console.log('💬 Processing chat message...');
+
+    // 1. Get or create session
+    const session = await memoryManager.getOrCreateSession(sessionId);
+
+    // 2. Get conversation history
+    const conversationHistory = await memoryManager.getConversationHistory(session.sessionId, 10);
+
+    // 3. Build context
+    let contextText = '';
+
+    // Add JD context if provided
+    if (jdContext) {
+      contextText += `Current Job Description:\n${jdContext}\n\n`;
+    } else {
+      // Try to get latest JD from session
+      const latestJD = await memoryManager.getLatestJD(session.sessionId);
+      if (latestJD) {
+        contextText += `Current Job Description (Version ${latestJD.version}):\n${latestJD.text}\n\n`;
+      }
+    }
+
+    // Retrieve relevant knowledge
+    const retrievedContext = await retrieveRelevantContext(message, ['marketTrends', 'jdTemplates', 'salaryData'], 2);
+    contextText += retrievedContext.contextText;
+
+    // 4. Generate response
+    llmService.initialize();
+    const response = await llmService.chat(message, conversationHistory, contextText);
+
+    // 5. Save to memory
+    await memoryManager.addMessage(session.sessionId, 'user', message);
+    await memoryManager.addMessage(session.sessionId, 'assistant', response.content, retrievedContext.sources);
+
+    // 6. Return response
+    const result = {
+      sessionId: session.sessionId,
+      response: response.content,
+      sources: retrievedContext.sources,
+      usage: response.usage,
+      timestamp: new Date().toISOString(),
+    };
+
+    console.log('✅ Chat response generated');
+    return result;
+  } catch (error) {
+    console.error('❌ Error in chat:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get agent conversation history
+ * @param {string} sessionId - Session ID
+ */
+export async function getAgentHistory(sessionId) {
+  try {
+    const session = await memoryManager.getSession(sessionId);
+
+    return {
+      sessionId: session.sessionId,
+      conversationHistory: session.conversationHistory,
+      jdVersions: session.jdVersions,
+      metadata: session.metadata,
+      stats: await memoryManager.getSessionStats(sessionId),
+    };
+  } catch (error) {
+    console.error('❌ Error getting history:', error);
+    throw error;
+  }
+}
+
+/**
+ * Add documents to vector store
+ * @param {string} collectionName - Collection name
+ * @param {Array} documents - Documents to add
+ * @param {Array} metadatas - Metadata for documents
+ */
+export async function addToVectorStore(collectionName, documents, metadatas = null) {
+  try {
+    console.log(`📥 Adding ${documents.length} documents to ${collectionName}...`);
+
+    await vectorStore.initialize();
+    embeddingsService.initialize();
+
+    // Generate embeddings
+    const embeddings = await embeddingsService.embedBatch(documents);
+
+    // Add to vector store
+    const result = await vectorStore.addDocuments(collectionName, documents, embeddings, metadatas);
+
+    console.log('✅ Documents added to vector store');
+    return result;
+  } catch (error) {
+    console.error('❌ Error adding to vector store:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get vector store statistics
+ */
+export async function getVectorStoreStats() {
+  try {
+    await vectorStore.initialize();
+    return await vectorStore.getAllStats();
+  } catch (error) {
+    console.error('❌ Error getting vector store stats:', error);
+    return { error: error.message };
+  }
+}

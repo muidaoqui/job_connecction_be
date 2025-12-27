@@ -1,23 +1,63 @@
 import express from "express";
-import { readPDF  } from "./rag.controller.js";
-import { uploadRagDocument } from "./rag.controller.js";
+import {
+    readPDF,
+    uploadRagDocument,
+    analyzeJD,
+    optimizeJD,
+    benchmarkSalaryController,
+    chatWithHRAgent,
+    getHistory,
+    addDocumentsToVectorStore,
+    getVectorStats
+} from "./rag.controller.js";
+import candidateAgentRoutes from "./candidate-agent.route.js";
+
 const router = express.Router();
+
+// ============================================
+// EXISTING ROUTES
+// ============================================
 
 // Route đọc PDF
 router.post("/read-pdf", readPDF);
-// curl -X POST "http://localhost:8080/api/rags/read-pdf" \
-//   -H "Content-Type: application/json" \
-//   -d '{"filePath":"D:/Job_Connection/uploads/resumes/your_cv.pdf"}'
-// curl -X POST http://localhost:8080/api/rags/preprocess-text \
-//   -H "Content-Type: application/json" \
-//   -d '{
-//     "text": "Đây là một đoạn văn bản mẫu. Nó sẽ được xử lý! Bạn có thể kiểm tra kết quả?",
-//     "chunkSize": 1000,
-//     "chunkOverlap": 200
-//   }'
+
 // Route upload document vào RAG
 router.post('/upload', uploadRagDocument);
 
-// Route query RAG
-// router.post('/query', queryRag);
+// ============================================
+// HR AGENT ROUTES
+// ============================================
+
+// Analyze Job Description
+router.post('/hr-agent/analyze-jd', analyzeJD);
+
+// Optimize Job Description
+router.post('/hr-agent/optimize-jd', optimizeJD);
+
+// Benchmark Salary
+router.post('/hr-agent/benchmark-salary', benchmarkSalaryController);
+
+// Chat with HR Agent
+router.post('/hr-agent/chat', chatWithHRAgent);
+
+// Get Agent History
+router.get('/hr-agent/history/:sessionId', getHistory);
+
+// ============================================
+// VECTOR STORE ROUTES
+// ============================================
+
+// Add documents to vector store
+router.post('/vector-store/add', addDocumentsToVectorStore);
+
+// Get vector store statistics
+router.get('/vector-store/stats', getVectorStats);
+
+// ============================================
+// CANDIDATE AGENT ROUTES
+// ============================================
+
+// Mount candidate agent routes
+router.use(candidateAgentRoutes);
+
 export default router;

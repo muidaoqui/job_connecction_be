@@ -1,0 +1,45 @@
+[
+    {
+        "content": "Best practice for Senior Software Engineer JD: Clearly separate must-have skills (3-5 years experience, proficiency in core tech stack) from nice-to-have skills (additional frameworks, certifications). Use action-oriented language to describe responsibilities.",
+        "metadata": {
+            "source": "HR Best Practices Guide",
+            "position": "Software Engineer",
+            "level": "Senior"
+        }
+    },
+    {
+        "content": "Effective JD structure: 1) Company overview (2-3 sentences), 2) Role summary (1 paragraph), 3) Key responsibilities (5-7 bullet points), 4) Required qualifications (must-have), 5) Preferred qualifications (nice-to-have), 6) Benefits and perks.",
+        "metadata": {
+            "source": "JD Writing Guide",
+            "category": "structure"
+        }
+    },
+    {
+        "content": "Avoid gender-biased language in job descriptions. Use neutral terms like 'they/their' instead of 'he/she'. Replace 'rockstar' or 'ninja' with 'skilled' or 'experienced'. This increases application rates by 30%.",
+        "metadata": {
+            "source": "Inclusive Hiring Research",
+            "category": "language"
+        }
+    },
+    {
+        "content": "For Product Manager roles: Emphasize cross-functional collaboration, data-driven decision making, and user-centric mindset. Include metrics ownership and stakeholder management in key responsibilities.",
+        "metadata": {
+            "source": "PM Hiring Guide",
+            "position": "Product Manager"
+        }
+    },
+    {
+        "content": "Salary transparency in JDs increases application quality by 40%. Include salary range or mention 'competitive salary based on experience' to set clear expectations.",
+        "metadata": {
+            "source": "Compensation Transparency Study",
+            "category": "compensation"
+        }
+    },
+    {
+        "content": "For junior positions: Focus on learning opportunities, mentorship programs, and growth potential. De-emphasize years of experience and emphasize willingness to learn and foundational skills.",
+        "metadata": {
+            "source": "Junior Talent Acquisition",
+            "level": "Junior"
+        }
+    }
+]
